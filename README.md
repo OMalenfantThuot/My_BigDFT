@@ -7,6 +7,7 @@ even though both packages do not provide the same API and functionalities.
 
 It is currently supported for the following python versions: 2.7, 3.6, 3.7.
 
+
 ## Installation
 
 BigDFT 1.8.2 must be installed in a given build directory.
@@ -15,6 +16,13 @@ End by running 'unset PYTHONPATH'.
 This gives the environment variables necessary for MyBigDFT to run correctly.
 
 You can now git clone this package and run 'pip install .'
+
+
+## Documentation
+
+The documentation of MyBigDFT can be found here:
+https://mmoriniere.gitlab.io/MyBigDFT/index.html
+
 
 ## Tests
 
