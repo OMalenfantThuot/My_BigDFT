@@ -184,6 +184,68 @@ class InputParams(MutableMapping):
             yaml.safe_dump(self.params, stream=f)
 
 
+PATHS = "paths"
+PRINT = "print"
+GLOBAL = "global"
+FLOAT_SCALAR = "scalar"
+ATTRIBUTES = {
+    "n_at": {PATHS: [["Atomic System Properties", "Number of atoms"]],
+             PRINT: "Number of Atoms", GLOBAL: True},
+    "boundary_conditions": {PATHS: [["Atomic System Properties",
+                                     "Boundary Conditions"]],
+                            PRINT: "Boundary Conditions", GLOBAL: True},
+    "cell": {PATHS: [["Atomic System Properties", "Box Sizes (AU)"]],
+             PRINT: "Cell size", GLOBAL: True},
+    "energy": {PATHS: [["Last Iteration", "FKS"], ["Last Iteration", "EKS"],
+                       ["Energy (Hartree)"]],
+               PRINT: "Energy", GLOBAL: False},
+    "fermi_level": {PATHS: [["Ground State Optimization", -1,
+                             "Fermi Energy"],
+                            ["Ground State Optimization", -1,
+                             "Hamiltonian Optimization", -1,
+                             "Subspace Optimization", "Fermi Energy"]],
+                    PRINT: True, GLOBAL: False},
+    "astruct": {PATHS: [["Atomic structure"]]},
+    "evals": {PATHS: [["Complete list of energy eigenvalues"],
+                      ["Ground State Optimization", -1, "Orbitals"],
+                      ["Ground State Optimization", -1,
+                       "Hamiltonian Optimization", -1,
+                       "Subspace Optimization", "Orbitals"]]},
+    "kpts": {PATHS: [["K points"]], PRINT: False, GLOBAL: True},
+    "gnrm_cv": {PATHS: [["dft", "gnrm_cv"]],
+                PRINT: "Convergence criterion on Wfn. Residue",
+                GLOBAL: True},
+    "kpt_mesh": {PATHS: [["kpt", "ngkpt"]], PRINT: True, GLOBAL: True},
+    "forcemax": {PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "maxval"],
+                         ["Clean forces norm (Ha/Bohr)", "maxval"]],
+                 PRINT: "Max val of Forces"},
+    "pressure": {PATHS: [["Pressure", "GPa"]], PRINT: True},
+    "dipole": {PATHS: [["Electric Dipole Moment (AU)", "P vector"]]},
+    "forces": {PATHS: [["Atomic Forces (Ha/Bohr)"]]},
+    "forcemax_cv": {PATHS: [["geopt", "forcemax"]],
+                    PRINT: "Convergence criterion on forces",
+                    GLOBAL: True, FLOAT_SCALAR: True},
+    "force_fluct": {PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "fluct"]],
+                    PRINT: "Threshold fluctuation of Forces"},
+    "magnetization": {PATHS: [["Ground State Optimization", -1,
+                               "Total magnetization"],
+                              ["Ground State Optimization", -1,
+                               "Hamiltonian Optimization", -1,
+                               "Subspace Optimization",
+                               "Total magnetization"]],
+                      PRINT: "Total magnetization of the system"},
+    "support_functions": {PATHS: [["Gross support functions moments",
+                                   "Multipole coefficients", "values"]]},
+    "electrostatic_multipoles": {PATHS: [["Multipole coefficients",
+                                          "values"]]},
+    "sdos": {PATHS: [["SDos files"]], GLOBAL: True},
+    "symmetry": {PATHS: [["Atomic System Properties", "Space group"]],
+                 PRINT: "Symmetry group", GLOBAL: True},
+    "walltime": {PATHS: [["Walltime since initialization"]],
+                 PRINT: "Walltime since initialization"}
+}
+
+
 class Logfile(Mapping):
     r"""
     Class allowing to initialize, read, write and interact with an
@@ -196,6 +258,8 @@ class Logfile(Mapping):
         :type log: dict
         """
         self._log = log
+        self._set_builtin_attributes()
+        self._clean_attributes()
         self._posinp = self._extract_posinp()
 
     @classmethod
@@ -218,6 +282,91 @@ class Logfile(Mapping):
         :rtype: dict
         """
         return self._log
+
+    def _set_builtin_attributes(self):
+        r"""
+        Set all the base attributes of a BigDFT Logfile.
+
+        They are defined by the ATTRIBUTES dictionary, whose keys are
+        the base name of each attribute, the values being the
+        description of the attribute as another dictionary.
+
+        Once retrieved from the logfile, the attributes are set under
+        their base name preceded by an underscore (e.g., the number of
+        atoms read thanks to the 'n_at' key of  ATTRIBUTES is finally
+        stored as the attribute '_n_at' of the Logfile instance).
+        This extra underscore is meant to prevent the user from updating
+        the value of the attribute.
+        """
+        for name, description in ATTRIBUTES.items():
+            # Loop over the various paths (or logfile levels) where the
+            # value might be stored.
+            for path in description[PATHS]:
+                # Loop over the different levels of the logfile to
+                # retrieve the value
+                value = self  # Always start from the bare logfile
+                for key in path:
+                    try:
+                        value = value.get(key)  # value can be a dict
+                    except AttributeError:
+                        try:
+                            value = value[key]  # value can be a list
+                        except TypeError:
+                            # This path leads to a dead-end: set a
+                            # default value before moving to the next
+                            # possible path.
+                            value = None
+                            continue
+                # No need to look for other paths if a value is found
+                if value is not None:
+                    break
+            setattr(self, "_"+name, value)
+
+    def _clean_attributes(self):
+        r"""
+        Clean the value of the built-in attributes.
+        """
+        self._boundary_conditions = self._boundary_conditions.lower()
+
+    def __getattr__(self, name):
+        r"""
+        Make the base attributes look for their private counterpart
+        (whose name has an initial underscore) that actually stores the
+        value of the attribute.
+
+        All other attributes behave as they should by default.
+        """
+        if name in ATTRIBUTES:
+            return getattr(self, "_"+name)
+        else:
+            super(Logfile, self).__setattr__(name)
+
+    def __setattr__(self, name, value):
+        r"""
+        Make the base attributes behave like properties while keeping
+        the default behaviour for the other ones.
+        """
+        if name in ATTRIBUTES:
+            raise AttributeError("can't set attribute")
+        else:
+            super(Logfile, self).__setattr__(name, value)
+
+    def __dir__(self):  # pragma: no cover
+        r"""
+        The base attributes are not found when doing dir() on a
+        Logfile instance, but their counterpart with a preceding
+        underscore is. What is done here is a removal of the
+        underscored names, replaced by the bare names (in order
+        to avoid name repetition).
+
+        The bare attributes still behave as properties, while their
+        value might be updated via the underscored attribute.
+        """
+        hidden_attributes = list(ATTRIBUTES.keys())
+        base_dir = super(Logfile, self).__dir__()
+        for name in hidden_attributes:
+            base_dir.remove("_"+name)
+        return base_dir + hidden_attributes
 
     def __getitem__(self, key):
         return self.log[key]
@@ -263,9 +412,9 @@ class Logfile(Mapping):
         n_at = len(atoms)
         units = log_pos["units"].lower()
         cell = log_pos["cell"]
-        BC = self["Atomic System Properties"]["Boundary Conditions"].lower()
+        BC = self.boundary_conditions
         if BC == "surface":
-            cell = self["Atomic System Properties"]["Box Sizes (AU)"]
+            cell = self.cell
             if units not in ["reduced", "atomic", "bohr"]:
                 raise NotImplementedError(
                     "Need to convert from atomic to {}".format(units))

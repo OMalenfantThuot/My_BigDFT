@@ -110,7 +110,27 @@ class TestLogfile:
     def test_from_file(self, key, value):
         assert self.log[key] == value
 
-    def test_cannot_set(self):
+    @pytest.mark.parametrize("attr, value",
+        [("_walltime", 148.76689),
+         ("_energy", -2.63322126878162308E+01),
+         ("_n_at", 4),
+         ("_boundary_conditions", "surface"),
+         ("_dipole", [1.9349, -7.4422e-06, 1.2549]),
+         ("_sdos", None),
+         ("_magnetization", None),
+         ("_pressure", None)])
+    def test_attributes(self, attr, value):
+        # Two asserts as one can get both attributes (say, _n_at and n_at)
+        assert getattr(self.log, attr) == value
+        assert getattr(self.log, attr[1:]) == value
+
+    @pytest.mark.parametrize("name",
+        ["n_at", "forces", "walltime"])
+    def test_set_base_attributes_raises_AttributeError(self, name):
+        with pytest.raises(AttributeError):
+            setattr(self.log, name, getattr(self.log, name))
+
+    def test_cannot_set_values_of_log_attr(self):
         with pytest.raises(TypeError):
             self.log['Walltime since initialization'] = 0
 
