@@ -18,3 +18,4 @@ tests/log-*yaml
 *.ipynb
 log.yaml
 *debug/
+doc/build/
