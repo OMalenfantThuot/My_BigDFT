@@ -1,0 +1,19 @@
+# Compilation/working files
+*swp
+*pyc
+*__pycache__*
+*egg-info*
+
+# Testing/coverage files
+*assets
+*pytest_report.html
+*htmlcov
+.coverage
+.pytest*
+.tox
+
+# Extra files
+.ipynb_checkpoints
+InputParams.ipynb
+log.yaml
+*debug/
