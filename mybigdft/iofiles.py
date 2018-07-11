@@ -270,7 +270,7 @@ class Logfile(Mapping):
                 raise NotImplementedError(
                     "Need to convert from atomic to {}".format(units))
         # Prepare the data in ordrer to initialize a Posinp instance
-        posinp = [[n_at, units], [BC, *cell]]
+        posinp = [[n_at, units], [BC] + cell]
         for atom in atoms:
             [(atom_type, position)] = atom.items()
             posinp.append(Atom(atom_type, position))
