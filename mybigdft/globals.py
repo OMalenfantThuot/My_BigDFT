@@ -12,6 +12,8 @@ try:
         inp_vars = next(source)
         profiles = next(source)
 except KeyError:
+    warnings.warn("BigDFT sources not found. Cannot read the input variables.",
+                  RuntimeWarning)
     inp_vars = {}
     profiles = {}
 # Add the posinp key (as it is not in input_variables_definition.yaml)
