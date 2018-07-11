@@ -8,7 +8,7 @@ try:
 except KeyError:
     warnings.warn("BigDFT sources not found. Default files will be used "
                   "instead (might lead to unwanted errors)", RuntimeWarning)
-    BIGDFT_SOURCES = os.path.relpath(".")
+    BIGDFT_SOURCES = ""
 inp_vars_file = os.path.join(BIGDFT_SOURCES,
                              "src/input_variables_definition.yaml")
 with open(inp_vars_file, "r") as f:
