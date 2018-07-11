@@ -6,6 +6,7 @@ import yaml
 try:
     BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
 except KeyError:
+    pass
     warnings.warn("BigDFT sources not found. Default files will be used "
                   "instead (might lead to unwanted errors)", RuntimeWarning)
     BIGDFT_SOURCES = os.path.normpath(
