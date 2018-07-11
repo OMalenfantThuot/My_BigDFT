@@ -1,0 +1,37 @@
+image: python:latest
+
+before_script:
+    - python -V  # Print out python version for debugging
+
+# test:
+#   script:
+#   # Run the tests
+#   - pip install -e .[test]
+#   - pytest
+
+run:
+    script:
+    - python setup.py bdist_wheel
+    # an alternative approach is to install and run:
+    - pip install dist/*
+    # run the command here
+    artifacts:
+        paths:
+        - dist/*.whl
+
+pages:
+    # before_script:
+    # # Install pandoc (to convert notebooks to html)
+    # - apt-get update -y
+    # - apt-get install -y pandoc
+    script:
+    # Build the SiegPy documentation
+    - pip install -e .[doc]
+    - cd doc
+    - make html
+    - mv build/html/ ../public/
+    artifacts:
+        paths:
+        - public
+    only:
+    - master
