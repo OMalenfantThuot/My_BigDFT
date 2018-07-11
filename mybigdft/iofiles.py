@@ -3,32 +3,15 @@ File containing the Input and Posinp classes.
 """
 
 from __future__ import print_function
-import os
 import warnings
 from copy import deepcopy
 from collections import Sequence, Mapping, MutableMapping
 import yaml
 import numpy as np
+from .globals import inp_vars
 
 
-__all__ = ["BIGDFT_SOURCES", "inp_vars", "profiles", "check", "clean",
-           "InputParams", "Logfile", "Posinp"]
-
-
-# Read the definition of the input variables from the BigDFT sources
-BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
-inp_vars_file = os.path.join(BIGDFT_SOURCES,
-                             "src/input_variables_definition.yaml")
-with open(inp_vars_file, "r") as f:
-    source = yaml.load_all(f)
-    inp_vars = next(source)
-    profiles = next(source)
-# Add the posinp key (as it is not in input_variables_definition.yaml)
-inp_vars["posinp"] = {"units": {"default": "atomic"},
-                      "cell": {"default": []},
-                      "positions": {"default": []},
-                      "properties": {"default": {"format": "xyz",
-                                                 "source": "posinp.xyz"}}}
+__all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
 
 
 def check(params):
@@ -436,6 +419,7 @@ class Posinp(Sequence):
         r"""
         The posinp is created from a list whose elements correspond to
         the various lines of an xyz file:
+
         * the first element of of the list is a list made of the number
           of atoms and the units (given by a string)
         * the second element is made of another list, made of the
