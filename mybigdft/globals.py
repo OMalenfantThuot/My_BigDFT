@@ -6,7 +6,8 @@ import yaml
 try:
     BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
 except KeyError:
-    warnings.warn("BigDFT sources not found", RuntimeWarning)
+    warnings.warn("BigDFT sources not found. Default files will be used "
+                  "instead (might lead to unwanted errors)", RuntimeWarning)
     BIGDFT_SOURCES = os.path.relpath(".")
 inp_vars_file = os.path.join(BIGDFT_SOURCES,
                              "src/input_variables_definition.yaml")
