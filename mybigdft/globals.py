@@ -1,8 +1,13 @@
 import os
+import warnings
 import yaml
 
 # Read the definition of the input variables from the BigDFT sources
-BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
+try:
+    BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
+except KeyError:
+    warnings.warn("BigDFT sources not found", RuntimeWarning)
+    BIGDFT_SOURCES = os.path.relpath(".")
 inp_vars_file = os.path.join(BIGDFT_SOURCES,
                              "src/input_variables_definition.yaml")
 with open(inp_vars_file, "r") as f:
