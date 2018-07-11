@@ -8,13 +8,13 @@
 *assets
 *pytest_report.html
 *htmlcov
-.coverage
+.coverage*
 .pytest*
 .tox
 tests/log-*yaml
 
 # Extra files
 .ipynb_checkpoints
-InputParams.ipynb
+*.ipynb
 log.yaml
 *debug/
