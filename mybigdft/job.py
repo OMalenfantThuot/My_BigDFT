@@ -34,9 +34,9 @@ class Job(object):
         wavefunctions of the reference calculation).
 
         :param inputparams: BigDFT input file.
-        :type inputparams: mybigdft.iofiles.InputParams
+        :type inputparams: ~mybigdft.iofiles.InputParams
         :param posinp: BigDFT initial geometry file.
-        :type posinp: mybigdft.iofiles.Posinp
+        :type posinp: ~mybigdft.iofiles.Posinp
         :param name: Prefix of the BigDFT calculation (optional,
             default value set to None).
         :type name: str
@@ -45,7 +45,7 @@ class Job(object):
         :type run_folder: str
         :param ref_calc: Other BigDFT calculation, taken as reference
             (optional, default value set to None)
-        :type ref_calc: bigdft.BigDFTCalc
+        :type ref_calc: ~mybigdft.job.Job
         :param skip: If True, the calculation will be skipped. (Note:
             Might not be useful now, since we check for the existence
             of the logfile before running, which might be the actual
@@ -147,7 +147,7 @@ class Job(object):
         :param force_run: States if the calculation has to be run,
             even though a logfile already exists. (Optional, default
             value set to False)
-        :type force_run: boolean
+        :type force_run: bool
         :param dry_run: If True, all folders and input files are written
             on disk, but are not run.
         :type dry_run: bool

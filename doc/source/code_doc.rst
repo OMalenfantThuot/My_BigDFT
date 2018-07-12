@@ -10,4 +10,5 @@ You will find here the documentation for the most useful classes and methods.
     :maxdepth: 2
 
     iofiles
+    job
     mybigdft
