@@ -394,13 +394,16 @@ class Logfile(Mapping):
         atoms = log_pos["positions"]
         n_at = len(atoms)
         units = log_pos["units"].lower()
-        cell = log_pos["cell"]
         BC = self.boundary_conditions
+        if BC not in ["free", "surface"]:
+            cell = log_pos["cell"]
+        else:
+            cell = []
         if BC == "surface":
-            cell = self.cell
             if units not in ["reduced", "atomic", "bohr"]:
                 raise NotImplementedError(
-                    "Need to convert from atomic to {}".format(units))
+                    "Need to convert cell size from atomic to {}"
+                    .format(units))
         # Prepare the data in ordrer to initialize a Posinp instance
         posinp = [[n_at, units], [BC] + cell]
         for atom in atoms:

@@ -4,6 +4,7 @@ import pytest
 from mybigdft.iofiles import InputParams, Posinp, Logfile, Atom
 
 tests_fol = "tests"
+# Result of an N2 calculation of very bad quality
 logname = os.path.join(tests_fol, "log.yaml")
 
 
@@ -76,17 +77,15 @@ class TestInputParams:
 
     def test_from_Logfile(self):
         inp = InputParams.from_Logfile(logname)
-        inp["posinp"]["cell"][1] = 0
         expected = {
-'dft': {'hgrids': 0.35, 'ixc': -101130, 'rmult': [6, 8]},
-'kpt': {'method': 'mpgrid', 'ngkpt': [4, 1, 4]},
+'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1, 'disablesym': True},
 'geopt': {'ncount_cluster_x': 1},
-'posinp': {'units': 'reduced',
-           'cell': [7.99354093169, 0, 4.61507300869],
-           'positions': [{'C': [0.08333333333, 0.5, 0.25]},
-                         {'C': [0.41666666666, 0.5, 0.25]},
-                         {'C': [0.5833333333299999, 0.5, 0.7499999999999999]},
-                         {'C': [0.91666666666, 0.5, 0.7499999999999999]}]}
+'posinp': {'units': 'angstroem',
+           'positions':
+[{'N': [2.9763078243490115e-23, 6.872205952043537e-23, 0.01071619987487793]},
+ {'N': [-1.1043449194501671e-23, -4.873421744830746e-23, 1.104273796081543]}],
+           'properties': {'format': 'xyz', 'source': 'N2.xyz'}
+          }
 }
         assert inp == expected
 
@@ -98,24 +97,25 @@ class TestInputParams:
 
 class TestLogfile:
 
+    # Logfile of an N2 calculation of bad quality
     log = Logfile.from_file(logname)
 
     @pytest.mark.parametrize("key, value",
-        [("Energy (Hartree)", -2.63322126878162308E+01),
-         ("Number of MPI tasks", 6),
+        [("Energy (Hartree)", -191.74377352940274),
+         ("Number of MPI tasks", 2),
          ("OpenMP parallelization", True),
-         ("Maximal OpenMP threads per MPI task", 3),
-         ("Force Norm (Hartree/Bohr)", 1.71711365963343639E-02),
-         ("Walltime since initialization", 148.76689)])
+         ("Maximal OpenMP threads per MPI task", 16),
+         ("Force Norm (Hartree/Bohr)", 448.63530538041755),
+         ("Walltime since initialization", 1.835567)])
     def test_from_file(self, key, value):
         assert self.log[key] == value
 
     @pytest.mark.parametrize("attr, value",
-        [("_walltime", 148.76689),
-         ("_energy", -2.63322126878162308E+01),
-         ("_n_at", 4),
-         ("_boundary_conditions", "surface"),
-         ("_dipole", [1.9349, -7.4422e-06, 1.2549]),
+        [("_walltime", 1.835567),
+         ("_energy", -191.74377352940274),
+         ("_n_at", 2),
+         ("_boundary_conditions", "free"),
+         ("_dipole", [0.69649, 0.69649, -2.4954]),
          ("_sdos", None),
          ("_magnetization", None),
          ("_pressure", None)])
@@ -135,7 +135,7 @@ class TestLogfile:
             self.log['Walltime since initialization'] = 0
 
     def test_len(self):
-        assert len(self.log) == 97
+        assert len(self.log) == 90
 
     def test_write(self):
         fname = os.path.join(tests_fol, "log-test.yaml")
@@ -146,11 +146,13 @@ class TestLogfile:
 
 class TestPosinp:
 
+    # Posinp with surface boundary conditions
     surface_filename = os.path.join(tests_fol, "surface.xyz")
     pos = Posinp.from_file(surface_filename)
+    # Posinp with free boundary conditions
     free_filename = os.path.join(tests_fol, "free.xyz")
     free_pos = Posinp.from_file(free_filename)
-    log_pos = Posinp.from_Logfile(logname)
+    # Posinp read from a string
     string = """\
 4   atomic
 free
@@ -159,20 +161,22 @@ C    3.330642055    0.000000000   1.153768252
 C    4.662898877    0.000000000   3.461304757
 C    7.327412521    0.000000000   3.461304757"""
     str_pos = Posinp.from_string(string)
+    # Posinp read from an N2 calculation of bad quality
+    log_pos = Posinp.from_Logfile(logname)
 
     @pytest.mark.parametrize("value, expected",
         [(pos.n_at, 4), (pos.units, "reduced"), (len(pos), 4),
          (pos.BC, "surface"),
          (pos.cell, [8.07007483423, 1.0, 4.65925987792]),
-         (pos[0], Atom("C", [0.08333333333, 0.5, 0.25]))])
+         (pos[0], Atom('C', [0.08333333333, 0.5, 0.25]))])
     def test_from_file(self, value, expected):
         assert value == expected
 
     @pytest.mark.parametrize("value, expected",
-        [(log_pos.n_at, 4), (log_pos.units, "reduced"), (len(log_pos), 4),
-         (log_pos.BC, "surface"),
-         (log_pos.cell, [7.99354, 0.0, 4.61507]),
-         (log_pos[0], Atom("C", [0.08333333333, 0.5, 0.25]))])
+        [(log_pos.n_at, 2), (log_pos.units, "angstroem"), (len(log_pos), 2),
+         (log_pos.BC, "free"),
+         (log_pos.cell, None),
+         (log_pos[0], Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23, 0.01071619987487793]))])
     def test_from_Logfile(self, value, expected):
         assert value == expected
 

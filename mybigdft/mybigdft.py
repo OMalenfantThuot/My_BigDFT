@@ -6,12 +6,9 @@ from __future__ import print_function
 import os
 import shutil
 import subprocess
+from .globals import bigdft_path
 
-
-# Define the path to the BigDFT executable
-bigdft = os.path.join(os.environ["BIGDFT_ROOT"], "bigdft")
-bigdft_tool = os.path.join(os.environ["BIGDFT_ROOT"], "bigdft-tool")
-# Global name for the BigDFT data folder
+# Name for the BigDFT data folder
 DATA = "data"
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -19,7 +16,7 @@ COORDS = ["x", "y", "z"]
 SIGNS = {"+": 1., "-": -1.}
 
 
-class BigDFTCalc(object):
+class BigDFTCalc(object):  # pragma: no cover
     r"""
     This class represents an usual BigDFT calculation. There are two
     main methods:
@@ -67,18 +64,18 @@ class BigDFTCalc(object):
             # A run folder was given, find the common prefix with the
             # current working directory
             basename = os.path.commonprefix([self.init_folder, run_folder])
-            # If there is no common prefix, then the run folder is
-            # already well defined, and the absolute folder is the
-            # the concatenation of the current working directory and
-            # the run folder
             if basename == '':
+                # If there is no common prefix, then the run folder is
+                # already well defined, and the absolute folder is the
+                # the concatenation of the current working directory and
+                # the run folder
                 self.run_folder = run_folder
                 self.abs_folder = os.path.join(self.init_folder, run_folder)
-            # Else, find the relative path with the common prefix to
-            # define run_folder, and use run_folder to define the
-            # absolute folder. The initial folder is changed to the
-            # common prefix.
             else:
+                # Else, find the relative path with the common prefix to
+                # define run_folder, and use run_folder to define the
+                # absolute folder. The initial folder is changed to the
+                # common prefix.
                 self.init_folder = basename
                 self.run_folder = os.path.relpath(run_folder, basename)
                 self.abs_folder = run_folder
@@ -95,13 +92,13 @@ class BigDFTCalc(object):
             self.input_name = prefix+".yaml"  # input file name
             self.output_name = "log-"+self.input_name  # output file name
             self.posinp_name = prefix+".xyz"  # posinp file name
-            self.command = [bigdft, prefix]  # BigDFT command
+            self.command = [bigdft_path, prefix]  # BigDFT command
             self.data_dir = DATA+'-'+prefix   # data folder
         else:
             self.input_name = "input.yaml"  # input file name
             self.output_name = "log.yaml"  # output file name
             self.posinp_name = "posinp.xyz"  # posinp file name
-            self.command = [bigdft]  # BigDFT command
+            self.command = [bigdft_path]  # BigDFT command
             self.data_dir = DATA  # Data folder
 
         # Set the reference calculation
@@ -196,9 +193,11 @@ class BigDFTCalc(object):
                     out, err = run.communicate()
                     print(out)
             else:
-                print("Logfile {} already exists!\n".format(self.output_name))
+                print("Logfile {} already exists!\n"
+                      .format(self.output_name))
         finally:
             # Set the path to the logfile
-            self.logfile_path = os.path.join(self.abs_folder, self.output_name)
+            self.logfile_path = os.path.join(self.abs_folder,
+                                             self.output_name)
             # Go back to the initial folder
             os.chdir(self.init_folder)

@@ -12,6 +12,9 @@
 .pytest*
 .tox
 tests/log-*yaml
+tests/logfiles
+*runtest*
+*minimal.yaml
 
 # Extra files
 .ipynb_checkpoints
