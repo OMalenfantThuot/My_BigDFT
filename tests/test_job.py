@@ -17,8 +17,8 @@ class TestJob:
 
     @pytest.mark.parametrize("attr, expected",
         [("inputparams", inp), ("posinp", pos),
-         ("logfile", None), ("logfile_name", "log.yaml"),
          ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
+         ("logfile", None), ("logfile_name", "log.yaml"),
          ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT"),
         ])
     def test_init(self, attr, expected):
@@ -31,8 +31,8 @@ class TestJob:
 
     @pytest.mark.parametrize("attr, expected",
         [("inputparams", inp), ("posinp", pos),
-         ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
+         ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("data_dir", "data-test"), ("ref_job", None),
          ("run_dir", "MyBigDFT"),
         ])
@@ -57,6 +57,15 @@ class TestJob:
     def test_init_without_posinp_raises_ValueError(self):
         with pytest.raises(ValueError):
             Job()
+
+    @pytest.mark.parametrize("attr",
+        ["inputparams", "posinp", "logfile", "ref_job",
+         "input_name", "posinp_name", "logfile_name",
+         "bigdft_cmd", "bigdft_tool_cmd",
+         "init_dir", "run_dir", "data_dir",])
+    def test_cannot_set_attributes(self, attr):
+        with pytest.raises(AttributeError):
+            setattr(job, attr, 1)
 
     def test_run(self):
         with Job(inputparams=inp, run_dir="tests") as job:
