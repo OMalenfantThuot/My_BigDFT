@@ -19,19 +19,30 @@ class TestJob:
         [("name", ""), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log.yaml"),
          ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
-         ("data_dir", "data"), ("ref_calc", None),
+         ("data_dir", "data"), ("ref_calc", None), ("run_dir", "MyBigDFT"),
         ])
     def test_init(self, attr, expected):
-        assert getattr(job, attr) == expected
+        if "_dir" in attr:
+            value = getattr(job, attr)
+            value = os.path.basename(os.path.normpath(value))
+            assert value == expected
+        else:
+            assert getattr(job, attr) == expected
 
     @pytest.mark.parametrize("attr, expected",
         [("name", "test"), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
          ("data_dir", "data-test"), ("ref_calc", None),
+         ("run_dir", "MyBigDFT"),
         ])
     def test_init_with_name(self, attr, expected):
-        assert getattr(job_with_name, attr) == expected
+        if "_dir" in attr:
+            value = getattr(job_with_name, attr)
+            value = os.path.basename(os.path.normpath(value))
+            assert value == expected
+        else:
+            assert getattr(job_with_name, attr) == expected
 
     def test_init_with_posinp_only(self):
         assert Job(posinp=pos).inputparams == {}

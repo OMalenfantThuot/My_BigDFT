@@ -9,8 +9,6 @@ import subprocess
 from .globals import bigdft_path, bigdft_tool_path
 from .iofiles import Logfile
 
-# Name for the BigDFT data directory
-DATA = "data"
 # Space coordinates
 COORDS = ["x", "y", "z"]
 # Dictionary to convert the string of the signs to floats
@@ -59,12 +57,28 @@ class Job(object):
         elif inputparams is None:
             inputparams = {}
 
+        # Set the base attributes
+        self.inputparams = inputparams
+        self.name = name
+        self.posinp = posinp
+        self.logfile = None
+        self.ref_calc = ref_calc
+
+        # Derive the rest of the attributes from the other arguments
+        self._set_directory_attributes(run_dir, name)
+        self._set_filename_attributes(name)
+        self._set_cmd_attributes(name, skip)
+
+    def _set_directory_attributes(self, run_dir, name):
+        self._set_init_and_run_directories(run_dir)
+        self._set_data_directory(name)
+
+    def _set_init_and_run_directories(self, run_dir):
         # Set the initial directory
         self.init_dir = os.getcwd()
         # Set the directory where the calculation will be run
         if run_dir is None:
-            self.run_dir = os.path.curdir
-            self.abs_dir = self.init_dir
+            self.run_dir = self.init_dir
         else:
             # A run directory was given, find the common prefix with the
             # current working directory
@@ -74,44 +88,49 @@ class Job(object):
                 # is already well defined, and the absolute directory is
                 # the concatenation of the current working directory and
                 # the run directory
-                self.run_dir = run_dir
-                self.abs_dir = os.path.join(self.init_dir, run_dir)
+                self.run_dir = os.path.join(self.init_dir, run_dir)
             else:
                 # Else, find the relative path with the common prefix to
                 # define run_dir, and use run_dir to define the
                 # absolute directory. The initial directory is changed to the
                 # common prefix.
                 self.init_dir = basename
-                self.run_dir = os.path.relpath(run_dir, start=basename)
-                print("Switch run_dir from {} to {}"
-                      .format(run_dir, self.run_dir))
-                self.abs_dir = run_dir
+                new_run_dir = os.path.relpath(run_dir, start=basename)
+                self.run_dir = os.path.join(self.init_dir, new_run_dir)
+                print("run_dir switched from {} to {}"
+                      .format(run_dir, new_run_dir))
 
-        # Set the attributes
-        self.inputparams = inputparams
-        self.name = name
-        self.posinp = posinp
-        self.logfile = None
-        self.ref_calc = ref_calc
+    def _set_data_directory(self, name):
+        # Set the data directory
+        DATA = "data"  # base name for the BigDFT data directory
+        if name != "":
+            data_dir = DATA+'-'+name
+        else:
+            data_dir = DATA
+        self.data_dir = os.path.join(self.run_dir, data_dir)
 
-        # Initialize some file and directory names and also BigDFT commands
+    def _set_cmd_attributes(self, name, skip):
+        # The base bigdft-tool command is always the same
+        self.bigdft_tool_cmd = [bigdft_tool_path]
+        # The base bigdft command depends on name and on skip
         skip_option = []
         if skip:
             skip_option += ["-s", "Yes"]
         if name != "":
+            self.bigdft_cmd = [bigdft_path, name] + skip_option
+        else:
+            self.bigdft_cmd = [bigdft_path] + skip_option
+
+    def _set_filename_attributes(self, name):
+        # Initialize some file and directory names and also BigDFT commands
+        if name != "":
             self.input_name = name+".yaml"  # input file name
             self.logfile_name = "log-"+self.input_name  # output file name
             self.posinp_name = name+".xyz"  # posinp file name
-            self.bigdft_cmd = [bigdft_path, name] + skip_option
-            self.bigdft_tool_cmd = [bigdft_tool_path]
-            self.data_dir = DATA+'-'+name  # data directory
         else:
             self.input_name = "input.yaml"  # input file name
             self.logfile_name = "log.yaml"  # output file name
             self.posinp_name = "posinp.xyz"  # posinp file name
-            self.bigdft_cmd = [bigdft_path] + skip_option
-            self.bigdft_tool_cmd = [bigdft_tool_path]
-            self.data_dir = DATA  # Data directory
 
     def __enter__(self):
         r"""
@@ -190,15 +209,14 @@ class Job(object):
         """
         # Find and copy the path to the reference data directory
         ref = self.ref_calc
-        ref_data_path = os.path.join(ref.abs_dir, ref.data_dir)
-        if os.path.exists(ref_data_path):
+        if os.path.exists(ref.data_dir):
             # Remove the previously existing data directory before
             # copying the reference data directory (otherwise,
             # shutil.copytree raises an error).
             if self.data_dir in os.listdir("."):
                 shutil.rmtree(self.data_dir)
-            shutil.copytree(ref_data_path, self.data_dir)
-        elif not os.path.exists(ref_data_path):
+            shutil.copytree(ref.data_dir, self.data_dir)
+        else:
             print("Data directory not found for reference calculation.")
 
     def _read_wavefunctions_from_data_dir(self):
@@ -298,7 +316,7 @@ class Job(object):
         Launch the command to run the bigdft or bigdft-tool command.
 
         :param command: The command to run bigdft or bigdft-tool.
-        :rtype: list
+        :type command: list
         """
         # Print the command in a human readable way
         to_str = "{} "*len(command)
