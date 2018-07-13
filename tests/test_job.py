@@ -3,7 +3,7 @@ import os
 import pytest
 import numpy as np
 from mybigdft.job import Job
-from mybigdft.iofiles import InputParams, Posinp  # , Logfile
+from mybigdft.iofiles import InputParams, Posinp, Logfile
 
 # Extract the input and posinp from an N2 calculation of bad quality
 logname = os.path.join("tests", "log.yaml")
@@ -19,7 +19,7 @@ class TestJob:
         [("name", ""), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log.yaml"),
          ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
-         ("data_dir", "data"), ("ref_calc", None), ("run_dir", "MyBigDFT"),
+         ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT"),
         ])
     def test_init(self, attr, expected):
         if "_dir" in attr:
@@ -33,7 +33,7 @@ class TestJob:
         [("name", "test"), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
-         ("data_dir", "data-test"), ("ref_calc", None),
+         ("data_dir", "data-test"), ("ref_job", None),
          ("run_dir", "MyBigDFT"),
         ])
     def test_init_with_name(self, attr, expected):
@@ -74,6 +74,36 @@ class TestJob:
             job.run(force_run=True)
         assert np.allclose([job.logfile.energy], [-191.74377352940274])
 
+    def test_clean(self):
+        with Job(inputparams=inp, name="dry_run", run_dir="tests") as job:
+            job._write_input_files(nmpi=1, dry_run=False)
+            job.clean()
+            assert not os.path.exists(job.posinp_name)
+            assert not os.path.exists(job.input_name)
+            assert not os.path.exists(job.logfile_name)
+
     def test_run_with_dry_run(self):
         with Job(inputparams=inp, name="dry_run", run_dir="tests") as job:
+            # Run the calculation
+            job.clean()
             job.run(dry_run=True, nmpi=2, nomp=4)
+            # Assert that there is no posinp file afterwards
+            assert not os.path.exists(job.posinp_name)
+            # There must be input and output files afterwards
+            new_inp = InputParams.from_file(job.input_name)
+            assert new_inp == inp
+            bigdft_tool_log = Logfile.from_file(job.logfile_name)
+            assert bigdft_tool_log.energy is None
+
+    def test_run_with_dry_run_with_posinp(self):
+        with Job(inputparams=inp, posinp=pos, name="dry_run",
+                 run_dir="tests") as job:
+            job.clean()
+            job.run(dry_run=True, nmpi=2, nomp=4)
+            # Make sure that input, posinp and output files are created
+            new_inp = InputParams.from_file(job.input_name)
+            assert new_inp == inp
+            new_pos = Posinp.from_file(job.posinp_name)
+            assert new_pos == pos
+            bigdft_tool_log = Logfile.from_file(job.logfile_name)
+            assert bigdft_tool_log.energy is None

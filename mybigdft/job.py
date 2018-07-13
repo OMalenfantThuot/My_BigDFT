@@ -18,7 +18,7 @@ SIGNS = {"+": 1., "-": -1.}
 class Job(object):
 
     def __init__(self, name="", inputparams=None, posinp=None, run_dir=None,
-                 ref_calc=None, skip=False):
+                 ref_job=None, skip=False):
         r"""
         You may pass input parameters and/or initial geometry (posinp).
         Make sure to at list provide initial positions, either via the
@@ -41,9 +41,9 @@ class Job(object):
         :param run_dir: Folder where to run the calculation
             (optional, default value set to None).
         :type run_dir: str
-        :param ref_calc: Other BigDFT calculation, taken as reference
+        :param ref_job: Other BigDFT calculation, taken as reference
             (optional, default value set to None)
-        :type ref_calc: ~mybigdft.job.Job
+        :type ref_job: ~mybigdft.job.Job
         :param skip: If True, the calculation will be skipped. (Note:
             Might not be useful now, since we check for the existence
             of the logfile before running, which might be the actual
@@ -62,7 +62,7 @@ class Job(object):
         self.name = name
         self.posinp = posinp
         self.logfile = None
-        self.ref_calc = ref_calc
+        self.ref_job = ref_job
 
         # Derive the rest of the attributes from the other arguments
         self._set_directory_attributes(run_dir, name)
@@ -70,10 +70,29 @@ class Job(object):
         self._set_cmd_attributes(name, skip)
 
     def _set_directory_attributes(self, run_dir, name):
+        r"""
+        Set the attributes regarding the directories used to run the
+        calculation and to store data.
+
+        :param run_dir: Folder where to run the calculation
+            (optional, default value set to None).
+        :type run_dir: str
+        :param name: Prefix of the BigDFT calculation (optional,
+            default value set to None).
+        :type name: str
+        """
         self._set_init_and_run_directories(run_dir)
         self._set_data_directory(name)
 
     def _set_init_and_run_directories(self, run_dir):
+        r"""
+        Set the attributes regarding the directories used to run the
+        calculation.
+
+        :param run_dir: Folder where to run the calculation
+            (optional, default value set to None).
+        :type run_dir: str
+        """
         # Set the initial directory
         self.init_dir = os.getcwd()
         # Set the directory where the calculation will be run
@@ -101,6 +120,13 @@ class Job(object):
                       .format(run_dir, new_run_dir))
 
     def _set_data_directory(self, name):
+        r"""
+        Set the attributes regarding the directories used to store data.
+
+        :param name: Prefix of the BigDFT calculation (optional,
+            default value set to None).
+        :type name: str
+        """
         # Set the data directory
         DATA = "data"  # base name for the BigDFT data directory
         if name != "":
@@ -110,6 +136,18 @@ class Job(object):
         self.data_dir = os.path.join(self.run_dir, data_dir)
 
     def _set_cmd_attributes(self, name, skip):
+        r"""
+        Set the base commands to run bigdft or bigdft-tool.
+
+        :param name: Prefix of the BigDFT calculation (optional,
+            default value set to None).
+        :type name: str
+        :param skip: If True, the calculation will be skipped. (Note:
+            Might not be useful now, since we check for the existence
+            of the logfile before running, which might be the actual
+            check of the skip option of BigDFT)
+        :type skip: bool
+        """
         # The base bigdft-tool command is always the same
         self.bigdft_tool_cmd = [bigdft_tool_path]
         # The base bigdft command depends on name and on skip
@@ -122,15 +160,23 @@ class Job(object):
             self.bigdft_cmd = [bigdft_path] + skip_option
 
     def _set_filename_attributes(self, name):
+        r"""
+        Set the attributes regarding the name of the input and output
+        files.
+
+        :param name: Prefix of the BigDFT calculation (optional,
+            default value set to None).
+        :type name: str
+        """
         # Initialize some file and directory names and also BigDFT commands
         if name != "":
             self.input_name = name+".yaml"  # input file name
-            self.logfile_name = "log-"+self.input_name  # output file name
             self.posinp_name = name+".xyz"  # posinp file name
+            self.logfile_name = "log-"+self.input_name  # output file name
         else:
             self.input_name = "input.yaml"  # input file name
-            self.logfile_name = "log.yaml"  # output file name
             self.posinp_name = "posinp.xyz"  # posinp file name
+            self.logfile_name = "log.yaml"  # output file name
 
     def __enter__(self):
         r"""
@@ -148,12 +194,9 @@ class Job(object):
 
     def __exit__(self, *args):
         r"""
-        When leaving the context manager:
-
-        * Read the logfile (if not a dry run),
-        * Go back to the initial directory.
+        When leaving the context manager, go back to the initial
+        directory.
         """
-        self.logfile = Logfile.from_file(self.logfile_name)
         os.chdir(self.init_dir)
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
@@ -179,7 +222,7 @@ class Job(object):
         :type dry_run: bool
         """
         # Copy the data directory of a reference calculation
-        if self.ref_calc is not None:
+        if self.ref_job is not None:
             self._copy_reference_data_dir()
 
         # Update the input file, so that it reads the reference
@@ -200,6 +243,8 @@ class Job(object):
                 print(output_msg)
         else:
             print("Logfile {} already exists!\n".format(self.logfile_name))
+        # Read the logfile
+        self.logfile = Logfile.from_file(self.logfile_name)
 
     def _copy_reference_data_dir(self):
         r"""
@@ -208,7 +253,7 @@ class Job(object):
         of the reference calculation.
         """
         # Find and copy the path to the reference data directory
-        ref = self.ref_calc
+        ref = self.ref_job
         if os.path.exists(ref.data_dir):
             # Remove the previously existing data directory before
             # copying the reference data directory (otherwise,
@@ -291,25 +336,20 @@ class Job(object):
             one.
         :type dry_run: bool
         """
-        # Set the name of the input files to write on disk
         if dry_run:
             # Use default names to create dummy files. They will be
             # deleted after the bigdft-tool command is run.
-            inpname = "input.yaml"
-            posname = "posinp.xyz"
-            self._dummy_files = [inpname, posname]
-        else:
-            inpname = self.input_name
-            posname = self.posinp_name
-
-        # Write the input files (if needed)
-        self.inputparams.write(inpname)
+            dummy_inp = "input.yaml"
+            self.inputparams.write(dummy_inp)
+            self._dummy_files = [dummy_inp]
+            if self.posinp is not None:
+                dummy_pos = "posinp.xyz"
+                self.posinp.write(dummy_pos)
+                self._dummy_files.append(dummy_pos)
+        # Always write the correct input files
+        self.inputparams.write(self.input_name)
         if self.posinp is not None:
-            self.posinp.write(posname)
-        elif dry_run:
-            # There is no dummy posinp file to write on disk, so it will
-            # not have to be deleted after bigdft-tool is run
-            self._dummy_files.pop()
+            self.posinp.write(self.posinp_name)
 
     def _launch_calculation(self, command):
         r"""
@@ -348,3 +388,17 @@ class Job(object):
         for filename in self._dummy_files:
             os.remove(filename)
         del self._dummy_files
+
+    def clean(self):
+        r"""
+        Delete all input and output files on disk.
+        """
+        filenames = [self.logfile_name, self.input_name, self.posinp_name]
+        for filename in filenames:
+            self._delete_file(filename)
+
+    def _delete_file(self, filename):
+        try:
+            os.remove(filename)
+        except OSError:
+            pass

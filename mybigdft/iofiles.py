@@ -386,7 +386,7 @@ class Logfile(Mapping):
     @property
     def posinp(self):
         r"""
-        :returns: Posinp used to during the calculation.
+        :returns: Posinp used during the calculation.
         :rtype: Posinp
         """
         return self._posinp

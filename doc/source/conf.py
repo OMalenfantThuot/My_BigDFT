@@ -79,7 +79,8 @@ autoclass_content = 'both'
 autodoc_member_order = 'bysource'
 
 # default flags for the auto-documentation
-autodoc_default_flags = ['members', 'show-inheritance', 'private-members']
+# autodoc_default_flags = ['members', 'show-inheritance', 'private-members']
+autodoc_default_flags = ['members', 'show-inheritance']
 
 # -- Options for HTML output -------------------------------------------------
 
