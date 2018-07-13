@@ -464,7 +464,6 @@ class Posinp(Sequence):
             self._cell = None
         # Set the attributes associated to all the other lines of the
         # xyz file, namely the atoms
-        assert all([isinstance(atom, Atom) for atom in posinp])
         if self.n_at != len(posinp):
             raise ValueError("The number of atoms do not correspond to the "
                              "number of positions.")

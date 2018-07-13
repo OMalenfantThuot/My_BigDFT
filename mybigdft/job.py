@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 from .globals import bigdft_path, bigdft_tool_path
-from .iofiles import Logfile
+from .iofiles import InputParams, Logfile
 
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -55,7 +55,7 @@ class Job(object):
            (posinp is None and "posinp" not in inputparams):
             raise ValueError("Please provide initial positions.")
         elif inputparams is None:
-            inputparams = {}
+            inputparams = InputParams()
 
         # Set the base attributes
         self._inputparams = inputparams
