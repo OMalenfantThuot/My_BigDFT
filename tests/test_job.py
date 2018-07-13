@@ -19,7 +19,7 @@ class TestJob:
         [("name", ""), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log.yaml"),
          ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
-         ("data_dir", "data")
+         ("data_dir", "data"), ("ref_calc", None),
         ])
     def test_init(self, attr, expected):
         assert getattr(job, attr) == expected
@@ -28,7 +28,7 @@ class TestJob:
         [("name", "test"), ("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
-         ("data_dir", "data-test")
+         ("data_dir", "data-test"), ("ref_calc", None),
         ])
     def test_init_with_name(self, attr, expected):
         assert getattr(job_with_name, attr) == expected
@@ -48,21 +48,21 @@ class TestJob:
             Job()
 
     def test_run(self):
-        with Job(inputparams=inp, run_folder="tests") as job:
+        with Job(inputparams=inp, run_dir="tests") as job:
             job.run()
         assert np.allclose([job.logfile.energy], [-191.74377352940274])
 
     def test_run_with_force_run(self):
-        with Job(inputparams=inp, run_folder="tests", name="runtest") as job:
+        with Job(inputparams=inp, run_dir="tests", name="runtest") as job:
             job.run(force_run=True, nmpi=2, nomp=4)
         assert np.allclose([job.logfile.energy], [-191.74377352940274])
 
     def test_run_with_force_run_and_inp_and_pos(self):
         with Job(inputparams=inp, posinp=pos,
-                 run_folder="tests", name="runtest") as job:
+                 run_dir="tests", name="runtest") as job:
             job.run(force_run=True)
         assert np.allclose([job.logfile.energy], [-191.74377352940274])
 
     def test_run_with_dry_run(self):
-        with Job(inputparams=inp) as job:
+        with Job(inputparams=inp, name="dry_run", run_dir="tests") as job:
             job.run(dry_run=True, nmpi=2, nomp=4)

@@ -6,7 +6,7 @@ from __future__ import print_function
 import warnings
 from copy import deepcopy
 from collections import Sequence, Mapping, MutableMapping
-import yaml
+import oyaml as yaml
 import numpy as np
 from .globals import inp_vars
 
@@ -255,7 +255,17 @@ class Logfile(Mapping):
         :returns: Logfile
         """
         with open(filename, "r") as f:
-            log = yaml.safe_load(f)
+            return cls.from_stream(f)
+
+    @classmethod
+    def from_stream(cls, stream):
+        r"""
+        Initialize the Logfile from a stream.
+
+        :param stream: Logfile as a stream.
+        :returns: Logfile
+        """
+        log = yaml.safe_load(stream)
         return cls(log)
 
     @property

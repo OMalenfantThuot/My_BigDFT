@@ -14,6 +14,9 @@ BigDFT 1.8.2 must be installed in a given build directory.
 Then, go to $BUILDDIR/install/bin and run 'source bigdftvars.sh'.
 End by running 'unset PYTHONPATH'.
 This gives the environment variables necessary for MyBigDFT to run correctly.
+Also, if your default python version is python3, modify the first line of 
+the bigdft-tool executable so that it forces the use of python2 (i.e.,
+set it to '#!/usr/bin/env python2')
 
 You can now git clone this package and run 'pip install .'
 
