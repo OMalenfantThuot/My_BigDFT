@@ -58,16 +58,116 @@ class Job(object):
             inputparams = {}
 
         # Set the base attributes
-        self.inputparams = inputparams
-        self.name = name
-        self.posinp = posinp
-        self.logfile = None
-        self.ref_job = ref_job
+        self._inputparams = inputparams
+        self._posinp = posinp
+        self._logfile = None
+        self._ref_job = ref_job
 
         # Derive the rest of the attributes from the other arguments
         self._set_directory_attributes(run_dir, name)
         self._set_filename_attributes(name)
         self._set_cmd_attributes(name, skip)
+
+    @property
+    def inputparams(self):
+        r"""
+        :returns inputparams: Input parameters of the calculation.
+        :rtype inputparams: InputParams
+        """
+        return self._inputparams
+
+    @property
+    def posinp(self):
+        r"""
+        :returns posinp: Initial positions of the calculation.
+        :rtype posinp: Posinp or None
+        """
+        return self._posinp
+
+    @property
+    def logfile(self):
+        r"""
+        :returns logfile: Logfile of the calculation (output of the
+            bigdft or bigdft-tool executable).
+        :rtype logfile: Logfile or None
+        """
+        return self._logfile
+
+    @property
+    def ref_job(self):
+        r"""
+        :returns ref_job: Job of the reference calculation.
+        :rtype ref_job: Job
+        """
+        return self._ref_job
+
+    @property
+    def init_dir(self):
+        r"""
+        :returns init_dir: Absolute path to the initial directory of the
+            calculation (can differ from run_dir).
+        :rtype init_dir: str
+        """
+        return self._init_dir
+
+    @property
+    def run_dir(self):
+        r"""
+        :returns run_dir: Absolute path to the directory where the
+            calculation is run.
+        :rtype run_dir: str
+        """
+        return self._run_dir
+
+    @property
+    def data_dir(self):
+        r"""
+        :returns data_dir: Absolute path to the data directory of the
+            calculation.
+        :rtype data_dir: str
+        """
+        return self._data_dir
+
+    @property
+    def bigdft_tool_cmd(self):
+        r"""
+        :returns bigdft_tool_cmd: Base command to run the bigdft-tool
+            executable.
+        :rtype bigdft_tool_cmd: list
+        """
+        return self._bigdft_tool_cmd
+
+    @property
+    def bigdft_cmd(self):
+        r"""
+        :returns bigdft_cmd: Base command to run the bigdft executable.
+        :rtype bigdft_cmd: list
+        """
+        return self._bigdft_cmd
+
+    @property
+    def input_name(self):
+        r"""
+        :returns input_name: Name of the input parameters file.
+        :rtype input_name: str
+        """
+        return self._input_name
+
+    @property
+    def posinp_name(self):
+        r"""
+        :returns posinp_name: Name of the input position file.
+        :rtype posinp_name: str
+        """
+        return self._posinp_name
+
+    @property
+    def logfile_name(self):
+        r"""
+        :returns logfile_name: Name of the logfile.
+        :rtype logfile_name: str
+        """
+        return self._logfile_name
 
     def _set_directory_attributes(self, run_dir, name):
         r"""
@@ -94,10 +194,10 @@ class Job(object):
         :type run_dir: str
         """
         # Set the initial directory
-        self.init_dir = os.getcwd()
+        self._init_dir = os.getcwd()
         # Set the directory where the calculation will be run
         if run_dir is None:
-            self.run_dir = self.init_dir
+            self._run_dir = self.init_dir
         else:
             # A run directory was given, find the common prefix with the
             # current working directory
@@ -107,15 +207,15 @@ class Job(object):
                 # is already well defined, and the absolute directory is
                 # the concatenation of the current working directory and
                 # the run directory
-                self.run_dir = os.path.join(self.init_dir, run_dir)
+                self._run_dir = os.path.join(self.init_dir, run_dir)
             else:
                 # Else, find the relative path with the common prefix to
                 # define run_dir, and use run_dir to define the
                 # absolute directory. The initial directory is changed to the
                 # common prefix.
-                self.init_dir = basename
+                self._init_dir = basename
                 new_run_dir = os.path.relpath(run_dir, start=basename)
-                self.run_dir = os.path.join(self.init_dir, new_run_dir)
+                self._run_dir = os.path.join(self.init_dir, new_run_dir)
                 print("run_dir switched from {} to {}"
                       .format(run_dir, new_run_dir))
 
@@ -133,7 +233,7 @@ class Job(object):
             data_dir = DATA+'-'+name
         else:
             data_dir = DATA
-        self.data_dir = os.path.join(self.run_dir, data_dir)
+        self._data_dir = os.path.join(self.run_dir, data_dir)
 
     def _set_cmd_attributes(self, name, skip):
         r"""
@@ -149,15 +249,15 @@ class Job(object):
         :type skip: bool
         """
         # The base bigdft-tool command is always the same
-        self.bigdft_tool_cmd = [bigdft_tool_path]
+        self._bigdft_tool_cmd = [bigdft_tool_path]
         # The base bigdft command depends on name and on skip
         skip_option = []
         if skip:
             skip_option += ["-s", "Yes"]
         if name != "":
-            self.bigdft_cmd = [bigdft_path, name] + skip_option
+            self._bigdft_cmd = [bigdft_path, name] + skip_option
         else:
-            self.bigdft_cmd = [bigdft_path] + skip_option
+            self._bigdft_cmd = [bigdft_path] + skip_option
 
     def _set_filename_attributes(self, name):
         r"""
@@ -170,13 +270,13 @@ class Job(object):
         """
         # Initialize some file and directory names and also BigDFT commands
         if name != "":
-            self.input_name = name+".yaml"  # input file name
-            self.posinp_name = name+".xyz"  # posinp file name
-            self.logfile_name = "log-"+self.input_name  # output file name
+            self._input_name = name+".yaml"  # input file name
+            self._posinp_name = name+".xyz"  # posinp file name
+            self._logfile_name = "log-"+self.input_name  # output file name
         else:
-            self.input_name = "input.yaml"  # input file name
-            self.posinp_name = "posinp.xyz"  # posinp file name
-            self.logfile_name = "log.yaml"  # output file name
+            self._input_name = "input.yaml"  # input file name
+            self._posinp_name = "posinp.xyz"  # posinp file name
+            self._logfile_name = "log.yaml"  # output file name
 
     def __enter__(self):
         r"""
@@ -243,8 +343,7 @@ class Job(object):
                 print(output_msg)
         else:
             print("Logfile {} already exists!\n".format(self.logfile_name))
-        # Read the logfile
-        self.logfile = Logfile.from_file(self.logfile_name)
+        self._logfile = Logfile.from_file(self.logfile_name)
 
     def _copy_reference_data_dir(self):
         r"""

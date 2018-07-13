@@ -16,7 +16,7 @@ job_with_name = Job(inputparams=inp, posinp=pos, name="test")
 class TestJob:
 
     @pytest.mark.parametrize("attr, expected",
-        [("name", ""), ("inputparams", inp), ("posinp", pos),
+        [("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log.yaml"),
          ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
          ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT"),
@@ -30,7 +30,7 @@ class TestJob:
             assert getattr(job, attr) == expected
 
     @pytest.mark.parametrize("attr, expected",
-        [("name", "test"), ("inputparams", inp), ("posinp", pos),
+        [("inputparams", inp), ("posinp", pos),
          ("logfile", None), ("logfile_name", "log-test.yaml"),
          ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
          ("data_dir", "data-test"), ("ref_job", None),
