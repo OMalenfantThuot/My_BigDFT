@@ -2,8 +2,7 @@ from __future__ import absolute_import
 import os
 import pytest
 import numpy as np
-from mybigdft.job import Job
-from mybigdft.iofiles import InputParams, Posinp, Logfile
+from mybigdft import InputParams, Posinp, Logfile, Job
 
 # Extract the input and posinp from an N2 calculation of bad quality
 logname = os.path.join("tests", "log.yaml")

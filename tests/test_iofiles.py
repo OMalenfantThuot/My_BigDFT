@@ -1,7 +1,7 @@
 from __future__ import absolute_import
 import os
 import pytest
-from mybigdft.iofiles import InputParams, Posinp, Logfile, Atom
+from mybigdft import InputParams, Posinp, Logfile, Atom
 
 tests_fol = "tests"
 # Result of an N2 calculation of very bad quality
