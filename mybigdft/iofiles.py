@@ -16,12 +16,17 @@ __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
 
 def check(params):
     """
-    Function checking that all the keys of params correspond to BigDFT
-    parameters.
+    Check that the keys of `params` correspond to BigDFT parameters.
 
-    :param params: Trial input parameters.
-    :type params: dict
-    :raises: KeyError
+    Parameters
+    ----------
+    params : dict
+        Trial input parameters.
+
+    Raises
+    ------
+    KeyError
+        If a key or a sub-key is not a BigDFT parameter.
     """
     for key, value in params.items():
         if key not in inp_vars:
@@ -33,16 +38,17 @@ def check(params):
 
 def clean(params):
     """
-    Function returning the parameters whose values are not their default,
-    after checking that all the keys in params correspond to actual
-    BigDFT parameters.
+    Parameters
+    ----------
+    params : dict
+        Trial BigDFT input parameters.
 
-    :param params: Trial input parameters.
-    :type params: dict
-    :returns: Input parameters whose values are not their default, after
-        checking that all the keys in params correspond to actual BigDFT
-        parameters.
-    :rtype: dict
+    Returns
+    -------
+    dict
+        Input parameters whose values are not their default, after
+        checking that all the keys in `params` correspond to actual
+        BigDFT parameters.
     """
     # Check the validity of the given input parameters
     check(params)
@@ -61,16 +67,43 @@ def clean(params):
 
 class InputParams(MutableMapping):
     r"""
-    Class allowing to initialize, read, write and interact with an input
-    file of a BigDFT calculation.
+    Class allowing to initialize, read, write and interact with the
+    input parameters of a BigDFT calculation.
     """
 
     def __init__(self, params=None):
         r"""
-        An input file is created from a yaml dictionary.
+        Input parameters are initialized from a yaml dictionary.
 
-        :param data: yaml dictionary of the input file.
-        :type data: dict
+        Parameters
+        ----------
+        data : dict
+            yaml dictionary of the input parameters.
+
+
+        >>> InputParams({'dft': {'hgrids': [0.35]*3}})
+        {'dft': {'hgrids': [0.35, 0.35, 0.35]}}
+
+        Default values are cleaned from the input parameters:
+
+        >>> InputParams({'dft': {'hgrids': [0.45]*3}})
+        {}
+
+        The input parameters can be empty:
+
+        >>> InputParams()
+        {}
+
+        Initializing with unknown parameters raises a ``KeyError``:
+
+        >>> InputParams({'dfpt': {'hgrids': [0.35]*3}})
+        Traceback (most recent call last):
+        ...
+        KeyError: "Unknown key 'dfpt'"
+        >>> InputParams({'dft': {'hgrid': [0.35]*3}})
+        Traceback (most recent call last):
+        ...
+        KeyError: "Unknown key 'hgrid' in 'dft'"
         """
         if params is None:
             params = {}
@@ -81,24 +114,46 @@ class InputParams(MutableMapping):
         r"""
         Initialize an InputParams instance from a BigDFT input file.
 
-        :param filename: Name of the file to read.
-        :type filename: str
-        :returns: InputParams instance initialized from the file.
-        :rtype: InputParams
+        Parameters
+        ----------
+        filename : str
+            Name of the file to read.
+
+        Returns
+        -------
+        InputParams
+            InputParams instance initialized from the file.
         """
         with open(filename, "r") as f:
-            params = yaml.safe_load(f)
-        return cls(params=params)
+            return cls.from_string(f)
 
     @classmethod
     def from_Logfile(cls, filename):
         """
-        Initialize an InputParams instance from a BigDFT logfile.
+        Initialize an InputParams instance from a BigDFT
+        :class:`Logfile`.
 
-        :param filename: Name of the file to read.
-        :type filename: str
-        :returns: InputParams instance initialized from the logfile.
-        :rtype: InputParams
+        Parameters
+        ----------
+        filename : str
+            Name of the logfile to read.
+
+        Returns
+        -------
+        InputParams
+            InputParams instance initialized from the logfile.
+
+
+        >>> inp = {'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
+        ... 'disablesym': True}, 'geopt': {'ncount_cluster_x': 1},
+        ... 'posinp': {'units': 'angstroem', 'positions':
+        ... [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
+        ...         0.01071619987487793]},
+        ...  {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
+        ...         1.104273796081543]}],
+        ...  'properties': {'format': 'xyz', 'source': 'N2.xyz'}}}
+        >>> inp == InputParams.from_Logfile("tests/log.yaml")
+        True
         """
         log = Logfile.from_file(filename)
         params = {key: log.log[key] for key in inp_vars}
@@ -109,10 +164,19 @@ class InputParams(MutableMapping):
         r"""
         Initialize an InputParams instance from a string.
 
-        :param string: InputParams parameters as a string.
-        :type string: str
-        :returns: InputParams instance initialized from the string.
-        :rtype: InputParams
+        Parameters
+        ----------
+        string : str
+            Input parameters dictionary as a string.
+
+        Returns
+        -------
+        InputParams
+            InputParams instance initialized from the string.
+
+
+        >>> InputParams.from_string("{'dft': {'rmult': [6, 8]}}")
+        {'dft': {'rmult': [6, 8]}}
         """
         params = yaml.safe_load(string)
         return cls(params=params)
@@ -120,8 +184,10 @@ class InputParams(MutableMapping):
     @property
     def params(self):
         """
-        :returns: Input parameters.
-        :rtype: dict
+        Returns
+        -------
+        dict
+            Input parameters.
         """
         return self._params
 
@@ -129,6 +195,21 @@ class InputParams(MutableMapping):
         return self.params[key]
 
     def __setitem__(self, key, value):
+        r"""
+        Set the input parameters after making sure that they are valid.
+
+        Parameters
+        ----------
+        key : str
+            Input parameters key.
+        value : dict
+            Value of the given key of input parameters.
+
+        Warns
+        -----
+        UserWarning
+            If the proposed update does not modify the input parameters.
+        """
         # Check that the key and its value are valid.
         params = {key: value}
         cleaned_params = clean(params)
@@ -159,8 +240,10 @@ class InputParams(MutableMapping):
         """
         Write the input parameters on disk.
 
-        :param filename: Name of the input file.
-        :type filename: str
+        Parameters
+        ----------
+        filename : str
+            Name of the input file.
         """
         with open(filename, "w") as f:
             self._params = clean(self.params)  # Make sure it is valid
@@ -237,44 +320,15 @@ class Logfile(Mapping):
 
     def __init__(self, log):
         r"""
-        :param log: Logfile.
-        :type log: dict
+        Parameters
+        ----------
+        log : dict
+            Output of the BigDFT code as a yaml dictionary.
         """
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
         self._posinp = self._extract_posinp()
-
-    @classmethod
-    def from_file(cls, filename):
-        r"""
-        Initialize the Logfile from a file on disk.
-
-        :param filename: Name of the logfile.
-        :type filename: str
-        :returns: Logfile
-        """
-        with open(filename, "r") as f:
-            return cls.from_stream(f)
-
-    @classmethod
-    def from_stream(cls, stream):
-        r"""
-        Initialize the Logfile from a stream.
-
-        :param stream: Logfile as a stream.
-        :returns: Logfile
-        """
-        log = yaml.safe_load(stream)
-        return cls(log)
-
-    @property
-    def log(self):
-        r"""
-        :returns: Logfile.
-        :rtype: dict
-        """
-        return self._log
 
     def _set_builtin_attributes(self):
         r"""
@@ -286,8 +340,8 @@ class Logfile(Mapping):
 
         Once retrieved from the logfile, the attributes are set under
         their base name preceded by an underscore (e.g., the number of
-        atoms read thanks to the 'n_at' key of  ATTRIBUTES is finally
-        stored as the attribute '_n_at' of the Logfile instance).
+        atoms read thanks to the `n_at` key of ATTRIBUTES is finally
+        stored as the attribute `_n_at` of the Logfile instance).
         This extra underscore is meant to prevent the user from updating
         the value of the attribute.
         """
@@ -321,6 +375,63 @@ class Logfile(Mapping):
         """
         self._boundary_conditions = self._boundary_conditions.lower()
 
+    @classmethod
+    def from_file(cls, filename):
+        r"""
+        Initialize the Logfile from a file on disk.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the logfile.
+
+        Returns
+        -------
+        Logfile
+            Logfile initialized from a file on disk.
+
+
+        >>> log = Logfile.from_file("tests/log.yaml")
+        >>> print(log.posinp)
+        2   angstroem
+        free
+        N   2.97630782434901e-23   6.87220595204354e-23   0.0107161998748779
+        N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154
+        <BLANKLINE>
+        >>> log.energy
+        -191.74377352940274
+        """
+        with open(filename, "r") as f:
+            return cls.from_stream(f)
+
+    @classmethod
+    def from_stream(cls, stream):
+        r"""
+        Initialize the Logfile from a stream.
+
+        Parameters
+        ----------
+        stream
+            Logfile as a stream.
+
+        Returns
+        -------
+        Logfile
+            Logfile initialized from a stream.
+        """
+        log = yaml.safe_load(stream)
+        return cls(log)
+
+    @property
+    def log(self):
+        r"""
+        Returns
+        -------
+        Logfile
+            Yaml dictionary of the output of the BigDFT code.
+        """
+        return self._log
+
     def __getattr__(self, name):
         r"""
         Make the base attributes look for their private counterpart
@@ -328,16 +439,37 @@ class Logfile(Mapping):
         value of the attribute.
 
         All other attributes behave as they should by default.
+
+        Parameters
+        ----------
+        name : str
+            Name of the attribute.
+
+        Returns
+        -------
+            Value of the required attribute.
         """
         if name in ATTRIBUTES:
             return getattr(self, "_"+name)
         else:
-            super(Logfile, self).__setattr__(name)
+            super(Logfile, self).__getattr__(name)
 
     def __setattr__(self, name, value):
         r"""
         Make the base attributes behave like properties while keeping
         the default behaviour for the other ones.
+
+        Parameters
+        ----------
+        name : str
+            Name of the attribute.
+        value
+            Value of the attribute.
+
+        Raises
+        ------
+        AttributeError
+            If one tries to update one of the base attribute.
         """
         if name in ATTRIBUTES:
             raise AttributeError("can't set attribute")
@@ -346,11 +478,11 @@ class Logfile(Mapping):
 
     def __dir__(self):  # pragma: no cover
         r"""
-        The base attributes are not found when doing dir() on a
-        Logfile instance, but their counterpart with a preceding
-        underscore is. What is done here is a removal of the
-        underscored names, replaced by the bare names (in order
-        to avoid name repetition).
+        The base attributes are not found when doing `dir()` on a
+        `Logfile` instance, but their counterpart with a preceding
+        underscore is. What is done here is a removal of the underscored
+        names, replaced by the bare names (in order to avoid name
+        repetition).
 
         The bare attributes still behave as properties, while their
         value might be updated via the underscored attribute.
@@ -377,8 +509,10 @@ class Logfile(Mapping):
         r"""
         Write the logfile on disk.
 
-        :param filename: Name of the logfile.
-        :type filename: str
+        Parameters
+        ----------
+        filename : str
+            Name of the logfile.
         """
         with open(filename, "w") as f:
             yaml.safe_dump(self.log, stream=f)
@@ -386,8 +520,10 @@ class Logfile(Mapping):
     @property
     def posinp(self):
         r"""
-        :returns: Posinp used during the calculation.
-        :rtype: Posinp
+        Returns
+        -------
+        Posinp
+            Posinp used during the calculation.
         """
         return self._posinp
 
@@ -396,8 +532,10 @@ class Logfile(Mapping):
         Extract the posinp from the information contained in the
         logfile.
 
-        :returns: Posinp used to during the calculation.
-        :rtype: Posinp
+        Returns
+        -------
+        Posinp
+            Posinp used to during the calculation.
         """
         # Initialize some variables from the logfile
         log_pos = self["posinp"]
@@ -434,16 +572,32 @@ class Posinp(Sequence):
         the various lines of an xyz file:
 
         * the first element of of the list is a list made of the number
-          of atoms and the units (given by a string)
+          of atoms and the units (given by a string),
         * the second element is made of another list, made of the
           boundary conditions (given by a string) and possibly three
           distances defining the cell size along each space coordinate
-          (x, y and z).
+          (:math:`x`, :math:`y` and :math:`z`).
         * all the other elements must be Atom instances (defining the
           type (as a string) and the position of each atom).
 
-        :param posinp: xyz file written as a list.
-        :type posinp: list
+        Parameters
+        ----------
+        posinp : list
+            xyz file stored as a list.
+
+
+        >>> posinp = Posinp([[2, 'angstroem'], ['free'],
+        ... Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])])
+        >>> posinp.n_at
+        2
+        >>> posinp.BC
+        'free'
+        >>> posinp.units
+        'angstroem'
+        >>> for atom in posinp:
+        ...     repr(atom)
+        "Atom('N', [0.0, 0.0, 0.0])"
+        "Atom('N', [0.0, 0.0, 1.1])"
         """
         # Set the attributes associated to the first line of the xyz
         # file, namely the number of atoms and the units used to define
@@ -475,8 +629,10 @@ class Posinp(Sequence):
         Initialize the input positions from a stream that mimics an xyz
         file.
 
-        :returns: Posinp read from the stream.
-        :rtype: Posinp
+        Returns
+        -------
+        Posinp
+            Posinp read from a stream.
         """
         for i, line in enumerate(stream):
             if i == 0:
@@ -507,10 +663,15 @@ class Posinp(Sequence):
     @classmethod
     def from_string(cls, posinp):
         r"""
-        :param posinp: Content of an xyz file.
-        :type posinp: str
-        :returns: Posinp read from the string.
-        :rtype: Posinp
+        Parameters
+        ----------
+        posinp : str
+            Content of an xyz file as a string.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from the string.
         """
         posinp = posinp.split("\n")
         return cls._from_stream(posinp)
@@ -518,10 +679,28 @@ class Posinp(Sequence):
     @classmethod
     def from_file(cls, filename):
         r"""
-        :param filename: Name of the input positions file on disk.
-        :type filename: str
-        :returns: Posinp read from a file.
-        :rtype: Posinp
+        Parameters
+        ----------
+        filename : str
+            Name of the input positions file on disk.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from a file on disk.
+
+
+        >>> posinp = Posinp.from_file("tests/surface.xyz")
+        >>> posinp.cell
+        [8.07007483423, 1.0, 4.65925987792]
+        >>> print(posinp)
+        4   reduced
+        surface   8.07007483423   1.0   4.65925987792
+        C   0.08333333333   0.5   0.25
+        C   0.41666666666   0.5   0.25
+        C   0.58333333333   0.5   0.75
+        C   0.91666666666   0.5   0.75
+        <BLANKLINE>
         """
         with open(filename, "r") as f:
             return cls._from_stream(f)
@@ -529,68 +708,120 @@ class Posinp(Sequence):
     @classmethod
     def from_Logfile(cls, logname):
         r"""
-        :param filename: Name of the logfile on disk.
-        :type filename: str
-        :returns: Posinp read from a logfile.
-        :rtype: Posinp
+        Parameters
+        ----------
+        logname : str
+            Name of the logfile on disk.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from a logfile.
+
+
+        >>> posinp = Posinp.from_Logfile("tests/log.yaml")
+        >>> print(posinp)
+        2   angstroem
+        free
+        N   2.97630782434901e-23   6.87220595204354e-23   0.0107161998748779
+        N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154
+        <BLANKLINE>
         """
         return Logfile.from_file(logname).posinp
 
     @property
     def n_at(self):
         r"""
-        :returns: Number of atoms.
-        :rtype: int
+        Returns
+        -------
+        int
+            Number of atoms.
         """
         return self._n_at
 
     @property
     def units(self):
         r"""
-        :returns: Units used to represent the atomic positions.
-        :rtype: str
+        Returns
+        -------
+        str
+            Units used to represent the atomic positions.
         """
         return self._units
 
     @property
     def BC(self):
         r"""
-        :returns: Boundary conditions.
-        :rtype: str
+        Returns
+        -------
+        str
+            Boundary conditions.
         """
         return self._BC
 
     @property
     def cell(self):
         r"""
-        :returns: Cell size.
-        :rtype: list of three float or None
+        Returns
+        -------
+        list of three float or None
+            Cell size.
         """
         return self._cell
 
     @property
     def atoms(self):
         r"""
-        :returns: Atoms of the system (atomic type and positions).
-        :rtype: list
+        Returns
+        -------
+        list
+            Atoms of the system (atomic type and positions).
         """
         return self._atoms
 
     def __getitem__(self, index):
+        r"""
+        The items of a Posinp instance actually are the atoms (so as to
+        behave like an immutable list of atoms).
+
+        Parameters
+        ----------
+        index : int
+            Index of a given atom
+
+        Returns
+        -------
+        Atom
+            The required atom.
+        """
         return self.atoms[index]
 
     def __len__(self):
         return len(self.atoms)
 
     def __eq__(self, other):
+        r"""
+        Parameters
+        ----------
+        other : Posinp
+            Other initial positions to be compared.
+
+        Returns
+        -------
+        bool
+            True if both initial positions have the same string
+            representation.
+        """
         return str(self) == str(other)
 
     def __str__(self):
         r"""
         Convert the Posinp to a string.
 
-        :returns: The Posinp instance as a string.
-        :rtype: str
+        Returns
+        -------
+        str
+            The Posinp instance as a string.
         """
         # Create the first two lines of the posinp file
         pos_str = "{}   {}\n".format(self.n_at, self.units)
@@ -607,26 +838,48 @@ class Posinp(Sequence):
         r"""
         Write the Posinp on disk.
 
-        :param filename: Name of the input positions file.
-        :type filename: str
+        Parameters
+        ----------
+        filename : str
+            Name of the input positions file.
         """
         with open(filename, "w") as f:
             f.write(str(self))
 
     def translate_atom(self, i_at, vector):
         r"""
-        :param i_at: Index of the atom.
-        :type i_at: int
-        :param vector: Translation vector to apply.
-        :type vector: list or numpy.array of length 3
-        :returns: A new posinp where the i_at atom was translated by
-            vector.
-        :rtype: Posinp
+        Translate the `i_at` atom in the three space coordinates
+        according to the value of `vector`.
+
+        Parameters
+        ----------
+        i_at : int
+            Index of the atom.
+        vector : list or numpy.array of length 3
+            Translation vector to apply.
+
+        Returns
+        -------
+        Posinp
+            A new posinp where the `i_at` atom was translated by
+            `vector`.
+
 
         .. Warning::
 
             You have to make sure that the units of the vector match
             those used by the posinp.
+
+
+        >>> posinp = Posinp([[2, 'angstroem'], ['free'],
+        ... Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])])
+        >>> new_posinp = posinp.translate_atom(1, [0.0, 0.0, 0.05])
+        >>> print(new_posinp)
+        2   angstroem
+        free
+        N   0.0   0.0   0.0
+        N   0.0   0.0   1.15
+        <BLANKLINE>
         """
         new_posinp = deepcopy(self)
         new_posinp.atoms[i_at] = self[i_at].translate(vector)
@@ -640,38 +893,63 @@ class Atom(object):
 
     def __init__(self, atom_type, position):
         r"""
-        :param atom_type: Type of the atom.
-        :type atom_type: str
-        :param position: Position of the atom.
-        :type position: list or numpy.array of length 3
+        Parameters
+        ----------
+        atom_type : str
+            Type of the atom.
+        position : list or numpy.array of length 3
+            Position of the atom.
+
+
+        >>> a = Atom('C', [0, 0, 0])
+        >>> a.atom_type
+        'C'
+        >>> a.position
+        array([0., 0., 0.])
         """
         # TODO: Check that the atom type exists
         assert len(position) == 3
         self._atom_type = atom_type
-        self._position = np.array(position)
+        self._position = np.array(position, dtype=float)
 
     @property
     def atom_type(self):
         r"""
-        :returns: Type of the atom.
-        :rtype: str
+        Returns
+        -------
+        str
+            Type of the atom.
         """
         return self._atom_type
 
     @property
     def position(self):
         r"""
-        :returns: Position of the atom.
-        :rtype: list or numpy.array of length 3
+        Returns
+        -------
+        list or numpy.array of length 3
+            Position of the atom.
         """
         return self._position
 
     def translate(self, vector):
         r"""
-        :returns: Atom translated according to the given vector.
-        :rtype: Atom
-        :param vector: Translation vector to apply.
-        :type vector: list or numpy.array of length 3
+        Translate the coordinates of the atom by the values of the
+        vector.
+
+        Returns
+        -------
+        Atom
+            Atom translated according to the given vector.
+
+        Parameters
+        ----------
+        vector : list or numpy.array of length 3
+            Translation vector to apply.
+
+
+        >>> Atom('C', [0, 0, 0]).translate([0.5, 0.5, 0.5])
+        Atom('C', [0.5, 0.5, 0.5])
         """
         assert len(vector) == 3
         new_atom = deepcopy(self)
@@ -680,16 +958,50 @@ class Atom(object):
 
     def __str__(self):
         r"""
-        :returns: String representation of the atom, mainly used to
-            create the string representation of a Posinp instance.
-        :rtype: str
+        Returns
+        -------
+        str
+            String representation of the atom, mainly used to create the
+            string representation of a Posinp instance.
         """
         return "{t}  {: .15}  {: .15}  {: .15}\n"\
                .format(t=self.atom_type, *self.position)
 
     def __repr__(self):
+        r"""
+        Returns
+        -------
+        str
+            General string representation of an Atom instance.
+        """
         return "Atom('{}', {})".format(self.atom_type, list(self.position))
 
     def __eq__(self, other):
-        return (np.array_equal(self.position, other.position)
-                and self.atom_type == other.atom_type)
+        r"""
+        Two atoms are the same if they are located on the same position
+        and have the same type.
+
+        Parameters
+        ----------
+        other
+            Other object.
+
+        Returns
+        -------
+        bool
+            True if both atoms have the same type and position.
+
+
+        >>> a = Atom('C', [0., 0., 0.])
+        >>> a == 1
+        False
+        >>> a == Atom('N', [0., 0., 0.])
+        False
+        >>> a == Atom('C', [1., 0., 0.])
+        False
+        """
+        try:
+            return (np.array_equal(self.position, other.position)
+                    and self.atom_type == other.atom_type)
+        except AttributeError:
+            return False

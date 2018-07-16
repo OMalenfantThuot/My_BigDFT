@@ -21,34 +21,43 @@ class Job(object):
                  ref_job=None, skip=False):
         r"""
         You may pass input parameters and/or initial geometry (posinp).
-        Make sure to at list provide initial positions, either via the
+        Make sure to at least provide initial positions, either via the
         posinp or the input parameters.
 
-        You may give a prefix to name the output files and specify the
-        directory where to run the calculation.
+        You may give a `name` for the calculation, used to name the
+        input and output files written on disk (default naming
+        conventions are used if not). You can also specify the directory
+        where to run the calculation with `run_dir`.
 
         A reference calculation may be given in order to copy its data
         directory to the present calculation (main use: restart from the
         wavefunctions of the reference calculation).
 
-        :param inputparams: BigDFT input file.
-        :type inputparams: ~mybigdft.iofiles.InputParams
-        :param posinp: BigDFT initial geometry file.
-        :type posinp: ~mybigdft.iofiles.Posinp
-        :param name: Prefix of the BigDFT calculation (optional,
-            default value set to None).
-        :type name: str
-        :param run_dir: Folder where to run the calculation
-            (optional, default value set to None).
-        :type run_dir: str
-        :param ref_job: Other BigDFT calculation, taken as reference
-            (optional, default value set to None)
-        :type ref_job: ~mybigdft.job.Job
-        :param skip: If True, the calculation will be skipped. (Note:
-            Might not be useful now, since we check for the existence
-            of the logfile before running, which might be the actual
-            check of the skip option of BigDFT)
-        :type skip: bool
+        Parameters
+        ----------
+        inputparams : InputParams or None
+            BigDFT input parameters.
+        posinp : Posinp or None
+            BigDFT initial geometry file.
+        name : str
+            Prefix of the BigDFT calculation (used to define the input
+            and output file names).
+        run_dir : str or None
+            Folder where to run the calculation (default to current
+            directory).
+        ref_job : Job or None
+            Other BigDFT calculation, taken as reference.
+        skip : bool
+            If `True`, the calculation will be skipped. (Note: Might not
+            be useful now, since we check for the existence of the
+            logfile before running, which might be the actual check of
+            the skip option of BigDFT.)
+
+        Raises
+        ------
+        ValueError
+            If no initial positions are given in the posinp or the input
+            parameters.
         """
         # Check the input parameters of the calculation
         if (inputparams is None and posinp is None) or \
@@ -71,101 +80,122 @@ class Job(object):
     @property
     def inputparams(self):
         r"""
-        :returns inputparams: Input parameters of the calculation.
-        :rtype inputparams: InputParams
+        Returns
+        -------
+        InputParams
+            Input parameters of the calculation.
         """
         return self._inputparams
 
     @property
     def posinp(self):
         r"""
-        :returns posinp: Initial positions of the calculation.
-        :rtype posinp: Posinp or None
+        Returns
+        -------
+        Posinp or None
+            Initial positions of the calculation.
         """
         return self._posinp
 
     @property
     def logfile(self):
         r"""
-        :returns logfile: Logfile of the calculation (output of the
-            bigdft or bigdft-tool executable).
-        :rtype logfile: Logfile or None
+        Returns
+        -------
+        Logfile or None
+            Logfile of the calculation (output of the bigdft or
+            bigdft-tool executable).
         """
         return self._logfile
 
     @property
     def ref_job(self):
         r"""
-        :returns ref_job: Job of the reference calculation.
-        :rtype ref_job: Job
+        Returns
+        -------
+        Job
+            Job of the reference calculation.
         """
         return self._ref_job
 
     @property
     def init_dir(self):
         r"""
-        :returns init_dir: Absolute path to the initial directory of the
-            calculation (can differ from run_dir).
-        :rtype init_dir: str
+        Returns
+        -------
+        str
+            Absolute path to the initial directory of the calculation
+            (can differ from :meth:`~mybigdft.job.Job.run_dir`).
         """
         return self._init_dir
 
     @property
     def run_dir(self):
         r"""
-        :returns run_dir: Absolute path to the directory where the
-            calculation is run.
-        :rtype run_dir: str
+        Returns
+        -------
+        str
+            Absolute path to the directory where the calculation is run.
         """
         return self._run_dir
 
     @property
     def data_dir(self):
         r"""
-        :returns data_dir: Absolute path to the data directory of the
-            calculation.
-        :rtype data_dir: str
+        Returns
+        -------
+        str
+            Absolute path to the data directory of the calculation.
         """
         return self._data_dir
 
     @property
     def bigdft_tool_cmd(self):
         r"""
-        :returns bigdft_tool_cmd: Base command to run the bigdft-tool
-            executable.
-        :rtype bigdft_tool_cmd: list
+        Returns
+        -------
+        list
+            Base command to run the bigdft-tool executable.
         """
         return self._bigdft_tool_cmd
 
     @property
     def bigdft_cmd(self):
         r"""
-        :returns bigdft_cmd: Base command to run the bigdft executable.
-        :rtype bigdft_cmd: list
+        Returns
+        -------
+        list
+            Base command to run the bigdft executable.
         """
         return self._bigdft_cmd
 
     @property
     def input_name(self):
         r"""
-        :returns input_name: Name of the input parameters file.
-        :rtype input_name: str
+        Returns
+        -------
+        str
+            Name of the input parameters file.
         """
         return self._input_name
 
     @property
     def posinp_name(self):
         r"""
-        :returns posinp_name: Name of the input position file.
-        :rtype posinp_name: str
+        Returns
+        -------
+        str
+            Name of the input position file.
         """
         return self._posinp_name
 
     @property
     def logfile_name(self):
         r"""
-        :returns logfile_name: Name of the logfile.
-        :rtype logfile_name: str
+        Returns
+        -------
+        str
+            Name of the logfile.
         """
         return self._logfile_name
 
@@ -174,12 +204,12 @@ class Job(object):
         Set the attributes regarding the directories used to run the
         calculation and to store data.
 
-        :param run_dir: Folder where to run the calculation
-            (optional, default value set to None).
-        :type run_dir: str
-        :param name: Prefix of the BigDFT calculation (optional,
-            default value set to None).
-        :type name: str
+        Parameters
+        ----------
+        run_dir : str or None
+            Folder where to run the calculation.
+        name : str
+            Prefix of the BigDFT calculation.
         """
         self._set_init_and_run_directories(run_dir)
         self._set_data_directory(name)
@@ -189,9 +219,10 @@ class Job(object):
         Set the attributes regarding the directories used to run the
         calculation.
 
-        :param run_dir: Folder where to run the calculation
-            (optional, default value set to None).
-        :type run_dir: str
+        Parameters
+        ----------
+        run_dir : str or None
+            Folder where to run the calculation.
         """
         # Set the initial directory
         self._init_dir = os.getcwd()
@@ -223,9 +254,10 @@ class Job(object):
         r"""
         Set the attributes regarding the directories used to store data.
 
-        :param name: Prefix of the BigDFT calculation (optional,
-            default value set to None).
-        :type name: str
+        Parameters
+        ----------
+        name : str
+            Prefix of the BigDFT calculation.
         """
         # Set the data directory
         DATA = "data"  # base name for the BigDFT data directory
@@ -239,14 +271,15 @@ class Job(object):
         r"""
         Set the base commands to run bigdft or bigdft-tool.
 
-        :param name: Prefix of the BigDFT calculation (optional,
-            default value set to None).
-        :type name: str
-        :param skip: If True, the calculation will be skipped. (Note:
-            Might not be useful now, since we check for the existence
-            of the logfile before running, which might be the actual
-            check of the skip option of BigDFT)
-        :type skip: bool
+        Parameters
+        ----------
+        name : str
+            Prefix of the BigDFT calculation.
+        skip : bool
+            If `True`, the calculation will be skipped. (Note: Might not
+            be useful now, since we check for the existence of the
+            logfile before running, which might be the actual check of
+            the skip option of BigDFT.)
         """
         # The base bigdft-tool command is always the same
         self._bigdft_tool_cmd = [bigdft_tool_path]
@@ -264,9 +297,10 @@ class Job(object):
         Set the attributes regarding the name of the input and output
         files.
 
-        :param name: Prefix of the BigDFT calculation (optional,
-            default value set to None).
-        :type name: str
+        Parameters
+        ----------
+        name : str
+            Prefix of the BigDFT calculation.
         """
         # Initialize some file and directory names and also BigDFT commands
         if name != "":
@@ -303,23 +337,24 @@ class Job(object):
         r"""
         Run the BigDFT calculation if it was not already performed.
 
-        You may force the calculation by setting force_run to True.
+        You may force the calculation by setting force_run to `True`.
 
-        If dry_run is set to True, then bigdft-tool is run instead.
+        If `dry_run` is set to `True`, then bigdft-tool is run instead.
 
         The number of MPI and OpenMP tasks may also be specified.
 
-        :param nmpi: Number of MPI tasks.
-        :type nmpi: int
-        :param nomp: Number of OpenMP tasks.
-        :type nomp: int
-        :param force_run: States if the calculation has to be run,
-            even though a logfile already exists.
-        :type force_run: bool
-        :param dry_run: If True, the input files are written on disk,
-            but the bigdft-tool command is run instead of the bigdft
-            one.
-        :type dry_run: bool
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        nomp : int
+            Number of OpenMP tasks.
+        force_run : bool
+            If `True`, the calculation is run even though a logfile
+            already exists.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
         """
         # Copy the data directory of a reference calculation
         if self.ref_job is not None:
@@ -392,8 +427,10 @@ class Job(object):
         r"""
         Set the number of OpenMP threads.
 
-        :param nomp: Number of OpenMP tasks.
-        :type nomp: int
+        Parameters
+        ----------
+        nomp : int
+            Number of OpenMP tasks.
         """
         nomp = int(nomp)  # Make sure you get an integer
         if nomp > 1:
@@ -401,15 +438,19 @@ class Job(object):
 
     def _get_command(self, nmpi, dry_run):
         r"""
-        :returns: The command to run bigdft if dry_run is set to False,
+        Returns
+        -------
+        command : list
+            The command to run bigdft if `dry_run` is set to `False`,
             else the command to run bigdft-tool.
-        :rtype: list
-        :param nmpi: Number of MPI tasks.
-        :type nmpi: int
-        :param dry_run: If True, the input files are written on disk,
-            but the bigdft-tool command is run instead of the bigdft
-            one.
-        :type dry_run: bool
+
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
         """
         nmpi = int(nmpi)  # Make sure you get an integer
         mpi_command = []
@@ -428,12 +469,13 @@ class Job(object):
         Write the input files on disk (there might be no posinp to write,
         since the input positions can be defined in the input).
 
-        :param nmpi: Number of MPI tasks (default value set to 1).
-        :type nmpi: int
-        :param dry_run: If True, the input files are written on disk,
-            but the bigdft-tool command is run instead of the bigdft
-            one.
-        :type dry_run: bool
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        dry_run : bool
+            If True, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
         """
         if dry_run:
             # Use default names to create dummy files. They will be
@@ -454,8 +496,10 @@ class Job(object):
         r"""
         Launch the command to run the bigdft or bigdft-tool command.
 
-        :param command: The command to run bigdft or bigdft-tool.
-        :type command: list
+        Parameters
+        ----------
+        command : list
+            The command to run bigdft or bigdft-tool.
         """
         # Print the command in a human readable way
         to_str = "{} "*len(command)
@@ -478,8 +522,10 @@ class Job(object):
         * Delete the dummy input files on disk and the associated
           temporary attribute.
 
-        :param output_msg: Output of the bigdft-tool command.
-        :type output_msg: str
+        Parameters
+        ----------
+        output_msg : str
+            Output of the bigdft-tool command.
         """
         log = Logfile.from_stream(output_msg)
         log.write(self.logfile_name)
@@ -497,6 +543,14 @@ class Job(object):
             self._delete_file(filename)
 
     def _delete_file(self, filename):
+        r"""
+        Delete a file, given a filename.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the file to delete.
+        """
         try:
             os.remove(filename)
         except OSError:

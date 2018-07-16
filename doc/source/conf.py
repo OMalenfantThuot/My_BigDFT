@@ -43,7 +43,13 @@ extensions = [
     'sphinx.ext.coverage',
     'sphinx.ext.viewcode',
     'sphinx.ext.mathjax',
+    'sphinx.ext.napoleon',
 ]
+
+# Napoleon settings (for numpy docstring style)
+napoleon_use_rtype = True
+napoleon_google_docstring = False
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']

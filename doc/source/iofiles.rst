@@ -7,6 +7,6 @@ are defined below:
 
 .. toctree::
 
-    logfile
-    posinp
     inputparams
+    posinp
+    logfile
