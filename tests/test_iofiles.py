@@ -75,6 +75,7 @@ class TestInputParams:
         inp = InputParams.from_file(self.filename)
         assert inp == {}
 
+    @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_from_Logfile(self):
         inp = InputParams.from_Logfile(logname)
         expected = {
@@ -118,7 +119,8 @@ class TestLogfile:
          ("_dipole", [0.69649, 0.69649, -2.4954]),
          ("_sdos", None),
          ("_magnetization", None),
-         ("_pressure", None)])
+         ("_pressure", None),
+         ("_atom_types", ['N'])])
     def test_attributes(self, attr, value):
         # Two asserts as one can get both attributes (say, _n_at and n_at)
         assert getattr(self.log, attr) == value
@@ -137,11 +139,18 @@ class TestLogfile:
     def test_len(self):
         assert len(self.log) == 90
 
+    @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_write(self):
         fname = os.path.join(tests_fol, "log-test.yaml")
         self.log.write(fname)
         log2 = Logfile.from_file(fname)
         assert log2 == self.log
+
+    def test_init_warns_UserWarning(self):
+        self.log["dft"]["ixc"] = -101130
+        with pytest.warns(UserWarning):
+            self.log._check_psppar()
+        self.log["dft"]["ixc"] = 1
 
 
 class TestPosinp:

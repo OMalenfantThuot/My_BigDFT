@@ -10,6 +10,10 @@ import oyaml as yaml
 import numpy as np
 from .globals import inp_vars
 
+# Catch the UserWarning warned while running the doctests
+import pytest
+pytestmark = pytest.mark.filterwarnings("ignore::UserWarning")
+
 
 __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
 
@@ -307,8 +311,12 @@ ATTRIBUTES = {
     "sdos": {PATHS: [["SDos files"]], GLOBAL: True},
     "symmetry": {PATHS: [["Atomic System Properties", "Space group"]],
                  PRINT: "Symmetry group", GLOBAL: True},
+    "atom_types": {PATHS: [["Atomic System Properties", "Types of atoms"]],
+                   PRINT: "List of the atomic types present in the posinp"},
     "walltime": {PATHS: [["Walltime since initialization"]],
-                 PRINT: "Walltime since initialization"}
+                 PRINT: "Walltime since initialization"},
+    "WARNINGS": {PATHS: [["WARNINGS"]],
+                 PRINT: "Warnings raised during the BigDFT run"},
 }
 
 
@@ -329,6 +337,7 @@ class Logfile(Mapping):
         self._set_builtin_attributes()
         self._clean_attributes()
         self._posinp = self._extract_posinp()
+        self._check_warnings()
 
     def _set_builtin_attributes(self):
         r"""
@@ -374,6 +383,37 @@ class Logfile(Mapping):
         Clean the value of the built-in attributes.
         """
         self._boundary_conditions = self._boundary_conditions.lower()
+
+    def _check_warnings(self):
+        r"""
+        Warns
+        -----
+        UserWarning
+            If there are some warnings in the Logfile or if the XC of
+            the pseudo-potentials do not match those of the input
+            parameters.
+        """
+        if self.WARNINGS is not None:
+            for warning in self.WARNINGS:
+                warnings.warn(warning, UserWarning)
+        self._check_psppar()
+
+    def _check_psppar(self):
+        r"""
+        Warns
+        -----
+        UserWarning
+            If the XC of the potential is different from the XC of the
+            input parameters.
+        """
+        for atom_type in self.atom_types:
+            psp_ixc = self["psppar.{}".format(atom_type)]["Pseudopotential XC"]
+            inp_ixc = self["dft"]["ixc"]
+            if psp_ixc != inp_ixc:
+                warnings.warn("The XC of pseudo potentials ({}) is different "
+                              "than the input XC ({}) for the '{}' atoms"
+                              .format(psp_ixc, inp_ixc, atom_type),
+                              UserWarning)
 
     @classmethod
     def from_file(cls, filename):
