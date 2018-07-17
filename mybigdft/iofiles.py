@@ -655,7 +655,8 @@ class Posinp(Sequence):
             raise ValueError(
                 "Reduced coordinates are not allowed with isolated BC.")
         if self.BC != "free":
-            self._cell = [float(coord) for coord in second_line[1:4]]
+            self._cell = [float(coord) if coord != ".inf" else coord
+                          for coord in second_line[1:4]]
         else:
             self._cell = None
         # Set the attributes associated to all the other lines of the
@@ -691,7 +692,8 @@ class Posinp(Sequence):
                 content = line.split()
                 BC = content[:1]
                 if content[0] != "free":
-                    cell = [float(c) for c in content[1:4]]
+                    cell = [float(c) if c != ".inf" else c
+                            for c in content[1:4]]
                     BC += cell
                 posinp.append(BC)
             else:
@@ -738,10 +740,10 @@ class Posinp(Sequence):
 
         >>> posinp = Posinp.from_file("tests/surface.xyz")
         >>> posinp.cell
-        [8.07007483423, 1.0, 4.65925987792]
+        [8.07007483423, '.inf', 4.65925987792]
         >>> print(posinp)
         4   reduced
-        surface   8.07007483423   1.0   4.65925987792
+        surface   8.07007483423   .inf   4.65925987792
         C   0.08333333333   0.5   0.25
         C   0.41666666666   0.5   0.25
         C   0.58333333333   0.5   0.75

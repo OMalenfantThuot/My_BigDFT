@@ -187,11 +187,29 @@ C    7.327412521    0.000000000   3.461304757"""
     str_pos = Posinp.from_string(string)
     # Posinp read from an N2 calculation of bad quality
     log_pos = Logfile.from_file(logname).posinp
+    # Posinp read from an InputParams instance with surface BC
+    surf_inp = InputParams({
+        'posinp': {
+            'units': 'angstroem',
+            'cell': [8.0, '.inf', 8.0],
+            'positions': [{'C': [0.0, 0.0, 0.0]}]
+        }
+    })
+    surf_pos = Posinp.from_InputParams(surf_inp)
+    # Posinp read from an InputParams instance with periodic BC
+    per_inp = InputParams({
+        'posinp': {
+            'units': 'angstroem',
+            'cell': [8.0, 1.0, 8.0],
+            'positions': [{'C': [0.0, 0.0, 0.0]}]
+        }
+    })
+    per_pos = Posinp.from_InputParams(per_inp)
 
     @pytest.mark.parametrize("value, expected", [
         (pos.n_at, 4), (pos.units, "reduced"), (len(pos), 4),
         (pos.BC, "surface"),
-        (pos.cell, [8.07007483423, 1.0, 4.65925987792]),
+        (pos.cell, [8.07007483423, '.inf', 4.65925987792]),
         (pos[0], Atom('C', [0.08333333333, 0.5, 0.25])),
     ])
     def test_from_file(self, value, expected):
@@ -201,9 +219,28 @@ C    7.327412521    0.000000000   3.461304757"""
         (log_pos.n_at, 2), (log_pos.units, "angstroem"), (len(log_pos), 2),
         (log_pos.BC, "free"),
         (log_pos.cell, None),
-        (log_pos[0], Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23, 0.01071619987487793])),  # noqa
+        (log_pos[0], Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
+                                0.01071619987487793])),
     ])
     def test_from_Logfile(self, value, expected):
+        assert value == expected
+
+    @pytest.mark.parametrize("value, expected", [
+        (surf_pos.n_at, 1), (surf_pos.units, "angstroem"), (len(surf_pos), 1),
+        (surf_pos.BC, "surface"),
+        (surf_pos.cell, [8, ".inf", 8]),
+        (surf_pos[0], Atom('C', [0, 0, 0])),
+    ])
+    def test_from_surface_InputParams(self, value, expected):
+        assert value == expected
+
+    @pytest.mark.parametrize("value, expected", [
+        (per_pos.n_at, 1), (per_pos.units, "angstroem"), (len(per_pos), 1),
+        (per_pos.BC, "periodic"),
+        (per_pos.cell, [8, 1.0, 8]),
+        (per_pos[0], Atom('C', [0, 0, 0])),
+    ])
+    def test_from_periodic_InputParams(self, value, expected):
         assert value == expected
 
     def test_from_string(self):
