@@ -9,8 +9,9 @@ class TestJob:
 
     # Extract the input and posinp from an N2 calculation of bad quality
     logname = os.path.join("tests", "log-warnings.yaml")
-    inp = InputParams.from_Logfile(logname)
-    pos = Posinp.from_Logfile(logname)
+    log = Logfile.from_file(logname)
+    inp = InputParams.from_Logfile(log)
+    pos = Logfile.from_file(logname).posinp
     job = Job(inputparams=inp, posinp=pos)
     job_with_name = Job(inputparams=inp, posinp=pos, name="test")
 
@@ -89,7 +90,7 @@ class TestJob:
 
     def test_clean(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
-            job._write_input_files(nmpi=1, dry_run=False)
+            job.write_input_files()
             job.clean()
             assert not os.path.exists(job.posinp_name)
             assert not os.path.exists(job.input_name)
@@ -122,3 +123,18 @@ class TestJob:
             assert new_pos == self.pos
             bigdft_tool_log = Logfile.from_file(job.logfile_name)
             assert bigdft_tool_log.energy is None
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test__check_logfile_posinp(self):
+        pos_name = os.path.join("tests", "surface.xyz")
+        pos = Posinp.from_file(pos_name)
+        with pytest.raises(UserWarning):
+            with Job(inputparams=self.inp, posinp=pos, run_dir="tests") as job:
+                job.run()
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test__check_logfile_inputparams(self):
+        with pytest.raises(UserWarning):
+            with Job(inputparams=InputParams(), posinp=self.pos,
+                     name="warnings", run_dir="tests") as job:
+                job.run()

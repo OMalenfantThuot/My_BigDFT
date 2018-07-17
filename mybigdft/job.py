@@ -6,8 +6,9 @@ from __future__ import print_function
 import os
 import shutil
 import subprocess
+from copy import deepcopy
 from .globals import bigdft_path, bigdft_tool_path
-from .iofiles import InputParams, Logfile
+from .iofiles import InputParams, Posinp, Logfile
 
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -63,30 +64,31 @@ class Job(object):
         A Job instance can be initialized by using a posinp only:
 
         >>> from mybigdft import Posinp, Atom
-        >>> pos = Posinp([[2, "angstroem"], ["free"],
-        ...               Atom('N', [0.0, 0.0, 0.0]),
-        ...               Atom('N', [0.0, 0.0, 1.1])])
-        >>> job = Job(posinp=pos, name="N2", run_dir="tests")
+        >>> pos = Posinp([
+        ...     [2, "angstroem"],
+        ...     ["free"],
+        ...     Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
+        ...                0.01071619987487793]),
+        ...     Atom('N', [-1.1043449194501671e-23, -4.873421744830746e-23,
+        ...                1.104273796081543])
+        ... ])
+        >>> job = Job(posinp=pos, run_dir="tests")
 
         Default values are therefore used for the input parameters:
 
         >>> job.inputparams
         {}
 
-        There is no logfile associated to the job yet as it was not run:
-
-        >>> job.logfile is None
-        True
-
         Input and output file names are defined from the `name` passed
-        as argument:
+        as argument. Here, no name is passed, so that default names are
+        used:
 
         >>> job.input_name
-        'N2.yaml'
+        'input.yaml'
         >>> job.posinp_name
-        'N2.xyz'
+        'posinp.xyz'
         >>> job.logfile_name
-        'log-N2.yaml'
+        'log.yaml'
 
         The directories are defined from the `run_dir` argument:
 
@@ -97,6 +99,24 @@ class Job(object):
         True
         >>> os.path.basename(job.run_dir)
         'tests'
+
+        There is no logfile associated to the job yet as it was not run:
+
+        >>> job.logfile is None
+        True
+
+        To run the job, do it from a context manager:
+        >>> with job as j:
+        ...     j.run()
+        ...
+        /.../tests
+        Logfile log.yaml already exists!
+        <BLANKLINE>
+
+        A logfile being found, it is read and not computed again:
+
+        >>> job.logfile is None
+        False
         """
         # Check the input parameters of the calculation
         if (inputparams is None and posinp is None) or \
@@ -110,11 +130,22 @@ class Job(object):
         self._posinp = posinp
         self._logfile = None
         self._ref_job = ref_job
+        self._name = str(name)
 
         # Derive the rest of the attributes from the other arguments
-        self._set_directory_attributes(run_dir, name)
-        self._set_filename_attributes(name)
-        self._set_cmd_attributes(name, skip)
+        self._set_directory_attributes(run_dir)
+        self._set_filename_attributes()
+        self._set_cmd_attributes(skip)
+
+    @property
+    def name(self):
+        r"""
+        Returns
+        str
+            Base name of the calculation used to set the names of
+            files and directories as well as the commands.
+        """
+        return self._name
 
     @property
     def inputparams(self):
@@ -238,7 +269,7 @@ class Job(object):
         """
         return self._logfile_name
 
-    def _set_directory_attributes(self, run_dir, name):
+    def _set_directory_attributes(self, run_dir):
         r"""
         Set the attributes regarding the directories used to run the
         calculation and to store data.
@@ -247,11 +278,9 @@ class Job(object):
         ----------
         run_dir : str or None
             Folder where to run the calculation.
-        name : str
-            Prefix of the BigDFT calculation.
         """
         self._set_init_and_run_directories(run_dir)
-        self._set_data_directory(name)
+        self._set_data_directory()
 
     def _set_init_and_run_directories(self, run_dir):
         r"""
@@ -289,31 +318,24 @@ class Job(object):
                 print("run_dir switched from {} to {}"
                       .format(run_dir, new_run_dir))
 
-    def _set_data_directory(self, name):
+    def _set_data_directory(self):
         r"""
         Set the attributes regarding the directories used to store data.
-
-        Parameters
-        ----------
-        name : str
-            Prefix of the BigDFT calculation.
         """
         # Set the data directory
         DATA = "data"  # base name for the BigDFT data directory
-        if name != "":
-            data_dir = DATA+'-'+name
+        if self.name != "":
+            data_dir = DATA+'-'+self.name
         else:
             data_dir = DATA
         self._data_dir = os.path.join(self.run_dir, data_dir)
 
-    def _set_cmd_attributes(self, name, skip):
+    def _set_cmd_attributes(self, skip):
         r"""
         Set the base commands to run bigdft or bigdft-tool.
 
         Parameters
         ----------
-        name : str
-            Prefix of the BigDFT calculation.
         skip : bool
             If `True`, the calculation will be skipped. (Note: Might not
             be useful now, since we check for the existence of the
@@ -321,30 +343,24 @@ class Job(object):
             the skip option of BigDFT.)
         """
         # The base bigdft-tool command is always the same
-        self._bigdft_tool_cmd = [bigdft_tool_path]
+        self._bigdft_tool_cmd = [bigdft_tool_path, "--name", self.name]
         # The base bigdft command depends on name and on skip
         skip_option = []
         if skip:
             skip_option += ["-s", "Yes"]
-        if name != "":
-            self._bigdft_cmd = [bigdft_path, name] + skip_option
+        if self.name != "":
+            self._bigdft_cmd = [bigdft_path, self.name] + skip_option
         else:
             self._bigdft_cmd = [bigdft_path] + skip_option
 
-    def _set_filename_attributes(self, name):
+    def _set_filename_attributes(self):
         r"""
         Set the attributes regarding the name of the input and output
         files.
-
-        Parameters
-        ----------
-        name : str
-            Prefix of the BigDFT calculation.
         """
-        # Initialize some file and directory names and also BigDFT commands
-        if name != "":
-            self._input_name = name+".yaml"  # input file name
-            self._posinp_name = name+".xyz"  # posinp file name
+        if self.name != "":
+            self._input_name = self.name+".yaml"  # input file name
+            self._posinp_name = self.name+".xyz"  # posinp file name
             self._logfile_name = "log-"+self.input_name  # output file name
         else:
             self._input_name = "input.yaml"  # input file name
@@ -404,20 +420,53 @@ class Job(object):
         if os.path.exists(self.data_dir):
             self._read_wavefunctions_from_data_dir()
 
-        # Run bigdft or bigdft-tool when asked or when the logfile does
-        # not exist (meaning that the calculation was not already done)
         if dry_run or force_run or not os.path.exists(self.logfile_name):
+            # Run bigdft (if dry_run is False) or bigdft-tool (if
+            # dry_run is True)
             self._set_environment(nomp)
-            self._write_input_files(nmpi, dry_run)
+            self.write_input_files()
             command = self._get_command(nmpi, dry_run)
             output_msg = self._launch_calculation(command)
             if dry_run:
-                self._after_dry_run(output_msg)
+                self._write_bigdft_tool_output(output_msg)
             else:
                 print(output_msg)
+            self._logfile = Logfile.from_file(self.logfile_name)
         else:
+            # The logfile already exists: the initial positions and the
+            # initial parameters used to perform that calculation must
+            # correspond to the ones used to initialize the current job.
             print("Logfile {} already exists!\n".format(self.logfile_name))
-        self._logfile = Logfile.from_file(self.logfile_name)
+            self._logfile = Logfile.from_file(self.logfile_name)
+            self._check_logfile_posinp()
+            self._check_logfile_inputparams()
+
+    def _check_logfile_posinp(self):
+        r"""
+        Check that the posinp used in the logfile corresponds to
+        the one used to initialize the job.
+        """
+        if self.posinp is None:
+            self._posinp = Posinp.from_InputParams(self.inputparams)
+        if self.logfile.posinp != self.posinp:
+            raise UserWarning(
+                "The initial geometry of this job do not correspond to the "
+                "one used in the Logfile")
+
+    def _check_logfile_inputparams(self):
+        r"""
+        Check that the input parameters used in the logfile
+        correspond to the ones used to initialize the job.
+        """
+        bare_inp = deepcopy(self.inputparams)
+        if "posinp" in bare_inp:
+            del bare_inp['posinp']
+        log_inp = InputParams.from_Logfile(self.logfile)
+        del log_inp['posinp']
+        if bare_inp != log_inp:
+            raise UserWarning(
+                "The input parameters of this job do not correspond to the "
+                "ones used in the Logfile.", UserWarning)
 
     def _copy_reference_data_dir(self):
         r"""
@@ -492,41 +541,23 @@ class Job(object):
             bigdft-tool command is run instead of the bigdft one.
         """
         nmpi = int(nmpi)  # Make sure you get an integer
-        mpi_command = []
+        mpi_option = []
         if dry_run:
             if nmpi > 1:
-                mpi_command = ['-n', str(nmpi)]
-            command = self.bigdft_tool_cmd + mpi_command
+                mpi_option = ['-n', str(nmpi)]
+            command = self.bigdft_tool_cmd + mpi_option
         else:
             if nmpi > 1:
-                mpi_command = ['mpirun', '-np', str(nmpi)]
-            command = mpi_command + self.bigdft_cmd
+                mpi_option = ['mpirun', '-np', str(nmpi)]
+            command = mpi_option + self.bigdft_cmd
         return command
 
-    def _write_input_files(self, nmpi, dry_run):
+    def write_input_files(self):
         r"""
         Write the input files on disk (there might be no posinp to write,
-        since the input positions can be defined in the input).
-
-        Parameters
-        ----------
-        nmpi : int
-            Number of MPI tasks.
-        dry_run : bool
-            If True, the input files are written on disk, but the
-            bigdft-tool command is run instead of the bigdft one.
+        since the initial positions can be defined in the input
+        parameters).
         """
-        if dry_run:
-            # Use default names to create dummy files. They will be
-            # deleted after the bigdft-tool command is run.
-            dummy_inp = "input.yaml"
-            self.inputparams.write(dummy_inp)
-            self._dummy_files = [dummy_inp]
-            if self.posinp is not None:
-                dummy_pos = "posinp.xyz"
-                self.posinp.write(dummy_pos)
-                self._dummy_files.append(dummy_pos)
-        # Always write the correct input files
         self.inputparams.write(self.input_name)
         if self.posinp is not None:
             self.posinp.write(self.posinp_name)
@@ -553,25 +584,17 @@ class Job(object):
         output_msg = out.decode('unicode_escape')
         return output_msg
 
-    def _after_dry_run(self, output_msg):
+    def _write_bigdft_tool_output(self, output_msg):
         r"""
-        Perform the following action:
-
-        * Write the output of the bigdft-tool command in a Logfile,
-        * Delete the dummy input files on disk and the associated
-          temporary attribute.
+        Write the output of the bigdft-tool command on disk.
 
         Parameters
         ----------
         output_msg : str
-            Output of the bigdft-tool command.
+            Output of the bigdft-tool command as a Logfile.
         """
         log = Logfile.from_stream(output_msg)
         log.write(self.logfile_name)
-
-        for filename in self._dummy_files:
-            os.remove(filename)
-        del self._dummy_files
 
     def clean(self):
         r"""

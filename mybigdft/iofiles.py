@@ -10,10 +10,6 @@ import oyaml as yaml
 import numpy as np
 from .globals import inp_vars
 
-# # Catch the UserWarning warned while running the doctests
-# import pytest
-# pytestmark = pytest.mark.filterwarnings("ignore::UserWarning")
-
 
 __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
 
@@ -61,11 +57,18 @@ def clean(params):
     for key, value in params.items():
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
-            if child_value == inp_vars[key][child_key].get("default"):
+            if (child_value == inp_vars[key][child_key].get("default")) or (
+                    child_key == "ncount_cluster_x" and
+                    params["geopt"].get("method") is None):
                 del real_params[key][child_key]
         # Delete the key if it is empty
         if real_params[key] == {}:
             del real_params[key]
+    # Remove the cumbersome geopt key if ncount_cluster_x is the only
+    # key (it happens when the input parameters are read from a Logfile)
+    dummy_value = {'ncount_cluster_x': 1}
+    if "geopt" in real_params and real_params["geopt"] == dummy_value:
+        del real_params["geopt"]
     return real_params
 
 
@@ -132,15 +135,15 @@ class InputParams(MutableMapping):
             return cls.from_string(f)
 
     @classmethod
-    def from_Logfile(cls, filename):
+    def from_Logfile(cls, logfile):
         """
         Initialize an InputParams instance from a BigDFT
         :class:`Logfile`.
 
         Parameters
         ----------
-        filename : str
-            Name of the logfile to read.
+        logfile : Logfile
+            Logfile of a BigDFT calculation.
 
         Returns
         -------
@@ -149,18 +152,17 @@ class InputParams(MutableMapping):
 
 
         >>> inp = {
-        ... 'geopt': {'ncount_cluster_x': 1},
         ... 'posinp': {'units': 'angstroem', 'positions':
         ... [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
         ...         0.01071619987487793]},
         ...  {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
         ...         1.104273796081543]}],
         ...  'properties': {'format': 'xyz', 'source': 'N2.xyz'}}}
-        >>> inp == InputParams.from_Logfile("tests/log.yaml")
+        >>> log = Logfile.from_file("tests/log.yaml")
+        >>> inp == InputParams.from_Logfile(log)
         True
         """
-        log = Logfile.from_file(filename)
-        params = {key: log.log[key] for key in inp_vars}
+        params = {key: logfile[key] for key in inp_vars}
         return cls(params=params)
 
     @classmethod
@@ -703,6 +705,8 @@ class Posinp(Sequence):
     @classmethod
     def from_string(cls, posinp):
         r"""
+        Initialize the input positions from a string.
+
         Parameters
         ----------
         posinp : str
@@ -719,6 +723,8 @@ class Posinp(Sequence):
     @classmethod
     def from_file(cls, filename):
         r"""
+        Initialize the input positions from a file on disk.
+
         Parameters
         ----------
         filename : str
@@ -746,28 +752,47 @@ class Posinp(Sequence):
             return cls._from_stream(f)
 
     @classmethod
-    def from_Logfile(cls, logname):
+    def from_InputParams(cls, inputparams):
         r"""
+        Initialize the input positions from BigDFT input parameters.
+
         Parameters
         ----------
-        logname : str
-            Name of the logfile on disk.
+        inputparams : InputParams
+            Input parameters of a BigDFT calculation.
 
         Returns
         -------
         Posinp
-            Posinp read from a logfile.
-
-
-        >>> posinp = Posinp.from_Logfile("tests/log.yaml")
-        >>> print(posinp)
-        2   angstroem
-        free
-        N   2.97630782434901e-23   6.87220595204354e-23   0.0107161998748779
-        N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154
-        <BLANKLINE>
+            Posinp initialized from an InputParams instance.
         """
-        return Logfile.from_file(logname).posinp
+        ref_pos = inputparams["posinp"]
+        # Set the values converning the first line, e.g.:
+        # - the number of atoms
+        # - the units
+        n_at = len(ref_pos["positions"])
+        units = ref_pos["units"]
+        posinp = [[n_at, units]]
+        # Set the values concerning the second line, e.g.:
+        # - the boundary condition (BC)
+        # - the size of the cell (optional)
+        cell = ref_pos.get("cell")
+        if cell is None:
+            BC = "free"
+            second_line = [BC]
+        else:
+            if cell[1] == ".inf":
+                BC = "surface"
+            else:
+                BC = "periodic"
+            second_line = [BC]
+            second_line += cell
+        posinp.append(second_line)
+        # Set the values for the the atoms
+        for atom in ref_pos["positions"]:
+            [(atom_type, position)] = atom.items()
+            posinp.append(Atom(atom_type, position))
+        return cls(posinp)
 
     @property
     def n_at(self):
@@ -873,6 +898,20 @@ class Posinp(Sequence):
         # Add all the other lines, representing the atoms
         pos_str += "".join([str(atom) for atom in self])
         return pos_str
+
+    def __repr__(self):
+        r"""
+        Returns
+        -------
+            The string representation of a Posinp instance.
+        """
+        msg = "[[{}, {}], [{}".format(self.n_at, self.units, self.BC)
+        if self.cell is not None:
+            msg += ", {}".format(self.cell)
+        msg += "], "
+        msg += ", ".join((repr(atom) for atom in self))
+        msg += "]"
+        return msg
 
     def write(self, filename):
         r"""

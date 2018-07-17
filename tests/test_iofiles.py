@@ -6,6 +6,7 @@ from mybigdft import InputParams, Posinp, Logfile, Atom
 tests_fol = "tests"
 # Result of an N2 calculation of very bad quality
 logname = os.path.join(tests_fol, "log-warnings.yaml")
+log = Logfile.from_file(logname)
 
 
 class TestInputParams:
@@ -81,11 +82,10 @@ class TestInputParams:
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_from_Logfile(self):
-        inp = InputParams.from_Logfile(logname)
+        inp = InputParams.from_Logfile(log)
         expected = {
             'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
                     'disablesym': True},
-            'geopt': {'ncount_cluster_x': 1},
             'posinp': {
                 'units': 'angstroem',
                 'positions':
@@ -186,7 +186,7 @@ C    4.662898877    0.000000000   3.461304757
 C    7.327412521    0.000000000   3.461304757"""
     str_pos = Posinp.from_string(string)
     # Posinp read from an N2 calculation of bad quality
-    log_pos = Posinp.from_Logfile(logname)
+    log_pos = Logfile.from_file(logname).posinp
 
     @pytest.mark.parametrize("value, expected", [
         (pos.n_at, 4), (pos.units, "reduced"), (len(pos), 4),
