@@ -58,6 +58,45 @@ class Job(object):
         ValueError
             If no initial positions are given in the posinp or the input
             parameters.
+
+
+        A Job instance can be initialized by using a posinp only:
+
+        >>> from mybigdft import Posinp, Atom
+        >>> pos = Posinp([[2, "angstroem"], ["free"],
+        ...               Atom('N', [0.0, 0.0, 0.0]),
+        ...               Atom('N', [0.0, 0.0, 1.1])])
+        >>> job = Job(posinp=pos, name="N2", run_dir="tests")
+
+        Default values are therefore used for the input parameters:
+
+        >>> job.inputparams
+        {}
+
+        There is no logfile associated to the job yet as it was not run:
+
+        >>> job.logfile is None
+        True
+
+        Input and output file names are defined from the `name` passed
+        as argument:
+
+        >>> job.input_name
+        'N2.yaml'
+        >>> job.posinp_name
+        'N2.xyz'
+        >>> job.logfile_name
+        'log-N2.yaml'
+
+        The directories are defined from the `run_dir` argument:
+
+        >>> import os
+        >>> os.getcwd() == job.init_dir
+        True
+        >>> os.path.basename(job.init_dir) != 'tests'
+        True
+        >>> os.path.basename(job.run_dir)
+        'tests'
         """
         # Check the input parameters of the calculation
         if (inputparams is None and posinp is None) or \
