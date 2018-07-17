@@ -1,5 +1,6 @@
 from __future__ import absolute_import
 import os
+import sys
 import pytest
 from mybigdft import InputParams, Posinp, Logfile, Atom
 
@@ -163,6 +164,11 @@ class TestLogfile:
             self.log._check_psppar()
         self.log["dft"]["ixc"] = 1
 
+    @pytest.mark.skipif(
+        sys.version_info < (3, 0),
+        reason="requires python3 or higher; see: "
+               "https://github.com/pytest-dev/pytest/issues/2917"
+    )
     def test_init_log_with_warnings_warns_UserWarnings(self):
         with pytest.warns(UserWarning):
             Logfile.from_file("tests/log-warnings.yaml")
