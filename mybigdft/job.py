@@ -2,7 +2,7 @@
 File containing the base class defining a BigDFT calculation.
 """
 
-from __future__ import print_function
+from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess

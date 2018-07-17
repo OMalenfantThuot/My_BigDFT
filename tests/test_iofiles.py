@@ -163,7 +163,7 @@ class TestLogfile:
             self.log._check_psppar()
         self.log["dft"]["ixc"] = 1
 
-    def test_init_run_warnings_warns_UserWarnings(self):
+    def test_init_log_with_warnings_warns_UserWarnings(self):
         with pytest.warns(UserWarning):
             Logfile.from_file("tests/log-warnings.yaml")
 

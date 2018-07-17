@@ -881,6 +881,10 @@ class Posinp(Sequence):
         """
         return str(self) == str(other)
 
+    def __ne__(self, other):
+        # This is only for the python2 version to work
+        return not self.__eq__(other)
+
     def __str__(self):
         r"""
         Convert the Posinp to a string.
