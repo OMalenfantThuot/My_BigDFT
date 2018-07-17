@@ -445,6 +445,12 @@ class Job(object):
         r"""
         Check that the posinp used in the logfile corresponds to
         the one used to initialize the job.
+
+        Raises
+        ------
+        UserWarning
+            If the initial geometry of the job does not correspond to the one
+            of the Logfile previously read from the disk.
         """
         if self.posinp is None:
             self._posinp = Posinp.from_InputParams(self.inputparams)
@@ -457,6 +463,12 @@ class Job(object):
         r"""
         Check that the input parameters used in the logfile
         correspond to the ones used to initialize the job.
+
+        Raises
+        ------
+        UserWarning
+            If the input parameters of the job does not correspond to the one
+            used in the Logfile previously read from the disk.
         """
         bare_inp = deepcopy(self.inputparams)
         if "posinp" in bare_inp:
@@ -474,13 +486,12 @@ class Job(object):
         directory so as to restart the new calculation from the result
         of the reference calculation.
         """
-        # Find and copy the path to the reference data directory
         ref = self.ref_job
         if os.path.exists(ref.data_dir):
-            # Remove the previously existing data directory before
-            # copying the reference data directory (otherwise,
-            # shutil.copytree raises an error).
             if self.data_dir in os.listdir("."):
+                # Remove the previously existing data directory before
+                # copying the reference data directory (otherwise,
+                # shutil.copytree raises an error).
                 shutil.rmtree(self.data_dir)
             shutil.copytree(ref.data_dir, self.data_dir)
         else:
