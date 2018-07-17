@@ -4,22 +4,22 @@ import pytest
 import numpy as np
 from mybigdft import InputParams, Posinp, Logfile, Job
 
+
 class TestJob:
 
     # Extract the input and posinp from an N2 calculation of bad quality
-    logname = os.path.join("tests", "log.yaml")
+    logname = os.path.join("tests", "log-warnings.yaml")
     inp = InputParams.from_Logfile(logname)
     pos = Posinp.from_Logfile(logname)
     job = Job(inputparams=inp, posinp=pos)
     job_with_name = Job(inputparams=inp, posinp=pos, name="test")
 
-
-    @pytest.mark.parametrize("attr, expected",
-        [("inputparams", inp), ("posinp", pos),
-         ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
-         ("logfile", None), ("logfile_name", "log.yaml"),
-         ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT"),
-        ])
+    @pytest.mark.parametrize("attr, expected", [
+        ("inputparams", inp), ("posinp", pos),
+        ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
+        ("logfile", None), ("logfile_name", "log.yaml"),
+        ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT")
+    ])
     def test_init(self, attr, expected):
         if "_dir" in attr:
             value = getattr(self.job, attr)
@@ -28,13 +28,13 @@ class TestJob:
         else:
             assert getattr(self.job, attr) == expected
 
-    @pytest.mark.parametrize("attr, expected",
-        [("inputparams", inp), ("posinp", pos),
-         ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
-         ("logfile", None), ("logfile_name", "log-test.yaml"),
-         ("data_dir", "data-test"), ("ref_job", None),
-         ("run_dir", "MyBigDFT"),
-        ])
+    @pytest.mark.parametrize("attr, expected", [
+        ("inputparams", inp), ("posinp", pos),
+        ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
+        ("logfile", None), ("logfile_name", "log-test.yaml"),
+        ("data_dir", "data-test"), ("ref_job", None),
+        ("run_dir", "MyBigDFT"),
+    ])
     def test_init_with_name(self, attr, expected):
         if "_dir" in attr:
             value = getattr(self.job_with_name, attr)
@@ -57,18 +57,20 @@ class TestJob:
         with pytest.raises(ValueError):
             Job()
 
-    @pytest.mark.parametrize("attr",
-        ["inputparams", "posinp", "logfile", "ref_job",
-         "input_name", "posinp_name", "logfile_name",
-         "bigdft_cmd", "bigdft_tool_cmd",
-         "init_dir", "run_dir", "data_dir",])
+    @pytest.mark.parametrize("attr", [
+        "inputparams", "posinp", "logfile", "ref_job",
+        "input_name", "posinp_name", "logfile_name",
+        "bigdft_cmd", "bigdft_tool_cmd",
+        "init_dir", "run_dir", "data_dir",
+    ])
     def test_cannot_set_attributes(self, attr):
         with pytest.raises(AttributeError):
             setattr(self.job, attr, 1)
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_run(self):
-        with Job(inputparams=self.inp, run_dir="tests") as job:
+        with Job(inputparams=self.inp, run_dir="tests",
+                 name='warnings') as job:
             job.run()
         assert np.allclose([job.logfile.energy], [-191.74377352940274])
 

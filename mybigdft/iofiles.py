@@ -10,9 +10,9 @@ import oyaml as yaml
 import numpy as np
 from .globals import inp_vars
 
-# Catch the UserWarning warned while running the doctests
-import pytest
-pytestmark = pytest.mark.filterwarnings("ignore::UserWarning")
+# # Catch the UserWarning warned while running the doctests
+# import pytest
+# pytestmark = pytest.mark.filterwarnings("ignore::UserWarning")
 
 
 __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
@@ -148,8 +148,8 @@ class InputParams(MutableMapping):
             InputParams instance initialized from the logfile.
 
 
-        >>> inp = {'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
-        ... 'disablesym': True}, 'geopt': {'ncount_cluster_x': 1},
+        >>> inp = {
+        ... 'geopt': {'ncount_cluster_x': 1},
         ... 'posinp': {'units': 'angstroem', 'positions':
         ... [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
         ...         0.01071619987487793]},
@@ -439,7 +439,7 @@ class Logfile(Mapping):
         N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154
         <BLANKLINE>
         >>> log.energy
-        -191.74377352940274
+        -19.884659235401838
         """
         with open(filename, "r") as f:
             return cls.from_stream(f)
@@ -575,7 +575,7 @@ class Logfile(Mapping):
         Returns
         -------
         Posinp
-            Posinp used to during the calculation.
+            Posinp used during the calculation.
         """
         # Initialize some variables from the logfile
         log_pos = self["posinp"]
