@@ -14,7 +14,7 @@ class TestWorkflow:
     wf = Workflow()
 
     @pytest.mark.parametrize("value, expected", [
-        (wf.queue, []), (wf.results, {}),
+        (wf.queue, []), (wf.logfiles, {}),
     ])
     def test_init(self, value, expected):
         assert value == expected

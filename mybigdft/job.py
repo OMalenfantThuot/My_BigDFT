@@ -141,6 +141,7 @@ class Job(object):
     def name(self):
         r"""
         Returns
+        -------
         str
             Base name of the calculation used to set the names of
             files and directories as well as the commands.

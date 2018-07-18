@@ -26,12 +26,12 @@ class PolTensor(Workflow):
 
     .. math::
 
-        \alpha_ij = \frac{\Delta D_i}{\Delta E_j}
+        \alpha_{ij} = \frac{\Delta D_i}{\Delta E_j}
 
     where :math:`i, j \in \{x, y, z\}`, :math:`\Delta D_i` is the
     variation of the dipole along the :math:`i` direction and
     :math:`\Delta E_j` is the variation of the electric field amplitude
-    alog the :math:`j` direction
+    along the :math:`j` direction
     """
 
     def __init__(self, ground_state, ef_amplitudes=[1e-4]*3, run_dir=None,
@@ -172,8 +172,8 @@ class PolTensor(Workflow):
 
     def post_proc(self):
         r"""
-        Compute the polarisability tensor and set its value (attribute
-        :meth:`poltensor`).
+        Compute the polarisability tensor and set its value (you can
+        access its value via the attribute :attr:`poltensor`).
         """
         poltensor = np.zeros((3, 3))
         # Ground state dipole
