@@ -27,7 +27,7 @@ The documentation of MyBigDFT can be found here:
 https://mmoriniere.gitlab.io/MyBigDFT/index.html
 
 It can also be built locally by running the following commands:
-- pip install [-e] .[doc]
+- pip install -e .[doc]
 - cd doc
 - make html
 
