@@ -10,7 +10,7 @@ class Workflow(object):
 
     @property
     def results(self):
-        return {job.name: job.result for job in self.queue}
+        return {job.name: job for job in self.queue}
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
         for job in self.queue:

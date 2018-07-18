@@ -108,7 +108,7 @@ class PolTensor(Workflow):
         # Add the electric field calculations along each coordinate
         efields = np.eye(3) * self.ef_amplitudes
         for i, efield in enumerate(efields):
-            name = gs.name + "_EF_along_{}".format(COORDS[i])
+            name = (gs.name + "_EF_along_{}".format(COORDS[i])).lstrip("_")
             inp = deepcopy(gs.inputparams)
             if 'dft' in inp:
                 inp['dft']['elecfield'] = efield.tolist()

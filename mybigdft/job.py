@@ -494,7 +494,7 @@ class Job(object):
         """
         ref = self.ref_job
         if os.path.exists(ref.data_dir):
-            if self.data_dir in os.listdir("."):
+            if os.path.basename(self.data_dir) in os.listdir(os.curdir):
                 # Remove the previously existing data directory before
                 # copying the reference data directory (otherwise,
                 # shutil.copytree raises an error).

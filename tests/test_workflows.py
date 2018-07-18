@@ -22,20 +22,16 @@ class TestWorkflow:
 
 class TestPolTensor:
 
-    # Run a pol. tensor calculation
-    gs = Job(posinp=pos, name='N2')
+    # Polarizibility tensor workflow which is not run
+    inp = InputParams({'dft': {'hgrids': [0.55]*3}})
+    gs = Job(inputparams=inp, posinp=pos, name='N2', run_dir='N2_pol_tensor')
     pt = PolTensor(gs, run_dir='tests/pol_tensor_N2')
-    pt.run()
-    # Another pol. tensor which is not run
-    inp2 = InputParams({'dft': {'hgrids': [0.55]*3}})
-    gs2 = Job(inputparams=inp2, posinp=pos, name='N2', run_dir='N2_pol_tensor')
-    pt2 = PolTensor(gs2, run_dir='tests/pol_tensor_N2')
 
     @pytest.mark.parametrize("value, expected", [
-        (pt2.ground_state, gs2),
-        (pt2.poltensor, None),
-        (pt2.ef_amplitudes, [1.e-4]*3),
-        (os.path.basename(pt2.ground_state.run_dir), "pol_tensor_N2"),
+        (pt.ground_state, gs),
+        (pt.poltensor, None),
+        (pt.ef_amplitudes, [1.e-4]*3),
+        (os.path.basename(pt.ground_state.run_dir), "pol_tensor_N2"),
     ])
     def test_init(self, value, expected):
         assert value == expected
@@ -56,13 +52,17 @@ class TestPolTensor:
             eval(to_evaluate)
 
     def test_run(self):
+        # Run a pol. tensor calculation
+        gs2 = Job(posinp=pos, name='N2')
+        pt2 = PolTensor(gs2, run_dir='tests/pol_tensor_N2')
+        pt2.run()
+        # Test the computed polarizability tensor
         expected = [
             [1.05558000e+01, -2.00000000e-04, -2.00000000e-04],
             [-2.00000000e-04, 1.05558000e+01, -2.00000000e-04],
             [0.00000000e+00, 0.00000000e+00, 1.50535000e+01]
         ]
-        np.testing.assert_almost_equal(self.pt.poltensor, expected)
-
-    def test_run_multiple_times_warns_UserWarning(self):
+        np.testing.assert_almost_equal(pt2.poltensor, expected)
+        # Test that running the workflow again warns a UserWarning
         with pytest.warns(UserWarning):
-            self.pt.run()
+            pt2.run()
