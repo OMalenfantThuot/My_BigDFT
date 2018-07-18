@@ -3,7 +3,7 @@ import warnings
 import yaml
 
 
-__all__ = ["inp_vars", "profiles", "bigdft_path", "bigdft_tool_path"]
+__all__ = ["input_variables", "profiles", "bigdft_path", "bigdft_tool_path"]
 
 
 # Read the definition of the input variables from the BigDFT sources
@@ -11,11 +11,11 @@ try:
     # Path to the BigDFT sources
     BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
     # Read the input variables and available profiles
-    inp_vars_file = os.path.join(BIGDFT_SOURCES,
-                                 "src/input_variables_definition.yaml")
-    with open(inp_vars_file, "r") as f:
+    input_variables_file = os.path.join(BIGDFT_SOURCES,
+                                        "src/input_variables_definition.yaml")
+    with open(input_variables_file, "r") as f:
         source = yaml.load_all(f)
-        inp_vars = next(source)
+        input_variables = next(source)
         profiles = next(source)
     # Path to the BigDFT and BigDFT-tool executables
     BIGDFT_ROOT = os.environ["BIGDFT_ROOT"]
@@ -28,13 +28,14 @@ except KeyError:  # pragma: no cover
                   "installed, run 'source bigdftvars.sh' in the same folder "
                   "as the bigdft executable.",
                   RuntimeWarning)
-    inp_vars = {}
+    input_variables = {}
     profiles = {}
     bigdft_path = "bigdft"
     bigdft_tool_path = "bigdft-tool"
 # Add the posinp key (as it is not in input_variables_definition.yaml)
-inp_vars["posinp"] = {"units": {"default": "atomic"},
-                      "cell": {"default": None},
-                      "positions": {"default": None},
-                      "properties": {"default": {"format": "xyz",
-                                                 "source": "posinp.xyz"}}}
+input_variables["posinp"] = {
+    "units": {"default": "atomic"},
+    "cell": {"default": None},
+    "positions": {"default": None},
+    "properties": {"default": {"format": "xyz", "source": "posinp.xyz"}}
+}

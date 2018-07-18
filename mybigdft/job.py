@@ -8,7 +8,7 @@ import shutil
 import subprocess
 from copy import deepcopy
 from .globals import bigdft_path, bigdft_tool_path
-from .iofiles import InputParams, Posinp, Logfile
+from .iofiles import InputParams, Posinp, Logfile, clean
 
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -471,10 +471,16 @@ class Job(object):
             the one used in the Logfile previously read from the disk.
         """
         bare_inp = deepcopy(self.inputparams)
+        log_inp = InputParams.from_Logfile(self.logfile)
+        # Clean the posinp from the input paramaters
         if "posinp" in bare_inp:
             del bare_inp['posinp']
-        log_inp = InputParams.from_Logfile(self.logfile)
         del log_inp['posinp']
+        # Clean the disablesym, if present only in the log_inp
+        if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
+            if 'dft' in bare_inp and 'disablesym' not in bare_inp['dft']:
+                del log_inp['dft']['disablesym']
+                log_inp._params = clean(log_inp.params)
         if bare_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "

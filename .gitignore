@@ -13,6 +13,7 @@
 .tox
 tests/log-*yaml
 tests/logfiles
+tests/pol_tensor_N2/
 *runtest*
 *dry_run*
 *minimal.yaml

@@ -8,7 +8,7 @@ from copy import deepcopy
 from collections import Sequence, Mapping, MutableMapping
 import oyaml as yaml
 import numpy as np
-from .globals import inp_vars
+from .globals import input_variables
 
 
 __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
@@ -29,10 +29,10 @@ def check(params):
         If a key or a sub-key is not a BigDFT parameter.
     """
     for key, value in params.items():
-        if key not in inp_vars:
+        if key not in input_variables:
             raise KeyError("Unknown key '{}'".format(key))
         for subkey in value.keys():
-            if subkey not in inp_vars[key].keys():
+            if subkey not in input_variables[key].keys():
                 raise KeyError("Unknown key '{}' in '{}'".format(subkey, key))
 
 
@@ -57,9 +57,8 @@ def clean(params):
     for key, value in params.items():
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
-            if (child_value == inp_vars[key][child_key].get("default")) or (
-                    child_key == "ncount_cluster_x" and
-                    params["geopt"].get("method") is None):
+            default_value = input_variables[key][child_key].get("default")
+            if child_value == default_value:
                 del real_params[key][child_key]
         # Delete the key if it is empty
         if real_params[key] == {}:
@@ -162,7 +161,7 @@ class InputParams(MutableMapping):
         >>> inp == InputParams.from_Logfile(log)
         True
         """
-        params = {key: logfile[key] for key in inp_vars}
+        params = {key: logfile[key] for key in input_variables}
         return cls(params=params)
 
     @classmethod
@@ -585,7 +584,7 @@ class Logfile(Mapping):
         n_at = len(atoms)
         units = log_pos.get("units")
         if units is None:
-            units = inp_vars["posinp"]["units"]["default"]
+            units = input_variables["posinp"]["units"]["default"]
         else:
             units = units.lower()
         BC = self.boundary_conditions
@@ -883,7 +882,13 @@ class Posinp(Sequence):
             True if both initial positions have the same string
             representation.
         """
-        return str(self) == str(other)
+        same_base = self.BC == other.BC and len(self) == len(other) and \
+            self.units == other.units and self.cell == other._cell
+        if same_base:
+            same_atoms = all([atom in other.atoms for atom in self.atoms])
+            return same_base and same_atoms
+        else:
+            return False
 
     def __ne__(self, other):
         # This is only for the python2 version to work
@@ -1090,7 +1095,11 @@ class Atom(object):
         False
         """
         try:
-            return (np.array_equal(self.position, other.position)
+            return (np.allclose(self.position, other.position)
                     and self.atom_type == other.atom_type)
         except AttributeError:
             return False
+
+    def __ne__(self, other):
+        # This is only for the python2 version to work correctly
+        return not self.__eq__(other)
