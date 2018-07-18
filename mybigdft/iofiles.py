@@ -583,7 +583,11 @@ class Logfile(Mapping):
         log_pos = self["posinp"]
         atoms = log_pos["positions"]
         n_at = len(atoms)
-        units = log_pos["units"].lower()
+        units = log_pos.get("units")
+        if units is None:
+            units = inp_vars["posinp"]["units"]["default"]
+        else:
+            units = units.lower()
         BC = self.boundary_conditions
         if BC not in ["free", "surface"]:
             cell = log_pos["cell"]

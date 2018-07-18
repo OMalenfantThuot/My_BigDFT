@@ -443,14 +443,14 @@ class Job(object):
 
     def _check_logfile_posinp(self):
         r"""
-        Check that the posinp used in the logfile corresponds to
-        the one used to initialize the job.
+        Check that the posinp used in the logfile corresponds to the one
+        used to initialize the job.
 
         Raises
         ------
         UserWarning
-            If the initial geometry of the job does not correspond to the one
-            of the Logfile previously read from the disk.
+            If the initial geometry of the job does not correspond to
+            the one of the Logfile previously read from the disk.
         """
         if self.posinp is None:
             self._posinp = Posinp.from_InputParams(self.inputparams)
@@ -461,14 +461,14 @@ class Job(object):
 
     def _check_logfile_inputparams(self):
         r"""
-        Check that the input parameters used in the logfile
-        correspond to the ones used to initialize the job.
+        Check that the input parameters used in the logfile correspond
+        to the ones used to initialize the job.
 
         Raises
         ------
         UserWarning
-            If the input parameters of the job does not correspond to the one
-            used in the Logfile previously read from the disk.
+            If the input parameters of the job does not correspond to
+            the one used in the Logfile previously read from the disk.
         """
         bare_inp = deepcopy(self.inputparams)
         if "posinp" in bare_inp:

@@ -34,7 +34,7 @@ except KeyError:  # pragma: no cover
     bigdft_tool_path = "bigdft-tool"
 # Add the posinp key (as it is not in input_variables_definition.yaml)
 inp_vars["posinp"] = {"units": {"default": "atomic"},
-                      "cell": {"default": []},
-                      "positions": {"default": []},
+                      "cell": {"default": None},
+                      "positions": {"default": None},
                       "properties": {"default": {"format": "xyz",
                                                  "source": "posinp.xyz"}}}
