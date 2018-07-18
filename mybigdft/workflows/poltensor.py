@@ -1,6 +1,7 @@
 from __future__ import print_function
 import warnings
 from copy import deepcopy
+from collections import Sequence
 import numpy as np
 from mybigdft import Job
 from mybigdft.job import COORDS
@@ -48,17 +49,14 @@ class PolTensor(Workflow):
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
         """
-        # Check the ground state
-        if not isinstance(ground_state, Job):
-            raise ValueError("ground_state must be a Job instance allowing to "
-                             "compute the ground state of the system.")
+        # Check the ground state has no electric field
         if 'dft' in ground_state.inputparams:
             efield = ground_state.inputparams['dft'].get('elecfield')
             if efield is not None:
                 warnings.warn("The ground state input parameters define an "
                               "electric field", UserWarning)
         # Check the electric field amplitudes
-        if len(ef_amplitudes) != 3:
+        if not isinstance(ef_amplitudes, Sequence) or len(ef_amplitudes) != 3:
             raise ValueError("You must provide three electric field "
                              "amplitudes, one for each space coordinate.")
         # Initialize the attributes that are specific to this workflow
@@ -129,6 +127,10 @@ class PolTensor(Workflow):
         if self.poltensor is None:
             super(PolTensor, self).run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+        else:
+            warning_msg = "Calculations already performed; set the argument "\
+                          "'force_run' to True to re-run them."
+            warnings.warn(warning_msg, UserWarning)
 
     def post_proc(self):
         r"""
