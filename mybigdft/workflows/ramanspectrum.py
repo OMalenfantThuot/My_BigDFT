@@ -7,9 +7,13 @@ from __future__ import print_function, absolute_import
 from copy import deepcopy
 import os
 import numpy as np
-from .mybigdft import BigDFTCalc, COORDS, SIGNS
-from .poltensor import PolTensorCalc
-from .iofiles import Logfile
+from mybigdft import Logfile
+from mybigdft.job import COORDS, SIGNS
+from .poltensor import PolTensor
+
+
+class BigDFTCalc(object):
+    pass
 
 
 # Mass of the different types of atoms in atomic mass units
@@ -216,7 +220,7 @@ class RamanSpectrumCalc(BigDFTCalc):
                         # Use the reference input file and the new
                         # posinp in the same run_folder. Use the
                         # previous bigdft calculation as a reference.
-                        pt_calc = PolTensorCalc(self.input_yaml,
+                        pt_calc = PolTensor(self.input_yaml,
                             new_posinp, ef_amplitudes=self.ef_amplitudes,
                             prefix=self.prefix, run_folder=run_folder,
                             ref_calc=bdft)  # noqa

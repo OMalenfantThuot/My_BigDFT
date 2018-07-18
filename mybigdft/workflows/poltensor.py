@@ -48,6 +48,14 @@ class PolTensor(Workflow):
         ef_amplitudes : list or numpy array of length 3
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
+        run_dir : str or None
+            Folder where to run the calculations (the `run_dir` of the
+            ground state is used by default).
+        skip : bool
+            If `True`, the calculations will be skipped. (Note: Might not
+            be useful now, since we check for the existence of the
+            logfile before running, which might be the actual check of
+            the skip option of BigDFT.)
         """
         # Check the ground state has no electric field
         if 'dft' in ground_state.inputparams:
@@ -73,8 +81,7 @@ class PolTensor(Workflow):
         Returns
         -------
         Job
-            Job used to compute the ground state of the system under
-            consideration.
+            Job of the ground state of the system under consideration.
         """
         return self._ground_state
 
@@ -92,23 +99,41 @@ class PolTensor(Workflow):
     @property
     def poltensor(self):
         r"""
+        Returns
+        -------
+        numpy.array
+            Polarizability tensor of the system.
         """
         return self._poltensor
 
     def _initialize_queue(self, run_dir, skip):
         r"""
+        Initialize the queue of calculations to be performed in order to
+        compute the polarizability tensor.
+
+        Parameters
+        ----------
+        run_dir : str or None
+            Folder where to run the calculations (the `run_dir` of the
+            ground state is used by default).
+        skip : bool
+            If `True`, the calculations will be skipped. (Note: Might not
+            be useful now, since we check for the existence of the
+            logfile before running, which might be the actual check of
+            the skip option of BigDFT.)
         """
         queue = []
         # Add the ground state job to the queue after updating the run
-        # directory
+        # directory if needed
         gs = self.ground_state
         if run_dir is not None:
             gs._set_directory_attributes(run_dir)
         queue.append(gs)
-        # Add the electric field calculations along each coordinate
+        # Add a job for each electric field calculation (one along each
+        # space coordinate)
         efields = np.eye(3) * self.ef_amplitudes
         for i, efield in enumerate(efields):
-            name = (gs.name + "_EF_along_{}".format(COORDS[i])).lstrip("_")
+            name = (gs.name+"_EF_along_{}".format(COORDS[i])).lstrip("_")
             inp = deepcopy(gs.inputparams)
             if 'dft' in inp:
                 inp['dft']['elecfield'] = efield.tolist()
@@ -123,6 +148,19 @@ class PolTensor(Workflow):
         r"""
         Run the calculations allowing to compute the polarizability
         tensor if the latter was not already computed.
+
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        nomp : int
+            Number of OpenMP tasks.
+        force_run : bool
+            If `True`, the calculations are run even though a logfile
+            already exists.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
         """
         if self.poltensor is None:
             super(PolTensor, self).run(
@@ -134,7 +172,8 @@ class PolTensor(Workflow):
 
     def post_proc(self):
         r"""
-        Method computing the polarisability tensor.
+        Compute the polarisability tensor and set its value (attribute
+        :meth:`poltensor`).
         """
         poltensor = np.zeros((3, 3))
         # Ground state dipole
