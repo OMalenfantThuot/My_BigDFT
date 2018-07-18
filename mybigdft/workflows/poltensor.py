@@ -5,10 +5,10 @@ from collections import Sequence
 import numpy as np
 from mybigdft import Job
 from mybigdft.job import COORDS
-from .workflow import Workflow
+from .workflow import AbstractWorkflow
 
 
-class PolTensor(Workflow):
+class PolTensor(AbstractWorkflow):
     r"""
     This Workflow allows to compute the polarizability tensor of a given
     system.

@@ -9,17 +9,6 @@ pos = Posinp([[2, 'angstroem'], ['free'],
               Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.095])])
 
 
-class TestWorkflow:
-
-    wf = Workflow()
-
-    @pytest.mark.parametrize("value, expected", [
-        (wf.queue, []), (wf.logfiles, {}),
-    ])
-    def test_init(self, value, expected):
-        assert value == expected
-
-
 class TestPolTensor:
 
     # Polarizibility tensor workflow which is not run

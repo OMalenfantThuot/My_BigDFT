@@ -1,24 +1,28 @@
-from __future__ import print_function
+from __future__ import print_function, unicode_literals
+import sys
+import abc
+
+if sys.version_info >= (3, 4):  # pragma: no cover
+    ABC = abc.ABC
+else:  # pragma: no cover
+    ABC = abc.ABCMeta(str('ABC'), (), {})
 
 
-class Workflow(object):
+class AbstractWorkflow(ABC):
     r"""
-    This (due to be an) abstract class is the base class of all the
-    workflows of this module. It
-    defines the queue of jobs as a list of :class:`~mybigdft.job.Job`
-    instances, that are run sequentially when the :meth:`run` method is
-    used.
+    This abstract class is the base class of all the workflows of this
+    module. It defines the queue of jobs as a list of
+    :class:`~mybigdft.job.Job` instances, that are run sequentially when
+    the :meth:`run` method is used.
     """
 
-    def __init__(self, queue=None):
+    def __init__(self, queue):
         r"""
         Parameters
         ----------
         queue : list
             List of all the jobs to run.
         """
-        if queue is None:
-            queue = []
         self._queue = queue
 
     @property
@@ -67,10 +71,45 @@ class Workflow(object):
         if not dry_run:
             self.post_proc()
 
-    def post_proc(self):
+    @abc.abstractmethod
+    def post_proc(self):  # pragma: no cover
         r"""
         This should be an abstract method used to post-process the
         output of the calculations and get some meaningful results out of
         them.
+        """
+        pass
+
+
+class Workflow(AbstractWorkflow):
+    r"""
+    This is a usable workflow that one can play with, but without post-
+    processing. This means you can add jobs to the queue and run them as
+    usual, but you must then code the post-processing yourself.
+    """
+
+    def __init__(self, queue=None):
+        r"""
+        Parameters
+        ----------
+        queue : list
+            List of all the jobs to run.
+
+
+        The queue can be empty:
+
+        >>> wf = Workflow()
+        >>> wf.queue
+        []
+        >>> wf.logfiles
+        {}
+        """
+        if queue is None:
+            queue = []
+        super(Workflow, self).__init__(queue)
+
+    def post_proc(self):  # pragma: no cover
+        r"""
+        Nothing is done here.
         """
         pass
