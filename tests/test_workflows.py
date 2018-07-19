@@ -5,6 +5,7 @@ import numpy as np
 from mybigdft import Atom, Posinp, Job, InputParams, Workflow
 from mybigdft.workflows import PolTensor
 
+
 pos = Posinp([[2, 'angstroem'], ['free'],
               Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.095])])
 
