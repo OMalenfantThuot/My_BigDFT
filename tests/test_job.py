@@ -55,8 +55,14 @@ class TestJob:
         assert "-s Yes" in cmd
 
     def test_init_without_posinp_raises_ValueError(self):
-        with pytest.raises(ValueError):
+        with pytest.raises(ValueError, match="provide initial positions"):
             Job()
+
+    def test_init_with_different_posinp_in_inputparams_raises_ValueError(self):
+        with pytest.raises(ValueError, match="do not define the same posinp."):
+            Job(inputparams=self.inp,
+                posinp=Posinp.from_file("tests/surface.xyz"))
+
 
     @pytest.mark.parametrize("attr", [
         "inputparams", "posinp", "logfile", "ref_job",
