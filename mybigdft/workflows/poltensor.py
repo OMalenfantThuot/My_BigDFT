@@ -34,8 +34,7 @@ class PolTensor(AbstractWorkflow):
     along the :math:`j` direction
     """
 
-    def __init__(self, ground_state, ef_amplitudes=[1e-4]*3, run_dir=None,
-                 skip=False):
+    def __init__(self, ground_state, ef_amplitudes=[1e-4]*3):
         r"""
         A PolTensor workflow is initialized by the job of the ground-
         state of the system and three electric field amplitudes.
@@ -48,14 +47,6 @@ class PolTensor(AbstractWorkflow):
         ef_amplitudes : list or numpy array of length 3
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
-        run_dir : str or None
-            Folder where to run the calculations (the `run_dir` of the
-            ground state is used by default).
-        skip : bool
-            If `True`, the calculations will be skipped. (Note: Might not
-            be useful now, since we check for the existence of the
-            logfile before running, which might be the actual check of
-            the skip option of BigDFT.)
         """
         # Check the ground state has no electric field
         if 'dft' in ground_state.inputparams:
@@ -72,7 +63,7 @@ class PolTensor(AbstractWorkflow):
         self._ef_amplitudes = ef_amplitudes
         self._poltensor = None  # The pol. tensor is not yet computed
         # Initialize the queue of jobs for this workflow
-        queue = self._initialize_queue(run_dir, skip)
+        queue = self._initialize_queue()
         super(PolTensor, self).__init__(queue=queue)
 
     @property
@@ -106,28 +97,15 @@ class PolTensor(AbstractWorkflow):
         """
         return self._poltensor
 
-    def _initialize_queue(self, run_dir, skip):
+    def _initialize_queue(self):
         r"""
         Initialize the queue of calculations to be performed in order to
         compute the polarizability tensor.
-
-        Parameters
-        ----------
-        run_dir : str or None
-            Folder where to run the calculations (the `run_dir` of the
-            ground state is used by default).
-        skip : bool
-            If `True`, the calculations will be skipped. (Note: Might not
-            be useful now, since we check for the existence of the
-            logfile before running, which might be the actual check of
-            the skip option of BigDFT.)
         """
         queue = []
         # Add the ground state job to the queue after updating the run
         # directory if needed
         gs = self.ground_state
-        if run_dir is not None:
-            gs._set_directory_attributes(run_dir)
         queue.append(gs)
         # Add a job for each electric field calculation (one along each
         # space coordinate)
@@ -140,7 +118,7 @@ class PolTensor(AbstractWorkflow):
             else:
                 inp['dft'] = {'elecfield': efield.tolist()}
             job = Job(name=name, inputparams=inp, posinp=gs.posinp,
-                      run_dir=run_dir, skip=skip, ref_job=gs)
+                      run_dir=gs.run_dir, skip=gs.skip, ref_job=gs)
             queue.append(job)
         return queue
 

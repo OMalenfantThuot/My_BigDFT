@@ -14,8 +14,8 @@ class TestPolTensor:
 
     # Polarizibility tensor workflow which is not run
     inp = InputParams({'dft': {'hgrids': [0.55]*3}})
-    gs = Job(inputparams=inp, posinp=pos, name='N2', run_dir='N2_pol_tensor')
-    pt = PolTensor(gs, run_dir='tests/pol_tensor_N2')
+    gs = Job(inputparams=inp, posinp=pos, name='N2', run_dir='pol_tensor_N2')
+    pt = PolTensor(gs)
 
     @pytest.mark.parametrize("value, expected", [
         (pt.ground_state, gs),
@@ -43,8 +43,8 @@ class TestPolTensor:
 
     def test_run(self):
         # Run a pol. tensor calculation
-        gs2 = Job(posinp=pos, name='N2')
-        pt2 = PolTensor(gs2, run_dir='tests/pol_tensor_N2')
+        gs2 = Job(posinp=pos, name='N2', run_dir='tests/pol_tensor_N2')
+        pt2 = PolTensor(gs2)
         pt2.run()
         # Test the computed polarizability tensor
         expected = [
