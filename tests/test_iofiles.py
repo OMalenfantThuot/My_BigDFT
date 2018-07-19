@@ -267,8 +267,10 @@ C    7.327412521    0.000000000   3.461304757"""
         assert new_pos[0] == Atom("C", [0.58333333333, 0.5, 0.25])
 
     @pytest.mark.parametrize("fname", [
-        "free_reduced.xyz", "missing_atom.xyz", "additional_atom.xyz",
+        "free_reduced.xyz",
+        "missing_atom.xyz",
+        "additional_atom.xyz",
     ])
-    def test_init_raises_ValueError(self, fname):
-        with pytest.raises(ValueError):
+    def test_init_raises_AssertionError(self, fname):
+        with pytest.raises(AssertionError):
             Posinp.from_file(os.path.join(tests_fol, fname))

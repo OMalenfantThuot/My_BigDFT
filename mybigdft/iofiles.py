@@ -154,13 +154,15 @@ class InputParams(MutableMapping):
             InputParams instance initialized from the logfile.
 
 
-        >>> inp = {
-        ... 'posinp': {'units': 'angstroem', 'positions':
-        ... [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
-        ...         0.01071619987487793]},
-        ...  {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
-        ...         1.104273796081543]}],
-        ...  'properties': {'format': 'xyz', 'source': 'N2.xyz'}}}
+        >>> inp = InputParams({
+        ...     'posinp': {'units': 'angstroem',
+        ...     'positions':
+        ...         [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
+        ...                 0.01071619987487793]},
+        ...          {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
+        ...                1.104273796081543]}],
+        ...     'properties': {'format': 'xyz', 'source': 'N2.xyz'}}
+        ... })
         >>> log = Logfile.from_file("tests/log.yaml")
         >>> inp == InputParams.from_Logfile(log)
         True
@@ -617,7 +619,7 @@ class Posinp(Sequence):
 
 
         >>> posinp = Posinp([Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
-                            'angstroem', 'free')
+        ...                 'angstroem', 'free')
         >>> len(posinp)
         2
         >>> posinp.BC
@@ -640,6 +642,8 @@ class Posinp(Sequence):
                     for coord in cell]
         if BC == "periodic":
             assert ".inf" not in cell
+        elif BC == "free":
+            assert units != "reduced"
         # Set the attributes
         self._atoms = atoms
         self._units = units
@@ -921,8 +925,8 @@ class Posinp(Sequence):
             those used by the posinp.
 
 
-        >>> posinp = Posinp([[2, 'angstroem'], ['free'],
-        ... Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])])
+        >>> posinp = Posinp([Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
+        ...                 'angstroem', 'free')
         >>> new_posinp = posinp.translate_atom(1, [0.0, 0.0, 0.05])
         >>> print(new_posinp)
         2   angstroem
@@ -1056,6 +1060,6 @@ class Atom(object):
         except AttributeError:
             return False
 
-    def __ne__(self, other):
-        # This is only for the python2 version to work correctly
-        return not self.__eq__(other)
+    # def __ne__(self, other):
+    #     # This is only for the python2 version to work correctly
+    #     return not self.__eq__(other)

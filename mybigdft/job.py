@@ -64,14 +64,12 @@ class Job(object):
         A Job instance can be initialized by using a posinp only:
 
         >>> from mybigdft import Posinp, Atom
-        >>> pos = Posinp([
-        ...     [2, "angstroem"],
-        ...     ["free"],
-        ...     Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
-        ...                0.01071619987487793]),
-        ...     Atom('N', [-1.1043449194501671e-23, -4.873421744830746e-23,
-        ...                1.104273796081543])
-        ... ])
+        >>> pos = Posinp(
+        ...     [Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
+        ...                 0.01071619987487793]),
+        ...      Atom('N', [-1.1043449194501671e-23, -4.873421744830746e-23,
+        ...                 1.104273796081543])], "angstroem", "free"
+        ... )
         >>> job = Job(posinp=pos, run_dir="tests")
 
         Default values are therefore used for the input parameters:
@@ -119,17 +117,15 @@ class Job(object):
         False
         """
         # Check the input parameters of the calculation
-        if (inputparams is None and posinp is None) or \
-           (posinp is None and "posinp" not in inputparams):
-            raise ValueError("Please provide initial positions.")
-        elif inputparams is None:
+        if inputparams is None:
             inputparams = InputParams()
-        elif posinp is None:
+        if posinp is None:
             posinp = inputparams.posinp
-        else:
-            if posinp == inputparams.posinp:
-                raise ValueError(
-                    "inputparams and posinp do not define the same posinp.")
+        if inputparams.posinp is None and posinp is None:
+            raise ValueError("Please provide initial positions.")
+        elif inputparams.posinp is not None and posinp != inputparams.posinp:
+            raise ValueError(
+                "inputparams and posinp do not define the same posinp.")
 
         # Set the base attributes
         self._inputparams = inputparams
@@ -488,7 +484,6 @@ class Job(object):
         # Clean the posinp from the input paramaters
         if "posinp" in bare_inp:
             del bare_inp['posinp']
-        del log_inp['posinp']
         # Clean the disablesym, if present only in the log_inp
         if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
             if 'dft' in bare_inp and 'disablesym' not in bare_inp['dft']:

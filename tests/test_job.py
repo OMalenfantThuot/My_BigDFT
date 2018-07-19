@@ -102,11 +102,11 @@ class TestJob:
             # Run the calculation
             job.clean()
             job.run(dry_run=True, nmpi=2, nomp=4)
-            # Assert that there is no posinp file afterwards
-            assert not os.path.exists(job.posinp_name)
             # There must be input and output files afterwards
             new_inp = InputParams.from_file(job.input_name)
             assert new_inp == self.inp
+            new_pos = Posinp.from_file(job.posinp_name)
+            assert new_pos == self.pos
             bigdft_tool_log = Logfile.from_file(job.logfile_name)
             assert bigdft_tool_log.energy is None
 
@@ -124,12 +124,11 @@ class TestJob:
             bigdft_tool_log = Logfile.from_file(job.logfile_name)
             assert bigdft_tool_log.energy is None
 
-    @pytest.mark.filterwarnings("ignore::UserWarning")
     def test__check_logfile_posinp(self):
         pos_name = os.path.join("tests", "surface.xyz")
         pos = Posinp.from_file(pos_name)
         with pytest.raises(UserWarning):
-            with Job(inputparams=self.inp, posinp=pos, run_dir="tests") as job:
+            with Job(posinp=pos, run_dir="tests") as job:
                 job.run()
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
