@@ -131,11 +131,12 @@ class Job(object):
         self._logfile = None
         self._ref_job = ref_job
         self._name = str(name)
+        self._skip = bool(skip)
 
         # Derive the rest of the attributes from the other arguments
         self._set_directory_attributes(run_dir)
         self._set_filename_attributes()
-        self._set_cmd_attributes(skip)
+        self._set_cmd_attributes()
 
     @property
     def name(self):
@@ -188,6 +189,19 @@ class Job(object):
             Job of the reference calculation.
         """
         return self._ref_job
+
+    @property
+    def skip(self):
+        r"""
+        Returns
+        -------
+        bool
+            If `True`, the calculation will be skipped. (Note: Might not
+            be useful now, since we check for the existence of the
+            logfile before running, which might be the actual check of
+            the skip option of BigDFT.)
+        """
+        return self._skip
 
     @property
     def init_dir(self):
@@ -331,23 +345,15 @@ class Job(object):
             data_dir = DATA
         self._data_dir = os.path.join(self.run_dir, data_dir)
 
-    def _set_cmd_attributes(self, skip):
+    def _set_cmd_attributes(self):
         r"""
         Set the base commands to run bigdft or bigdft-tool.
-
-        Parameters
-        ----------
-        skip : bool
-            If `True`, the calculation will be skipped. (Note: Might not
-            be useful now, since we check for the existence of the
-            logfile before running, which might be the actual check of
-            the skip option of BigDFT.)
         """
         # The base bigdft-tool command is always the same
         self._bigdft_tool_cmd = [bigdft_tool_path, "--name", self.name]
         # The base bigdft command depends on name and on skip
         skip_option = []
-        if skip:
+        if self.skip:
             skip_option += ["-s", "Yes"]
         if self.name != "":
             self._bigdft_cmd = [bigdft_path, self.name] + skip_option
