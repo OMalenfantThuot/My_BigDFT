@@ -124,6 +124,12 @@ class Job(object):
             raise ValueError("Please provide initial positions.")
         elif inputparams is None:
             inputparams = InputParams()
+        elif posinp is None:
+            posinp = inputparams.posinp
+        else:
+            if posinp == inputparams.posinp:
+                raise ValueError(
+                    "inputparams and posinp do not define the same posinp.")
 
         # Set the base attributes
         self._inputparams = inputparams

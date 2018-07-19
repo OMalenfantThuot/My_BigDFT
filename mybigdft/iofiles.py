@@ -1,5 +1,5 @@
 r"""
-File containing the Input and Posinp classes.
+File containing the InputParams, Posinp, Logfile and Atom classes.
 """
 
 from __future__ import print_function
@@ -113,6 +113,10 @@ class InputParams(MutableMapping):
         """
         if params is None:
             params = {}
+        if "posinp" in params:
+            self._posinp = Posinp.from_dict(params.pop("posinp"))
+        else:
+            self._posinp = None
         self._params = clean(params)
 
     @classmethod
@@ -195,6 +199,16 @@ class InputParams(MutableMapping):
             Input parameters.
         """
         return self._params
+
+    @property
+    def posinp(self):
+        r"""
+        Returns
+        -------
+        Posinp or None
+            Initial positions contained in the input parameters
+        """
+        return self._posinp
 
     def __getitem__(self, key):
         return self.params[key]
@@ -757,47 +771,79 @@ class Posinp(Sequence):
             return cls._from_stream(f)
 
     @classmethod
-    def from_InputParams(cls, inputparams):
+    def from_dict(cls, posinp):
         r"""
         Initialize the input positions from BigDFT input parameters.
 
         Parameters
         ----------
-        inputparams : InputParams
-            Input parameters of a BigDFT calculation.
+        posinp : dict
+            Posinp as a dictionary coming from an InputParams or
+            Logfile instance.
 
         Returns
         -------
         Posinp
             Posinp initialized from an InputParams instance.
         """
-        ref_pos = inputparams["posinp"]
-        # Set the values converning the first line, e.g.:
-        # - the number of atoms
-        # - the units
-        n_at = len(ref_pos["positions"])
-        units = ref_pos["units"]
-        posinp = [[n_at, units]]
-        # Set the values concerning the second line, e.g.:
-        # - the boundary condition (BC)
-        # - the size of the cell (optional)
-        cell = ref_pos.get("cell")
+        # Read data from the dictionary
+        atoms = []  # atomic positions
+        for atom in posinp["positions"]:
+            [(atom_type, position)] = atom.items()
+            atoms.append(Atom(atom_type, position))
+        units = posinp["units"]  # Units of the coordinates
+        cell = posinp.get("cell")  # Simulation cell size
+        # The boundary condition (BC) is infered from the cell value
         if cell is None:
             BC = "free"
-            second_line = [BC]
         else:
             if cell[1] == ".inf":
                 BC = "surface"
             else:
                 BC = "periodic"
-            second_line = [BC]
-            second_line += cell
-        posinp.append(second_line)
-        # Set the values for the the atoms
-        for atom in ref_pos["positions"]:
-            [(atom_type, position)] = atom.items()
-            posinp.append(Atom(atom_type, position))
-        return cls(posinp)
+        return cls(atoms, BC, units, cell=cell)
+
+#    def from_InputParams(cls, inputparams):
+#        r"""
+#        Initialize the input positions from BigDFT input parameters.
+#
+#        Parameters
+#        ----------
+#        inputparams : InputParams
+#            Input parameters of a BigDFT calculation.
+#
+#        Returns
+#        -------
+#        Posinp
+#            Posinp initialized from an InputParams instance.
+#        """
+#        ref_pos = inputparams["posinp"]
+#        # Set the values converning the first line, e.g.:
+#        # - the number of atoms
+#        # - the units
+#        n_at = len(ref_pos["positions"])
+#        units = ref_pos["units"]
+#        posinp = [[n_at, units]]
+#        # Set the values concerning the second line, e.g.:
+#        # - the boundary condition (BC)
+#        # - the size of the cell (optional)
+#        cell = ref_pos.get("cell")
+#        if cell is None:
+#            BC = "free"
+#            second_line = [BC]
+#        else:
+#            if cell[1] == ".inf":
+#                BC = "surface"
+#            else:
+#                BC = "periodic"
+#            second_line = [BC]
+#            second_line += cell
+#        posinp.append(second_line)
+#        # Set the values for the the atoms
+#        for atom in ref_pos["positions"]:
+#            [(atom_type, position)] = atom.items()
+#            posinp.append(Atom(atom_type, position))
+#        return cls(posinp)
 
     @property
     def n_at(self):
