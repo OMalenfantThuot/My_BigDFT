@@ -351,7 +351,7 @@ class Logfile(Mapping):
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        self._posinp = self._extract_posinp()
+        self._posinp = Posinp.from_dict(log['posinp'])
         self._check_warnings()
 
     def _set_builtin_attributes(self):
@@ -582,72 +582,43 @@ class Logfile(Mapping):
         """
         return self._posinp
 
-    def _extract_posinp(self):
-        r"""
-        Extract the posinp from the information contained in the
-        logfile.
-
-        Returns
-        -------
-        Posinp
-            Posinp used during the calculation.
-        """
-        # Initialize some variables from the logfile
-        log_pos = self["posinp"]
-        atoms = log_pos["positions"]
-        n_at = len(atoms)
-        units = log_pos.get("units")
-        if units is None:
-            units = input_variables["posinp"]["units"]["default"]
-        else:
-            units = units.lower()
-        BC = self.boundary_conditions
-        if BC not in ["free", "surface"]:
-            cell = log_pos["cell"]
-        else:
-            cell = []
-        if BC == "surface":
-            if units not in ["reduced", "atomic", "bohr"]:
-                raise NotImplementedError(
-                    "Need to convert cell size from atomic to {}"
-                    .format(units))
-        # Prepare the data in ordrer to initialize a Posinp instance
-        posinp = [[n_at, units], [BC] + cell]
-        for atom in atoms:
-            [(atom_type, position)] = atom.items()
-            posinp.append(Atom(atom_type, position))
-        return Posinp(posinp)
-
 
 class Posinp(Sequence):
     r"""
     Class allowing to initialize, read, write and interact with the
-    input geometry of a BigDFT calculation (in the form of an xyz file).
+    input geometry of a BigDFT calculation in the form of an xyz file.
+
+    Such a file is made of a few lines, containing all the necessary
+    information to specify a given system of interest:
+
+    * the first line contains the number of atoms :math:`n_{at}` and the
+      units for the coordinates (and possibly the cell size),
+    * the second line contains the boundary conditions used and possibly
+      the simulation cell size (for periodic or surface boundary
+      conditions),
+    * the subsequent :math:`n_{at}` lines are used to define each atom
+      of the system: first its type, then its position given by three
+      coordinates (for :math:`x`, :math:`y` and :math:`z`).
     """
 
-    def __init__(self, posinp):
+    def __init__(self, atoms, units, BC, cell=None):
         r"""
-        The posinp is created from a list whose elements correspond to
-        the various lines of an xyz file:
-
-        * the first element of of the list is a list made of the number
-          of atoms and the units (given by a string),
-        * the second element is made of another list, made of the
-          boundary conditions (given by a string) and possibly three
-          distances defining the cell size along each space coordinate
-          (:math:`x`, :math:`y` and :math:`z`).
-        * all the other elements must be Atom instances (defining the
-          type (as a string) and the position of each atom).
-
         Parameters
         ----------
-        posinp : list
-            xyz file stored as a list.
+        atoms : list
+            List of :class:`Atom` instances.
+        units : str
+            Units of the coordinate system.
+        BC : str
+            Boundary conditions.
+        cell : Sequence of length 3 or None
+            Size of the simulation domain in the three space
+            coordinates.
 
 
-        >>> posinp = Posinp([[2, 'angstroem'], ['free'],
-        ... Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])])
-        >>> posinp.n_at
+        >>> posinp = Posinp([Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
+                            'angstroem', 'free')
+        >>> len(posinp)
         2
         >>> posinp.BC
         'free'
@@ -658,30 +629,22 @@ class Posinp(Sequence):
         "Atom('N', [0.0, 0.0, 0.0])"
         "Atom('N', [0.0, 0.0, 1.1])"
         """
-        # Set the attributes associated to the first line of the xyz
-        # file, namely the number of atoms and the units used to define
-        # the atomic positions
-        first_line = posinp.pop(0)
-        self._n_at = first_line[0]
-        self._units = first_line[1].lower()
-        # Set the attributes associated to the second line of the xyz
-        # file, namely the boundary conditions and the size of the cell
-        second_line = posinp.pop(0)
-        self._BC = second_line[0].lower()
-        if self.BC == "free" and self.units == "reduced":
-            raise ValueError(
-                "Reduced coordinates are not allowed with isolated BC.")
-        if self.BC != "free":
-            self._cell = [float(coord) if coord != ".inf" else coord
-                          for coord in second_line[1:4]]
+        # Check initial values
+        BC = BC.lower()
+        units = units.lower()
+        if cell is None:
+            assert BC == "free"
         else:
-            self._cell = None
-        # Set the attributes associated to all the other lines of the
-        # xyz file, namely the atoms
-        if self.n_at != len(posinp):
-            raise ValueError("The number of atoms do not correspond to the "
-                             "number of positions.")
-        self._atoms = posinp
+            assert len(cell) == 3
+            cell = [abs(float(coord)) if coord != ".inf" else coord
+                    for coord in cell]
+        if BC == "periodic":
+            assert ".inf" not in cell
+        # Set the attributes
+        self._atoms = atoms
+        self._units = units
+        self._cell = cell
+        self._BC = BC
 
     @classmethod
     def _from_stream(cls, stream):
@@ -694,32 +657,31 @@ class Posinp(Sequence):
         Posinp
             Posinp read from a stream.
         """
+        atoms = []
         for i, line in enumerate(stream):
             if i == 0:
                 # Read the first line, containing the number of atoms
                 # and the units of the coordinates of each atom
-                posinp = []
                 content = line.split()
                 n_at = int(content[0])
                 units = content[1]
-                posinp.append([n_at, units])
             elif i == 1:
-                # Read the second line,
-                # containing the boundary conditions
+                # Read the second line, containing the boundary
+                # conditions and possibly the cell size.
                 content = line.split()
-                BC = content[:1]
-                if content[0] != "free":
-                    cell = [float(c) if c != ".inf" else c
-                            for c in content[1:4]]
-                    BC += cell
-                posinp.append(BC)
+                BC = content[0].lower()
+                if BC != "free":
+                    cell = content[1:4]
+                else:
+                    cell = None
             else:
                 # Read the atom (type and position)
                 content = line.split()
                 atom_type = content[0]
-                position = [float(c) for c in content[1:4]]
-                posinp.append(Atom(atom_type, position))
-        return cls(posinp)
+                position = content[1:4]
+                atoms.append(Atom(atom_type, position))
+        assert n_at == len(atoms)
+        return cls(atoms, units, BC, cell=cell)
 
     @classmethod
     def from_string(cls, posinp):
@@ -773,7 +735,7 @@ class Posinp(Sequence):
     @classmethod
     def from_dict(cls, posinp):
         r"""
-        Initialize the input positions from BigDFT input parameters.
+        Initialize the input positions from a dictionary.
 
         Parameters
         ----------
@@ -784,7 +746,7 @@ class Posinp(Sequence):
         Returns
         -------
         Posinp
-            Posinp initialized from an InputParams instance.
+            Posinp initialized from an dictionary.
         """
         # Read data from the dictionary
         atoms = []  # atomic positions
@@ -793,7 +755,7 @@ class Posinp(Sequence):
             atoms.append(Atom(atom_type, position))
         units = posinp["units"]  # Units of the coordinates
         cell = posinp.get("cell")  # Simulation cell size
-        # The boundary condition (BC) is infered from the cell value
+        # Infer the boundary conditions from the value of cell
         if cell is None:
             BC = "free"
         else:
@@ -801,59 +763,7 @@ class Posinp(Sequence):
                 BC = "surface"
             else:
                 BC = "periodic"
-        return cls(atoms, BC, units, cell=cell)
-
-#    def from_InputParams(cls, inputparams):
-#        r"""
-#        Initialize the input positions from BigDFT input parameters.
-#
-#        Parameters
-#        ----------
-#        inputparams : InputParams
-#            Input parameters of a BigDFT calculation.
-#
-#        Returns
-#        -------
-#        Posinp
-#            Posinp initialized from an InputParams instance.
-#        """
-#        ref_pos = inputparams["posinp"]
-#        # Set the values converning the first line, e.g.:
-#        # - the number of atoms
-#        # - the units
-#        n_at = len(ref_pos["positions"])
-#        units = ref_pos["units"]
-#        posinp = [[n_at, units]]
-#        # Set the values concerning the second line, e.g.:
-#        # - the boundary condition (BC)
-#        # - the size of the cell (optional)
-#        cell = ref_pos.get("cell")
-#        if cell is None:
-#            BC = "free"
-#            second_line = [BC]
-#        else:
-#            if cell[1] == ".inf":
-#                BC = "surface"
-#            else:
-#                BC = "periodic"
-#            second_line = [BC]
-#            second_line += cell
-#        posinp.append(second_line)
-#        # Set the values for the the atoms
-#        for atom in ref_pos["positions"]:
-#            [(atom_type, position)] = atom.items()
-#            posinp.append(Atom(atom_type, position))
-#        return cls(posinp)
-
-    @property
-    def n_at(self):
-        r"""
-        Returns
-        -------
-        int
-            Number of atoms.
-        """
-        return self._n_at
+        return cls(atoms, units, BC, cell=cell)
 
     @property
     def units(self):
@@ -950,7 +860,7 @@ class Posinp(Sequence):
             The Posinp instance as a string.
         """
         # Create the first two lines of the posinp file
-        pos_str = "{}   {}\n".format(self.n_at, self.units)
+        pos_str = "{}   {}\n".format(len(self), self.units)
         pos_str += self.BC
         if self.cell is not None:
             pos_str += "   {}   {}   {}\n".format(*self.cell)
@@ -966,7 +876,7 @@ class Posinp(Sequence):
         -------
             The string representation of a Posinp instance.
         """
-        msg = "[[{}, {}], [{}".format(self.n_at, self.units, self.BC)
+        msg = "[[{}, {}], [{}".format(len(self), self.units, self.BC)
         if self.cell is not None:
             msg += ", {}".format(self.cell)
         msg += "], "

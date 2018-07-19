@@ -84,7 +84,7 @@ class TestInputParams:
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_from_Logfile(self):
         inp = InputParams.from_Logfile(log)
-        expected = {
+        expected = InputParams({
             'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
                     'disablesym': True},
             'posinp': {
@@ -96,7 +96,7 @@ class TestInputParams:
                             1.104273796081543]}],
                 'properties': {'format': 'xyz', 'source': 'N2.xyz'}
             }
-        }
+        })
         assert inp == expected
 
     def test_from_string(self):
@@ -201,7 +201,7 @@ C    7.327412521    0.000000000   3.461304757"""
             'positions': [{'C': [0.0, 0.0, 0.0]}]
         }
     })
-    surf_pos = Posinp.from_InputParams(surf_inp)
+    surf_pos = surf_inp.posinp
     # Posinp read from an InputParams instance with periodic BC
     per_inp = InputParams({
         'posinp': {
@@ -210,10 +210,10 @@ C    7.327412521    0.000000000   3.461304757"""
             'positions': [{'C': [0.0, 0.0, 0.0]}]
         }
     })
-    per_pos = Posinp.from_InputParams(per_inp)
+    per_pos = per_inp.posinp
 
     @pytest.mark.parametrize("value, expected", [
-        (pos.n_at, 4), (pos.units, "reduced"), (len(pos), 4),
+        (len(pos), 4), (pos.units, "reduced"), (len(pos), 4),
         (pos.BC, "surface"),
         (pos.cell, [8.07007483423, '.inf', 4.65925987792]),
         (pos[0], Atom('C', [0.08333333333, 0.5, 0.25])),
@@ -222,7 +222,7 @@ C    7.327412521    0.000000000   3.461304757"""
         assert value == expected
 
     @pytest.mark.parametrize("value, expected", [
-        (log_pos.n_at, 2), (log_pos.units, "angstroem"), (len(log_pos), 2),
+        (len(log_pos), 2), (log_pos.units, "angstroem"), (len(log_pos), 2),
         (log_pos.BC, "free"),
         (log_pos.cell, None),
         (log_pos[0], Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
@@ -232,7 +232,7 @@ C    7.327412521    0.000000000   3.461304757"""
         assert value == expected
 
     @pytest.mark.parametrize("value, expected", [
-        (surf_pos.n_at, 1), (surf_pos.units, "angstroem"), (len(surf_pos), 1),
+        (len(surf_pos), 1), (surf_pos.units, "angstroem"), (len(surf_pos), 1),
         (surf_pos.BC, "surface"),
         (surf_pos.cell, [8, ".inf", 8]),
         (surf_pos[0], Atom('C', [0, 0, 0])),
@@ -241,7 +241,7 @@ C    7.327412521    0.000000000   3.461304757"""
         assert value == expected
 
     @pytest.mark.parametrize("value, expected", [
-        (per_pos.n_at, 1), (per_pos.units, "angstroem"), (len(per_pos), 1),
+        (len(per_pos), 1), (per_pos.units, "angstroem"), (len(per_pos), 1),
         (per_pos.BC, "periodic"),
         (per_pos.cell, [8, 1.0, 8]),
         (per_pos[0], Atom('C', [0, 0, 0])),

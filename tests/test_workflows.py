@@ -2,12 +2,12 @@ from __future__ import absolute_import
 import os
 import pytest
 import numpy as np
-from mybigdft import Atom, Posinp, Job, InputParams, Workflow
+from mybigdft import Atom, Posinp, Job, InputParams
 from mybigdft.workflows import PolTensor
 
 
-pos = Posinp([[2, 'angstroem'], ['free'],
-              Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.095])])
+pos = Posinp(
+    [Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.095])], 'angstroem', 'free')
 
 
 class TestPolTensor:
