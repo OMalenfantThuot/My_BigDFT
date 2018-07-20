@@ -852,7 +852,7 @@ class Posinp(Sequence):
                 return same_base and same_atoms
             else:
                 return False
-        except Exception:
+        except AttributeError:
             return False
 
     def __ne__(self, other):
