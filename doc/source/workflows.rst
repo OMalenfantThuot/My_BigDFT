@@ -11,3 +11,4 @@ that are used to automate some calculations.
 
     workflow
     poltensor
+    phonon_raman

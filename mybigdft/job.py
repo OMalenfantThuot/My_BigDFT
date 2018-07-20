@@ -104,6 +104,7 @@ class Job(object):
         True
 
         To run the job, do it from a context manager:
+
         >>> with job as j:
         ...     j.run()
         ...

@@ -39,7 +39,7 @@ class PhononEnergies(AbstractWorkflow):
     This class allows to run all the calculations enabling the
     computation of the phonon energies of a given system.
 
-    To get the energies of the Raman spectrum, one needs to find the
+    To get the phonon energies of the system, one needs to find the
     eigenvalues of the dynamical matrix, that is closely related to the
     Hessian. To build these matrices, one must find the derivatives of
     the forces when each coordinate of each atom is translated by a
@@ -54,28 +54,26 @@ class PhononEnergies(AbstractWorkflow):
     def __init__(self, ground_state, translation_amplitudes=[0.45/64]*3):
         r"""
         From a ground state calculation, which must correspond to the
-        equilibrium calculation geometry, all the jobs necessary
-        for the calculation of the raman spectrum are prepared.
-        where each atom is moved around
-        its initial position in the three space coordinates to get the
-        vibrational energies. This amounts to 6 n_at BigDFT
-        calculations (where n_at is the number of atoms of the system).
+        equilibrium calculation geometry, the :math:`6 n_{at}` jobs
+        necessary for the calculation of the phonon energies are
+        prepared.
 
-        The distance of the displacement in a direction is controlled
-        by the grid space hgrid in that direction multiplied by
-        translation_amplitudes. These 6 n_at calculations allow only
-        for the phonon
-        energies calculations as post-processing.
+        The distance of the displacement in each direction is controlled
+        by `translation_amplitudes` (one amplitude per space coordinate
+        must be given).
 
-        If interested in getting the intensity and depolarization
-        ratio of each normal mode,
-        see PhononIntensities.
+        The phonon energies calculations are computed while post-
+        processing the results of all the calculations (after running
+        the run method). They correspond to the energies of the Raman
+        spectrum. If interested in getting the intensity and
+        depolarization ratio of each phonon (or normal mode), see
+        :class:`RamanSpectrum`.
 
         Parameters
         ----------
-        translation_amplitudes: list (of length 3)
-            Amplitudes of the translations to be applied along each of
-            the three space coordinates.
+        translation_amplitudes: Sequence of length 3
+            Amplitudes of the translations to be applied to each atom
+            along each of the three space coordinates.
         """
         # Check the translation amplitudes
         if not isinstance(translation_amplitudes, Sequence) or \
@@ -112,6 +110,9 @@ class PhononEnergies(AbstractWorkflow):
         r"""
         Returns
         -------
+        Sequence of length 3
+            Amplitudes of the translations to be applied to each atom
+            along each of the three space coordinates.
         """
         return self._translation_amplitudes
 
@@ -120,6 +121,8 @@ class PhononEnergies(AbstractWorkflow):
         r"""
         Returns
         -------
+        numpy.array or None
+            Phonon energies of the system.
         """
         self._phonon_energies
 
@@ -128,18 +131,18 @@ class PhononEnergies(AbstractWorkflow):
         r"""
         Returns
         -------
-        :returns: Displacements each atom of the system must undergo.
-            There are six of them (two per space coordinate) in order
-            to be able to compute the Hessian matrix by using the
-            central difference scheme.
-        :rtype: dict of length 6
+        dict of length 6
+            Displacements each atom of the system must undergo. There
+            are six of them (two per space coordinate) in order to be
+            able to compute the Hessian matrix by using the central
+            difference scheme.
         """
         return self._displacements
 
     def _initialize_queue(self):
         r"""
-        Initialize the queue of calculations to be performed in order to
-        compute the Raman spectrum.
+        Initialize the queue of jobs to be run in order to compute the
+        phonon energies.
         """
         queue = []
         gs = self.ground_state
@@ -164,9 +167,8 @@ class PhononEnergies(AbstractWorkflow):
 
     def _set_displacements(self):
         r"""
-        Function used to define the six similar displacements each atom
-        must undergo from the amplitudes of displacement in each
-        direction.
+        Set the six displacements each atom must undergo from the
+        amplitudes of displacement in each direction.
         """
         displacements = {}
         for i, coord in enumerate(COORDS):
@@ -179,9 +181,7 @@ class PhononEnergies(AbstractWorkflow):
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
         r"""
         Run the calculations allowing to compute the phonon energies,
-        and also the
-        It also gathers the output forces of the system for each
-        calculation in the 'forces' attribute as a dictionary.
+        which are computed at the post-processing level.
 
         Parameters
         ----------
@@ -206,49 +206,54 @@ class PhononEnergies(AbstractWorkflow):
 
     def post_proc(self):
         r"""
-        Method running the post-processing of the calculations, here:
-        * computing the dynamical matrix,
-        * solving it to get the normal modes and their energies.
+        Run the post-processing of the calculations, here:
+
+        * compute the dynamical matrix,
+        * solve it to get the phonons (normal modes) and their energies.
         """
         # - Set the dynamical matrix
-        self.dyn_mat = self._build_dyn_mat()
+        self.dyn_mat = self._compute_dyn_mat()
         # - Find the energies as eigenvalues of the dynamical matrix
         self.energies = {}
         self.energies['Ha'], self.normal_modes = self._solve_dyn_mat()
         self.energies['cm^-1'] = self.energies['Ha'] * HA_TO_CMM1
 
-    def _build_dyn_mat(self):
+    def _compute_dyn_mat(self):
         r"""
-        Method computing the dynamical matrix of the system. It is
-        very similar to the Hessian matrix: its elements are only
-        corrected by a weight :math:`w,` which is the inverse of the
-        square-root of the product of the atomic masses of the atoms
-        involved in the Hessian matrix element.
+        Compute the dynamical matrix of the system. It is very similar
+        to the Hessian matrix: its elements are only corrected by a
+        weight :math:`w,` which is the inverse of the square-root of the
+        product of the atomic masses of the atoms involved in the
+        Hessian matrix element.
 
         The masses are counted in electronic mass units (which is the
         atomic unit of mass, that is different from the atomic mass
         unit).
 
-        :returns: Dynamical matrix.
-        :rtype: 2D square numpy array of dimension :math:`3 n_{at}`
+        Returns
+        -------
+        2D square numpy array of dimension :math:`3 n_{at}`
+            Dynamical matrix.
         """
-        # Numpy does the ratio of arrays intelligently: by making
-        # masses an array of the same size as the Hessian, there is
-        # nothing but the ratio of both arrays to perform to get
-        # the dynamical matrix.
-        h = self._build_hessian()
-        masses = self._build_masses()
+        # Numpy does the ratio of arrays intelligently: by making masses
+        # an array of the same size as the Hessian, there is nothing but
+        # the ratio of both arrays to perform to get the dynamical
+        # matrix.
+        h = self._compute_hessian()
+        masses = self._compute_masses()
         return h / masses
 
-    def _build_masses(self):
+    def _compute_masses(self):
         r"""
-        Method computing the masses array used to define the dynamical
-        matrix. The masses are counted in electronic mass units (which
-        is the atomic unit of mass, that is different from the atomic
-        mass unit).
+        Compute the masses array used to define the dynamical matrix.
+        The masses are counted in electronic mass units (which is the
+        atomic unit of mass, that is different from the atomic mass
+        unit).
 
-        :returns: Masses matrix.
-        :rtype: 2D square numpy array of dimension :math:`3 n_{at}`
+        Returns
+        -------
+        2D square numpy array of dimension :math:`3 n_{at}`
+            Masses matrix.
         """
         # Get the atoms of the system from the reference posinp
         posinp = self.ground_state.posinp
@@ -262,14 +267,16 @@ class PhononEnergies(AbstractWorkflow):
         # mass units
         return np.sqrt(masses) * AMU_TO_EMU
 
-    def _build_hessian(self):
+    def _compute_hessian(self):
         r"""
-        Method computing the Hessian of the system. Its dimension is
+        Compute the Hessian of the system. Its dimension is
         :math:`3 n_{at}`, where :math:`n_{at}` is the number of atoms of
         the system.
 
-        :returns: Hessian matrix.
-        :rtype: 2D square numpy array of dimension :math:`3 n_{at}`
+        Returns
+        -------
+        2D square numpy array of dimension :math:`3 n_{at}`
+            Hessian matrix.
         """
         # Initialization of variables
         gs = self.ground_state
@@ -315,12 +322,14 @@ class PhononEnergies(AbstractWorkflow):
 
     def _solve_dyn_mat(self):
         r"""
-        Method solving the dynamical matrix to get the phonon energies
-        (converted in Hartree) and the eigenvectors.
+        Solve the dynamical matrix to get the phonon energies (converted
+        in Hartree) and the eigenvectors.
 
-        :returns: Tuple made of the eigenvalues (as an array) and the
+        Returns
+        -------
+        tuple
+            Tuple made of the eigenvalues (as an array) and the
             eigenvectors (as a matrix).
-        :rtype: tuple
         """
         eigs, vecs = np.linalg.eig(self.dyn_mat)
         eigs = np.array([np.sqrt(-e) if e < 0 else np.sqrt(e) for e in eigs])
@@ -346,3 +355,10 @@ class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
 
     def __str__(self):
         return('Displacement: {}'.format(self.vector))
+
+
+class RamanSpectrum(AbstractWorkflow):
+    r"""
+    """
+
+    pass

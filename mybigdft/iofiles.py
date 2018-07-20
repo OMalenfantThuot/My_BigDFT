@@ -840,13 +840,13 @@ class Posinp(Sequence):
         r"""
         Parameters
         ----------
-        other : Posinp
-            Other initial positions to be compared.
+        other : object
+            Any other object.
 
         Returns
         -------
         bool
-            `True`if both initial positions have the same number of
+            `True` if both initial positions have the same number of
             atoms, the same units and boundary conditions and the same
             atoms (whatever the order of the atoms in the initial list
             of atoms).
