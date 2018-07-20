@@ -400,6 +400,13 @@ class Logfile(Mapping):
         Clean the value of the built-in attributes.
         """
         self._boundary_conditions = self._boundary_conditions.lower()
+        # Make the forces as a numpy array of shape (n_at, 3)
+        if self.forces is not None:
+            new_forces = np.array([])
+            for force in self.forces:
+                new_forces = np.append(new_forces, force.values()[0])
+            new_forces = new_forces.reshape((self.n_at, 3))
+            self._forces = new_forces
 
     def _check_warnings(self):
         r"""
