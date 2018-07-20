@@ -35,7 +35,7 @@ It can also be built locally by running the following commands:
 ## Tests
 
 To be able to run all tests, make sure to install the package by running the
-'pip install [-e] .[test]' as it might install extra packages required for the
+'pip install -e .[test]' as it might install extra packages required for the
 tests to run (use the -e option if you wish to edit the source files).
 
 You can then simply run the command 'pytest' in the main directory to run all
