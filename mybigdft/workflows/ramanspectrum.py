@@ -32,7 +32,7 @@ ANG_TO_B = 1. / B_TO_ANG
 HA_TO_CMM1 = 219474.6313705
 
 
-class PhononEnergies(AbstractWorkflow):
+class Phonons(AbstractWorkflow):
     r"""
     This class allows to run all the calculations enabling the
     computation of the phonon energies of a given system.
@@ -94,7 +94,7 @@ class PhononEnergies(AbstractWorkflow):
         self._normal_modes = None
         # Initialize the queue of jobs for this workflow
         queue = self._initialize_queue()
-        super(PhononEnergies, self).__init__(queue=queue)
+        super(Phonons, self).__init__(queue=queue)
 
     @property
     def ground_state(self):
@@ -222,7 +222,7 @@ class PhononEnergies(AbstractWorkflow):
             bigdft-tool command is run instead of the bigdft one.
         """
         if self.energies is None:
-            super(PhononEnergies, self).run(
+            super(Phonons, self).run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
         else:
             warning_msg = "Calculations already performed; set the argument "\
@@ -359,13 +359,41 @@ class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
 
 class RamanSpectrum(AbstractWorkflow):
     r"""
+    This class allows to run all the calculations enabling the
+    computation of the Raman spectrum of a given system, that is its
+    normal modes of vibration (or phonons) associated to a given energy
+    and an intensity. The so-called depolarization ratios of each phonon
+    mode are also be computed.
+
+    One therefore needs to compute the phonons first. This is done by
+    solving the dynamical matrix (the eigenvalues giving the phonon
+    energies and the eigenvectors the normal modes). This matrix is
+    computed at the expense of :math:`6 n_{at}` BigDFT calculations,
+    where each atom is in turns translated by a small amount around its
+    equilibrium positions. You may want to refer to the :class:`Phonons`
+    class for more details.
+
+    To get the intensities (or activities) of the spectrum, one must
+    compute the derivative of the polarizability tensor along the normal
+    modes. To that end, one must compute the polarizability tensor at
+    each of the positons used to get the vibrational energies, and this
+    means applying an external electric field along each coordinate.
+    One calculations per space coordinate lead to 3 extra calculations,
+    meaning that :math:`18 n_{at}` additional BigDFT standard
+    calculations are required to obtain a Raman spectrum intensities,
+    leading to :math:`24 n_{at}` calculations in total.
     """
 
     def __init__(self, phonons, ef_amplitudes=[1e-4]*3):
         r"""
+        From a phonon calculation, one is able to compute the Raman
+        spectrum of a given system by only specifying the electric field
+        amplitudes used to compute the polarizability tensor at each
+        out-of-equilibrium positions used to compute the phonons.
+
         Parameters
         ----------
-        phonons : PhononEnergies
+        phonons : Phonons
             Phonon energies workflow.
         ef_amplitudes : list or numpy array of length 3
             Amplitude of the electric field to be applied in the three
@@ -390,7 +418,7 @@ class RamanSpectrum(AbstractWorkflow):
         r"""
         Returns
         -------
-        PhononEnergies
+        Phonons
             Workflow allowing to compute the phonon energies of the
             system under consideration.
         """
@@ -493,8 +521,10 @@ class RamanSpectrum(AbstractWorkflow):
 
     def post_proc(self):
         r"""
-        Compute the intensities of the Raman spectrum set its value (you can
-        access its value via the attribute :attr:`poltensor`).
+        Compute the intensities and depolarization ratio of each normal
+        mode and set their values (you can access their values via the
+        attributes :attr:`intensities` and :attr:`depolarization_ratios`,
+        respectively).
         """
         # - Set the derivatives of the polarizability tensors
         #   along each displacement directions

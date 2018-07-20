@@ -3,7 +3,7 @@ import os
 import pytest
 import numpy as np
 from mybigdft import Atom, Posinp, Job, InputParams
-from mybigdft.workflows import PolTensor, PhononEnergies, RamanSpectrum
+from mybigdft.workflows import PolTensor, Phonons, RamanSpectrum
 
 
 pos = Posinp(
@@ -58,7 +58,7 @@ class TestPolTensor:
             pt2.run()
 
 
-class TestPhononEnergies:
+class TestPhonons:
 
     gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
 
@@ -72,7 +72,7 @@ class TestPhononEnergies:
 # N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
 #         pos = Posinp.from_string(N2_ref)
 #         gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
-#         ph = PhononEnergies(gs)
+#         ph = Phonons(gs)
 #         ph.run(nmpi=2, nomp=2)
 #         np.testing.assert_almost_equal(
 #             max(ph.energies['cm^-1']), 2.38632021e+03, decimal=6)
@@ -81,9 +81,9 @@ class TestPhononEnergies:
 #             ph.run()
 
     @pytest.mark.parametrize("to_evaluate", [
-        "PhononEnergies(self.gs, translation_amplitudes=1)",
-        "PhononEnergies(self.gs, translation_amplitudes=[3]*2)",
-        "PhononEnergies(self.gs, translation_amplitudes=[3]*4)",
+        "Phonons(self.gs, translation_amplitudes=1)",
+        "Phonons(self.gs, translation_amplitudes=[3]*2)",
+        "Phonons(self.gs, translation_amplitudes=[3]*4)",
     ])
     def test_init_raises_ValueError(self, to_evaluate):
         with pytest.raises(ValueError):
@@ -93,7 +93,7 @@ class TestPhononEnergies:
 class TestRamanSpectrum:
 
     gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
-    ph = PhononEnergies(gs)
+    ph = Phonons(gs)
 
     def test_run(self):
         N2_ref = """2  angstroem
@@ -102,7 +102,7 @@ N    2.976307744763e-23    6.872205902435e-23    1.071620018790e-02
 N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
         pos = Posinp.from_string(N2_ref)
         gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
-        phonons = PhononEnergies(gs)
+        phonons = Phonons(gs)
         raman = RamanSpectrum(phonons)
         raman.run(nmpi=2, nomp=2)
         # Test the only physically relevant phonon energy
