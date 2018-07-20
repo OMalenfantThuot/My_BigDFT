@@ -839,15 +839,20 @@ class Posinp(Sequence):
         Returns
         -------
         bool
-            True if both initial positions have the same string
-            representation.
+            `True`if both initial positions have the same number of
+            atoms, the same units and boundary conditions and the same
+            atoms (whatever the order of the atoms in the initial list
+            of atoms).
         """
-        same_base = self.BC == other.BC and len(self) == len(other) and \
-            self.units == other.units and self.cell == other._cell
-        if same_base:
-            same_atoms = all([atom in other.atoms for atom in self.atoms])
-            return same_base and same_atoms
-        else:
+        try:
+            same_base = self.BC == other.BC and len(self) == len(other) and \
+                self.units == other.units and self.cell == other._cell
+            if same_base:
+                same_atoms = all([atom in other.atoms for atom in self.atoms])
+                return same_base and same_atoms
+            else:
+                return False
+        except Exception:
             return False
 
     def __ne__(self, other):

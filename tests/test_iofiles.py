@@ -274,3 +274,11 @@ C    7.327412521    0.000000000   3.461304757"""
     def test_init_raises_AssertionError(self, fname):
         with pytest.raises(AssertionError):
             Posinp.from_file(os.path.join(tests_fol, fname))
+
+    def test___eq__(self):
+        atom1 = Atom('N', [0.0, 0.0, 0.0])
+        atom2 = Atom('N', [0.0, 0.0, 1.1])
+        pos1 = Posinp([atom1, atom2], 'angstroem', 'free')
+        pos2 = Posinp([atom2, atom1], 'angstroem', 'free')
+        assert pos1 == pos2  # The order of the atoms in the list do not count
+        assert pos1 != 1  # No error if other object is not a posinp
