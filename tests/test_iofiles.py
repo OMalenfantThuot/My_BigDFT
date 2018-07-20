@@ -173,6 +173,14 @@ class TestLogfile:
         with pytest.warns(UserWarning):
             Logfile.from_file("tests/log-warnings.yaml")
 
+    @pytest.mark.parametrize("attr", [
+        "n_at", "dipole", "forces", "pressure", "sdos", "energy",
+        "boundary_conditions", "cell", "fermi_level", "astruct", "evals",
+        "kpts", "gnrm_cv"
+    ])
+    def test___dir__(self, attr):
+        assert attr in dir(self.log) and "_"+attr not in dir(self.log)
+
 
 class TestPosinp:
 

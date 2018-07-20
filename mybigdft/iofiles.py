@@ -404,7 +404,7 @@ class Logfile(Mapping):
         if self.forces is not None:
             new_forces = np.array([])
             for force in self.forces:
-                new_forces = np.append(new_forces, force.values()[0])
+                new_forces = np.append(new_forces, list(force.values())[0])
             new_forces = new_forces.reshape((self.n_at, 3))
             self._forces = new_forces
 
@@ -435,7 +435,7 @@ class Logfile(Mapping):
             inp_ixc = self["dft"]["ixc"]
             if psp_ixc != inp_ixc:
                 warnings.warn("The XC of pseudo potentials ({}) is different "
-                              "than the input XC ({}) for the '{}' atoms"
+                              "from the input XC ({}) for the '{}' atoms"
                               .format(psp_ixc, inp_ixc, atom_type),
                               UserWarning)
 
@@ -540,7 +540,7 @@ class Logfile(Mapping):
         else:
             super(Logfile, self).__setattr__(name, value)
 
-    def __dir__(self):  # pragma: no cover
+    def __dir__(self):
         r"""
         The base attributes are not found when doing `dir()` on a
         `Logfile` instance, but their counterpart with a preceding
@@ -552,7 +552,15 @@ class Logfile(Mapping):
         value might be updated via the underscored attribute.
         """
         hidden_attributes = list(ATTRIBUTES.keys())
-        base_dir = super(Logfile, self).__dir__()
+        try:  # pragma: no cover
+            base_dir = super(Logfile, self).__dir__()  # Python3
+        except AttributeError:  # pragma: no cover
+            base_dir = dir(super(Logfile, self))  # Python2
+            # Add the missing stuff
+            base_dir += ["write", "log", "from_file", "from_stream",
+                         "posinp", "values", "keys", "get", "items",
+                         "_check_psppar", "_check_warnings",
+                         "_clean_attributes", "_set_builtin_attributes"]
         for name in hidden_attributes:
             base_dir.remove("_"+name)
         return base_dir + hidden_attributes
@@ -963,25 +971,25 @@ class Atom(object):
 
 
         >>> a = Atom('C', [0, 0, 0])
-        >>> a.atom_type
+        >>> a.type
         'C'
         >>> a.position
         array([0., 0., 0.])
         """
         # TODO: Check that the atom type exists
         assert len(position) == 3
-        self._atom_type = atom_type
+        self._type = atom_type
         self._position = np.array(position, dtype=float)
 
     @property
-    def atom_type(self):
+    def type(self):
         r"""
         Returns
         -------
         str
             Type of the atom.
         """
-        return self._atom_type
+        return self._type
 
     @property
     def position(self):
@@ -1026,7 +1034,7 @@ class Atom(object):
             string representation of a Posinp instance.
         """
         return "{t}  {: .15}  {: .15}  {: .15}\n"\
-               .format(t=self.atom_type, *self.position)
+               .format(t=self.type, *self.position)
 
     def __repr__(self):
         r"""
@@ -1035,7 +1043,7 @@ class Atom(object):
         str
             General string representation of an Atom instance.
         """
-        return "Atom('{}', {})".format(self.atom_type, list(self.position))
+        return "Atom('{}', {})".format(self.type, list(self.position))
 
     def __eq__(self, other):
         r"""
@@ -1063,7 +1071,7 @@ class Atom(object):
         """
         try:
             return (np.allclose(self.position, other.position)
-                    and self.atom_type == other.atom_type)
+                    and self.type == other.type)
         except AttributeError:
             return False
 

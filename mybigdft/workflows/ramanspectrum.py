@@ -7,13 +7,13 @@ from __future__ import print_function, absolute_import
 import warnings
 # from copy import deepcopy
 import os
-from collections import Sequence, namedtuple
+from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 # from mybigdft import Logfile, Job
 from mybigdft import Job
 from mybigdft.job import COORDS, SIGNS
 from .workflow import AbstractWorkflow
-from .poltensor import PolTensor
+# from .poltensor import PolTensor
 
 
 # Mass of the different types of atoms in atomic mass units
@@ -87,13 +87,16 @@ class PhononEnergies(AbstractWorkflow):
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._translation_amplitudes = translation_amplitudes
-        # Initialize some attributes containing relevant data
+        # The displacements define the 6 translation vectors each atom
+        # must undergo
         self._displacements = self._set_displacements()
         # The phonon energies are not yet computed
-        self._phonon_energies = None
+        self._energies = None
+        self._dyn_mat = None
+        self._normal_modes = None
         # Initialize the queue of jobs for this workflow
         queue = self._initialize_queue()
-        super(PolTensor, self).__init__(queue=queue)
+        super(PhononEnergies, self).__init__(queue=queue)
 
     @property
     def ground_state(self):
@@ -117,21 +120,42 @@ class PhononEnergies(AbstractWorkflow):
         return self._translation_amplitudes
 
     @property
-    def phonon_energies(self):
+    def energies(self):
         r"""
         Returns
         -------
         numpy.array or None
             Phonon energies of the system.
         """
-        self._phonon_energies
+        return self._energies
+
+    @property
+    def dyn_mat(self):
+        r"""
+        Returns
+        -------
+        numpy.array or None
+            Dynamical matrix deduced from the calculations.
+        """
+        return self._dyn_mat
+
+    @property
+    def normal_modes(self):
+        r"""
+        Returns
+        -------
+        numpy.array or None
+            Normal modes of the system found as eigenvectors of the
+            dynamical matrix.
+        """
+        return self._normal_modes
 
     @property
     def displacements(self):
         r"""
         Returns
         -------
-        dict of length 6
+        OrderedDict of length 6
             Displacements each atom of the system must undergo. There
             are six of them (two per space coordinate) in order to be
             able to compute the Hessian matrix by using the central
@@ -154,7 +178,8 @@ class PhononEnergies(AbstractWorkflow):
         for i_at in range(len(gs.posinp)):
             for key, disp in self.displacements.items():
                 # Prepare the new job by translating an atom
-                run_dir = os.path.join("atom{:04d}".format(i_at), key)
+                run_dir = os.path.join(
+                    gs.run_dir, "atom{:04d}".format(i_at), key)
                 new_posinp = gs.posinp.translate_atom(i_at, disp.vector)
                 job = Job(inputparams=gs.inputparams, posinp=new_posinp,
                           name=gs.name, run_dir=run_dir, skip=gs.skip,
@@ -162,7 +187,7 @@ class PhononEnergies(AbstractWorkflow):
                 # Add attributes to the job to facilitate post-processing
                 job.moved_atom = i_at
                 job.displacement = disp
-                self.queue.append(job)
+                queue.append(job)
         return queue
 
     def _set_displacements(self):
@@ -170,12 +195,14 @@ class PhononEnergies(AbstractWorkflow):
         Set the six displacements each atom must undergo from the
         amplitudes of displacement in each direction.
         """
-        displacements = {}
+        displacements = OrderedDict()
         for i, coord in enumerate(COORDS):
             for sign in SIGNS:
                 key = coord + sign
                 amplitude = SIGNS[sign] * self.translation_amplitudes[i]
-                displacements[key] = Displacement(i, amplitude, sign)
+                if self.ground_state.posinp.units == 'angstroem':
+                    amplitude *= B_TO_ANG
+                displacements[key] = Displacement(i, amplitude)
         return displacements
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
@@ -196,7 +223,7 @@ class PhononEnergies(AbstractWorkflow):
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
         """
-        if self.phonon_energies is None:
+        if self.energies is None:
             super(PhononEnergies, self).run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
         else:
@@ -212,11 +239,11 @@ class PhononEnergies(AbstractWorkflow):
         * solve it to get the phonons (normal modes) and their energies.
         """
         # - Set the dynamical matrix
-        self.dyn_mat = self._compute_dyn_mat()
+        self._dyn_mat = self._compute_dyn_mat()
         # - Find the energies as eigenvalues of the dynamical matrix
-        self.energies = {}
-        self.energies['Ha'], self.normal_modes = self._solve_dyn_mat()
-        self.energies['cm^-1'] = self.energies['Ha'] * HA_TO_CMM1
+        self._energies = {}
+        self._energies['Ha'], self._normal_modes = self._solve_dyn_mat()
+        self._energies['cm^-1'] = self.energies['Ha'] * HA_TO_CMM1
 
     def _compute_dyn_mat(self):
         r"""
@@ -257,7 +284,7 @@ class PhononEnergies(AbstractWorkflow):
         """
         # Get the atoms of the system from the reference posinp
         posinp = self.ground_state.posinp
-        atom_types = [atom.keys()[0] for atom in posinp]
+        atom_types = [atom.type for atom in posinp]
         # Build the masses matrix (the loops over range(3) are here
         # to ensure that masses has the same dimension as the Hessian)
         masses = [[ATOMS_MASS[atom1] * ATOMS_MASS[atom2]
@@ -282,42 +309,22 @@ class PhononEnergies(AbstractWorkflow):
         gs = self.ground_state
         n_at = len(gs.posinp)
         h = np.array([])  # Hessian matrix
-        # First loop over all atoms
-        for i_at in range(n_at):
-            for job1, job2 in zip(*[iter(self.queue)]*2):
-                # The Hessian is made of the delta of the forces
-                # with respect to the delta of the move distances.
-                new_line = []
-                # 1- Find the delta displacement. It is twice the
-                #    distance of the positive move along the direction
-                #    of the displacement.
-                amp1 = job1.displacement.amplitude
-                amp2 = job2.displacement.amplitude
-                assert amp1 == - amp2
-                delta_x = amp1 - amp2
-                # # Make sure there is no div. by 0
-                # amplitude = self.amplitudes[i_coord]
-                # if amplitude is None or amplitude == 0.0:
-                #     amplitude = 1.0
-                # # The Hessian is then built line by line:
-                # # 1- Find the delta displacement. It is twice the
-                # #    distance of the positive move along the direction
-                # #    of the displacement.
-                # delta_x = 2 * amplitude
-                # 2- Find the delta forces for each atom and update
-                #    the new line of the Hessian.
-                forces1 = job1.logfile.forces.flatten()
-                forces2 = job2.logfile.forces.flatten()
-                new_line = (forces1 - forces2) / delta_x
-                h = np.append(h, new_line)
-                # for j_at in range(n_at):
-                #     delta_forces = forces1[j_at] - forces2[j_at]
-                #     new_line += list(delta_forces/delta_x)
-                # # The new line of the Hessian is now complete
-                # h.append(new_line)
-        # Return the Hessian matrix as a numpy array
+        for job1, job2 in zip(*[iter(self.queue)]*2):
+            # Get the value of the delta of move amplitudes
+            amp1 = job1.displacement.amplitude
+            amp2 = job2.displacement.amplitude
+            assert amp1 == - amp2
+            delta_x = amp1 - amp2
+            if self.ground_state.posinp.units == 'angstroem':
+                delta_x *= ANG_TO_B
+            # Get the value of the delta of forces
+            forces1 = job1.logfile.forces.flatten()
+            forces2 = job2.logfile.forces.flatten()
+            # Set a new line of the Hessian matrix
+            new_line = (forces1 - forces2) / delta_x
+            h = np.append(h, new_line)
+        # Return the Hessian matrix as a symmetric numpy array
         h = h.reshape(3*n_at, 3*n_at)
-        # h = np.array(h)
         return (h + h.T) / 2.
 
     def _solve_dyn_mat(self):
@@ -346,15 +353,10 @@ class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
     def vector(self):
         vector = [0.0] * 3
         vector[self.i_coord] = self.amplitude
-        # if amplitude is not None and amplitude != 0.:
-        #     vector = [0.0] * 3
-        #     vector[i] = SIGNS[sign] * amplitude
-        # else:
-        #     raise NotImplementedError()
         return vector
 
-    def __str__(self):
-        return('Displacement: {}'.format(self.vector))
+    # def __str__(self):
+    #     return('Displacement: {}'.format(self.vector))
 
 
 class RamanSpectrum(AbstractWorkflow):
