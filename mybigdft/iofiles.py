@@ -856,7 +856,7 @@ class Posinp(Sequence):
 
     def __str__(self):
         r"""
-        Convert the Posinp to a string.
+        Convert the Posinp to a string in the xyz format.
 
         Returns
         -------
@@ -880,13 +880,8 @@ class Posinp(Sequence):
         -------
             The string representation of a Posinp instance.
         """
-        msg = "[[{}, {}], [{}".format(len(self), self.units, self.BC)
-        if self.cell is not None:
-            msg += ", {}".format(self.cell)
-        msg += "], "
-        msg += ", ".join((repr(atom) for atom in self))
-        msg += "]"
-        return msg
+        r = "Posinp({0.atoms}, {0.units}, {0.BC}, cell={0.cell})".format(self)
+        return r
 
     def write(self, filename):
         r"""
