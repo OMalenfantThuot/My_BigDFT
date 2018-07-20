@@ -5,15 +5,13 @@ molecular system with BigDFT.
 
 from __future__ import print_function, absolute_import
 import warnings
-# from copy import deepcopy
 import os
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
-# from mybigdft import Logfile, Job
 from mybigdft import Job
 from mybigdft.job import COORDS, SIGNS
 from .workflow import AbstractWorkflow
-# from .poltensor import PolTensor
+from .poltensor import PolTensor
 
 
 # Mass of the different types of atoms in atomic mass units
@@ -89,7 +87,7 @@ class PhononEnergies(AbstractWorkflow):
         self._translation_amplitudes = translation_amplitudes
         # The displacements define the 6 translation vectors each atom
         # must undergo
-        self._displacements = self._set_displacements()
+        self._displacements = self._init_displacements()
         # The phonon energies are not yet computed
         self._energies = None
         self._dyn_mat = None
@@ -190,7 +188,7 @@ class PhononEnergies(AbstractWorkflow):
                 queue.append(job)
         return queue
 
-    def _set_displacements(self):
+    def _init_displacements(self):
         r"""
         Set the six displacements each atom must undergo from the
         amplitudes of displacement in each direction.
@@ -363,4 +361,249 @@ class RamanSpectrum(AbstractWorkflow):
     r"""
     """
 
-    pass
+    def __init__(self, phonons, ef_amplitudes=[1e-4]*3):
+        r"""
+        Parameters
+        ----------
+        phonons : PhononEnergies
+            Phonon energies workflow.
+        ef_amplitudes : list or numpy array of length 3
+            Amplitude of the electric field to be applied in the three
+            directions of space (:math:`x`, :math:`y`, :math:`z`).
+        """
+        # Check the electric field amplitudes
+        if not isinstance(ef_amplitudes, Sequence) or len(ef_amplitudes) != 3:
+            raise ValueError("You must provide three electric field "
+                             "amplitudes, one for each space coordinate.")
+        # Initialize the attributes that are specific to this workflow
+        self._phonons = phonons
+        self._ef_amplitudes = ef_amplitudes
+        # The phonon intensities are not yet computed
+        self._intensities = None
+        self._depol_ratios = None
+        # Initialize the poltensor workflows, no need of a queue
+        self._poltensor_workflows = self._init_poltensor_workflows()
+        super(RamanSpectrum, self).__init__(queue=[])
+
+    @property
+    def phonons(self):
+        r"""
+        Returns
+        -------
+        PhononEnergies
+            Workflow allowing to compute the phonon energies of the
+            system under consideration.
+        """
+        return self._phonons
+
+    @property
+    def ef_amplitudes(self):
+        r"""
+        Returns
+        -------
+        list or numpy array of length 3
+            Amplitude of the electric field to be applied in the three
+            directions of space (:math:`x`, :math:`y`, :math:`z`).
+        """
+        return self._ef_amplitudes
+
+    @property
+    def energies(self):
+        r"""
+        Returns
+        -------
+        numpy.array or None
+            Phonon energies of the system.
+        """
+        return self.phonons.energies
+
+    @property
+    def intensities(self):
+        r"""
+        Returns
+        -------
+        list or None
+            Intensities of the phonons.
+        """
+        return self._intensities
+
+    @property
+    def depolarization_ratios(self):
+        r"""
+        Returns
+        -------
+        list or None
+            Depolarization ratios of the phonons.
+        """
+        return self._depolarization_ratios
+
+    @property
+    def poltensor_workflows(self):
+        r"""
+        Returns
+        -------
+        list
+            Polarizability tensor workflows to be performed in order to
+            compute the Raman intensities.
+        """
+        return self._poltensor_workflows
+
+    def _init_poltensor_workflows(self):
+        r"""
+        Returns
+        -------
+        list
+            Polarizability tensor workflows to be performed in order to
+            compute the Raman intensities.
+        """
+        return [PolTensor(job, ef_amplitudes=self.ef_amplitudes)
+                for job in self.phonons.queue]
+
+    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
+        r"""
+        Run the calculations allowing to compute the phonon energies and
+        the related intensities in order to be able to plot the Raman
+        spectrum of the system under consideration.
+
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        nomp : int
+            Number of OpenMP tasks.
+        force_run : bool
+            If `True`, the calculations are run even though a logfile
+            already exists.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
+        """
+        if self.intensities is None:
+            self.phonons.run(
+                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+            for pt in self.poltensor_workflows:
+                pt.run(
+                    nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+            super(RamanSpectrum, self).run(
+                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+        else:
+            warning_msg = "Calculations already performed; set the argument "\
+                          "'force_run' to True to re-run them."
+            warnings.warn(warning_msg, UserWarning)
+
+    def post_proc(self):
+        r"""
+        Compute the intensities of the Raman spectrum set its value (you can
+        access its value via the attribute :attr:`poltensor`).
+        """
+        # - Set the derivatives of the polarizability tensors
+        #   along each displacement directions
+        deriv_pol_tensors = self._compute_deriv_pol_tensors()
+        # - Set the mean polarizability derivatives (alpha), the
+        #   anisotropies of the polarizability tensor derivative
+        #   (beta_sq), the intensity and the depolarization ratio
+        #   for each normal mode:
+        self._alphas = []
+        self._betas_sq = []
+        self._intensities = []
+        self._depolarization_ratios = []
+        # - Loop over the normal modes
+        for pt_flat in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
+            # Reshape the derivative of the polarizability tensor
+            # along the current normal mode
+            pt = pt_flat.reshape(3, 3)
+            # Find the principal values of polarizability
+            alphas = np.linalg.eigvals(pt)
+            # Mean polarizability derivative
+            alpha = np.sum(alphas) / 3.
+            self._alphas.append(alpha)
+            # Anisotropy of the polarizability tensor derivative
+            beta_sq = ((alphas[0]-alphas[1])**2 +
+                       (alphas[1]-alphas[2])**2 +
+                       (alphas[2]-alphas[0])**2) / 2.
+            self._betas_sq.append(beta_sq)
+            # # Mean polarizability derivative
+            # alpha = 1./3. * pt.trace()
+            # self._alphas.append(alpha)
+            # # Anisotropy of the polarizability tensor derivative
+            # beta_sq = 1./2. * ((pt[0][0]-pt[1][1])**2 +
+            #                    (pt[0][0]-pt[2][2])**2 +
+            #                    (pt[1][1]-pt[2][2])**2 +
+            #                    6.*(pt[0][1]**2+pt[0][2]**2+pt[1][2]**2))
+            # self._betas_sq.append(beta_sq)
+            # From the two previous quantities, it is possible to
+            # compute the intensity (converted from atomic units
+            # to Ang^4.amu^-1) and the depolarization ratio
+            # of the normal mode.
+            conversion = B_TO_ANG**4 / EMU_TO_AMU
+            self._intensities.append((45*alpha**2 + 7*beta_sq) * conversion)
+            self._depolarization_ratios.append(
+                3*beta_sq / (45*alpha**2 + 4*beta_sq))
+
+    def _compute_deriv_pol_tensors(self):
+        r"""
+        Compute the derivative of the polarizability tensor along all
+        the atom displacements.
+
+        All the elements of the derivative of the polarizability tensor
+        along one displacement direction are represented by a line of
+        the returned array. There are :math:`3 n_at` such lines (because
+        there are 3 displacements per atom). This representation allows
+        for a simpler evaluation of these derivatives along the normal
+        modes.
+
+        Note that each element is also weighted by the inverse of the
+        square root of the atom that is moved.
+
+        Returns
+        -------
+        2D np.array of shape :math:`(3 n_{at}, 9)`
+            Derivatives of the polarizability tensor.
+        """
+        deriv_pts = np.array([])
+        for pt1, pt2 in zip(*[iter(self.poltensor_workflows)]*2):
+            # Get the value of the delta of move amplitudes
+            gs1 = pt1.ground_state
+            gs2 = pt2.ground_state
+            amp = gs1.displacement.amplitude
+            assert amp == - gs2.displacement.amplitude
+            delta_x = 2 * amp
+            if gs1.posinp.units == 'angstroem':
+                delta_x *= ANG_TO_B
+            # Get the value of the delta of poltensors
+            i_at = gs1.moved_atom
+            assert i_at == gs2.moved_atom
+            m = ATOMS_MASS[gs1.posinp[i_at].type]
+            delta_pol_tensor = pt1.poltensor - pt2.poltensor
+            # Compute the derivative of the polarizability tensor
+            deriv = delta_pol_tensor / delta_x / np.sqrt(m*AMU_TO_EMU)
+            deriv_pts = np.append(deriv_pts, deriv.flatten())
+        # Return the transpose of this array
+        deriv_pts = deriv_pts.reshape(3*len(gs1.posinp), 9)
+        return deriv_pts.T
+        # # Return the Hessian matrix as a symmetric numpy array
+        # h = h.reshape(3*n_at, 3*n_at)
+        # # Loop over the atoms
+        # for i_at, atom_dir in enumerate(self.atom_dirs):
+        #     # Loop over the displacement directions
+        #     for i, coord in enumerate(COORDS):
+        #         # Get the delta of the polarizability tensors
+        #         # corresponding to the two atomic displacements along
+        #         # the current direction
+        #         m = ATOMS_MASS[self.posinp.atoms[i_at]['Type']]
+        #        pts = [self.pol_tensors[atom_dir][coord][j] for j in range(2)]
+        #         delta_pol_tensor = (pts[0] - pts[1]) / np.sqrt(m*AMU_TO_EMU)
+        #         # Norm of the atom displacement in that direction (in
+        #         # bohr)
+        #         delta_x = 2 * self.displacements[i]
+        #         # Compute the derivative of each component of the
+        #         # polarizability tensor for a given direction
+        #         deriv = delta_pol_tensor / delta_x
+        #         # The polarizability tensor is flatten to make it a
+        #         # line of the derivative of the polarizability tensor
+        #         # array.
+        #         deriv_pol_tensors.append(deriv.flatten())
+        # # Convert the array into a numpy array and transpose it before
+        # # returning it
+        # deriv_pol_tensors = np.array(deriv_pol_tensors).T
+        # return deriv_pol_tensors

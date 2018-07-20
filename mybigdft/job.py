@@ -333,8 +333,8 @@ class Job(object):
                 self._init_dir = basename
                 new_run_dir = os.path.relpath(run_dir, start=basename)
                 self._run_dir = os.path.join(self.init_dir, new_run_dir)
-                print("run_dir switched from {} to {}"
-                      .format(run_dir, new_run_dir))
+                # print("run_dir switched from {} to {}"
+                #       .format(run_dir, new_run_dir))
 
     def _set_data_directory(self):
         r"""

@@ -63,7 +63,6 @@ class TestJob:
             Job(inputparams=self.inp,
                 posinp=Posinp.from_file("tests/surface.xyz"))
 
-
     @pytest.mark.parametrize("attr", [
         "inputparams", "posinp", "logfile", "ref_job",
         "input_name", "posinp_name", "logfile_name",
