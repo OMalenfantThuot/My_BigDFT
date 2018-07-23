@@ -193,7 +193,7 @@ class InputParams(MutableMapping):
         >>> InputParams.from_string("{'dft': {'rmult': [6, 8]}}")
         {'dft': {'rmult': [6, 8]}}
         """
-        params = yaml.load(string, Loader=CLoader)
+        params = yaml.load(string, Loader=Loader)
         return cls(params=params)
 
     @property
@@ -272,7 +272,7 @@ class InputParams(MutableMapping):
         """
         with open(filename, "w") as f:
             self._params = clean(self.params)  # Make sure it is valid
-            yaml.dump(self.params, stream=f, Dumper=CDumper)
+            yaml.dump(self.params, stream=f, Dumper=Dumper)
 
 
 PATHS = "paths"
@@ -487,7 +487,7 @@ class Logfile(Mapping):
         Logfile
             Logfile initialized from a stream.
         """
-        log = yaml.load(stream, Loader=CLoader)
+        log = yaml.load(stream, Loader=Loader)
         return cls(log)
 
     @property
@@ -591,7 +591,7 @@ class Logfile(Mapping):
             Name of the logfile.
         """
         with open(filename, "w") as f:
-            yaml.dump(self.log, stream=f, Dumper=CDumper)
+            yaml.dump(self.log, stream=f, Dumper=Dumper)
 
     @property
     def posinp(self):
