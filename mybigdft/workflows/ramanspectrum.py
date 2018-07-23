@@ -531,12 +531,9 @@ class RamanSpectrum(AbstractWorkflow):
         deriv_pol_tensors = self._compute_deriv_pol_tensors()
         # - Set the mean polarizability derivatives (alpha), the
         #   anisotropies of the polarizability tensor derivative
-        #   (beta_sq), the intensity and the depolarization ratio
-        #   for each normal mode:
-        self._alphas = []
-        self._betas_sq = []
-        self._intensities = []
-        self._depolarization_ratios = []
+        #   (beta_sq) for each normal mode
+        self._alphas = np.array([])
+        self._betas_sq = np.array([])
         # - Loop over the normal modes
         for pt_flat in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
             # Reshape the derivative of the polarizability tensor
@@ -546,12 +543,12 @@ class RamanSpectrum(AbstractWorkflow):
             alphas = np.linalg.eigvals(pt)
             # Mean polarizability derivative
             alpha = np.sum(alphas) / 3.
-            self._alphas.append(alpha)
+            self._alphas = np.append(self._alphas, alpha)
             # Anisotropy of the polarizability tensor derivative
             beta_sq = ((alphas[0]-alphas[1])**2 +
                        (alphas[1]-alphas[2])**2 +
                        (alphas[2]-alphas[0])**2) / 2.
-            self._betas_sq.append(beta_sq)
+            self._betas_sq = np.append(self._betas_sq, beta_sq)
             # # Mean polarizability derivative
             # alpha = 1./3. * pt.trace()
             # self._alphas.append(alpha)
@@ -561,14 +558,15 @@ class RamanSpectrum(AbstractWorkflow):
             #                    (pt[1][1]-pt[2][2])**2 +
             #                    6.*(pt[0][1]**2+pt[0][2]**2+pt[1][2]**2))
             # self._betas_sq.append(beta_sq)
-            # From the two previous quantities, it is possible to
-            # compute the intensity (converted from atomic units
-            # to Ang^4.amu^-1) and the depolarization ratio
-            # of the normal mode.
-            conversion = B_TO_ANG**4 / EMU_TO_AMU
-            self._intensities.append((45*alpha**2 + 7*beta_sq) * conversion)
-            self._depolarization_ratios.append(
-                3*beta_sq / (45*alpha**2 + 4*beta_sq))
+        # From the two previous quantities, it is possible to
+        # compute the intensity (converted from atomic units
+        # to Ang^4.amu^-1) and the depolarization ratio
+        # of the normal mode.
+        conversion = B_TO_ANG**4 / EMU_TO_AMU
+        self._intensities = \
+            (45*self._alphas**2 + 7*self._betas_sq) * conversion
+        self._depolarization_ratios = \
+            3*self._betas_sq / (45*self._alphas**2 + 4*self._betas_sq)
 
     def _compute_deriv_pol_tensors(self):
         r"""

@@ -60,7 +60,7 @@ class TestPolTensor:
 
 class TestPhonons:
 
-    gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
+    gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
 
 # This test is redundant with the one below; it is kept commented in cas
 # This test is redundant with the one below; it is kept commented in cas
@@ -71,7 +71,7 @@ class TestPhonons:
 # N    2.976307744763e-23    6.872205902435e-23    1.071620018790e-02
 # N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
 #         pos = Posinp.from_string(N2_ref)
-#         gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
+#         gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
 #         ph = Phonons(gs)
 #         ph.run(nmpi=2, nomp=2)
 #         np.testing.assert_almost_equal(
@@ -92,7 +92,7 @@ class TestPhonons:
 
 class TestRamanSpectrum:
 
-    gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
+    gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
     ph = Phonons(gs)
 
     def test_run(self):
@@ -101,7 +101,7 @@ free
 N    2.976307744763e-23    6.872205902435e-23    1.071620018790e-02
 N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
         pos = Posinp.from_string(N2_ref)
-        gs = Job(posinp=pos, name='N2', run_dir='tests/phonon_N2')
+        gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
         phonons = Phonons(gs)
         raman = RamanSpectrum(phonons)
         raman.run(nmpi=2, nomp=2)
