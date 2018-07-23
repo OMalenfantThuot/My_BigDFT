@@ -657,10 +657,10 @@ class Posinp(Sequence):
             assert BC == "free"
         else:
             assert len(cell) == 3
-            cell = [abs(float(coord)) if coord != ".inf" else coord
-                    for coord in cell]
+            cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
+                    for size in cell]
         if BC == "periodic":
-            assert ".inf" not in cell
+            assert "inf" not in cell
         elif BC == "free":
             assert units != "reduced"
         # Set the attributes
@@ -742,10 +742,10 @@ class Posinp(Sequence):
 
         >>> posinp = Posinp.from_file("tests/surface.xyz")
         >>> posinp.cell
-        [8.07007483423, '.inf', 4.65925987792]
+        [8.07007483423, 'inf', 4.65925987792]
         >>> print(posinp)
         4   reduced
-        surface   8.07007483423   0.0   4.65925987792
+        surface   8.07007483423   inf   4.65925987792
         C   0.08333333333   0.5   0.25
         C   0.41666666666   0.5   0.25
         C   0.58333333333   0.5   0.75
@@ -782,7 +782,7 @@ class Posinp(Sequence):
         if cell is None:
             BC = "free"
         else:
-            if cell[1] == ".inf":
+            if cell[1] in [".inf", "inf"]:
                 BC = "surface"
             else:
                 BC = "periodic"
@@ -902,10 +902,8 @@ class Posinp(Sequence):
         # Create the first two lines of the posinp file
         pos_str = "{}   {}\n".format(len(self), self.units)
         pos_str += self.BC
-        cell = self.cell
-        if cell is not None:
-            cell = [coord if coord != ".inf" else 0.0 for coord in cell]
-            pos_str += "   {}   {}   {}\n".format(*cell)
+        if self.cell is not None:
+            pos_str += "   {}   {}   {}\n".format(*self.cell)
         else:
             pos_str += "\n"
         # Add all the other lines, representing the atoms

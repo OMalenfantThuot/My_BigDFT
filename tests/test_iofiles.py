@@ -223,7 +223,7 @@ C    7.327412521    0.000000000   3.461304757"""
     @pytest.mark.parametrize("value, expected", [
         (len(pos), 4), (pos.units, "reduced"), (len(pos), 4),
         (pos.BC, "surface"),
-        (pos.cell, [8.07007483423, '.inf', 4.65925987792]),
+        (pos.cell, [8.07007483423, 'inf', 4.65925987792]),
         (pos[0], Atom('C', [0.08333333333, 0.5, 0.25])),
     ])
     def test_from_file(self, value, expected):
@@ -242,7 +242,7 @@ C    7.327412521    0.000000000   3.461304757"""
     @pytest.mark.parametrize("value, expected", [
         (len(surf_pos), 1), (surf_pos.units, "angstroem"), (len(surf_pos), 1),
         (surf_pos.BC, "surface"),
-        (surf_pos.cell, [8, ".inf", 8]),
+        (surf_pos.cell, [8, "inf", 8]),
         (surf_pos[0], Atom('C', [0, 0, 0])),
     ])
     def test_from_surface_InputParams(self, value, expected):
@@ -290,3 +290,44 @@ C    7.327412521    0.000000000   3.461304757"""
         pos2 = Posinp([atom2, atom1], 'angstroem', 'free')
         assert pos1 == pos2  # The order of the atoms in the list do not count
         assert pos1 != 1  # No error if other object is not a posinp
+
+    def test_with_surface_BC(self):
+        # Two Posinp instances with surface BC are the same even if they
+        # have a different cell size along y-axis
+        pos_with_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[40, ".inf", 40])
+        pos_wo_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[40, 40, 40])
+        assert pos_with_inf == pos_wo_inf
+        # They are obviously different if the cell size along the other
+        # directions are not the same
+        pos2_wo_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[20, "inf", 40])
+        assert pos_with_inf != pos2_wo_inf
+        assert pos2_wo_inf.BC == pos_with_inf.BC  # They still have the same BC
+        # You can only have a cell with ".inf" in 2nd positiion to
+        # initialize a calculation with surface BC without using a
+        # Posinp instance
+        inp_with_inf = InputParams({"posinp": {
+            "units": "angstroem",
+            "cell": [40, ".inf", 40],
+            "positions": [
+                {'N': [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]},
+                {'N': [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154]},
+            ]
+        }})
+        assert pos_with_inf == inp_with_inf.posinp
