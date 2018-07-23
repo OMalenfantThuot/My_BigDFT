@@ -2,7 +2,7 @@ from __future__ import absolute_import
 import os
 import pytest
 import numpy as np
-from mybigdft import InputParams, Posinp, Logfile, Job
+from mybigdft import InputParams, Posinp, Atom, Logfile, Job
 
 
 class TestJob:
@@ -142,3 +142,43 @@ class TestJob:
             with Job(inputparams=InputParams(), posinp=self.pos,
                      name="warnings", run_dir="tests") as job:
                 job.run()
+
+    def test_posinp_with_surface_BC(self):
+        # Two Posinp instances with surface BC are the same even if they
+        # have a different cell size along y-axis
+        pos_with_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[40, ".inf", 40])
+        pos_wo_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[40, 40, 40])
+        assert pos_with_inf == pos_wo_inf
+        # They are obviously different if the cell size along the other
+        # directions are not the same
+        pos2_wo_inf = Posinp([
+            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]),
+            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154])],
+            'angstroem', 'surface', cell=[20, ".inf", 40])
+        assert pos_with_inf != pos2_wo_inf
+        # You can only have a cell with ".inf" in 2nd positiion to
+        # initialize a calculation with surface BC without using a
+        # Posinp instance
+        inp_with_inf = InputParams({"posinp": {
+            "units": "angstroem",
+            "cell": [40, ".inf", 40],
+            "positions": [
+                {'N': [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]},
+                {'N': [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154]},
+            ]
+        }})
+        assert pos_with_inf == inp_with_inf.posinp

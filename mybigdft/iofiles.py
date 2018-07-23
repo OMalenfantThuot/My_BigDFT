@@ -745,7 +745,7 @@ class Posinp(Sequence):
         [8.07007483423, '.inf', 4.65925987792]
         >>> print(posinp)
         4   reduced
-        surface   8.07007483423   .inf   4.65925987792
+        surface   8.07007483423   0.0   4.65925987792
         C   0.08333333333   0.5   0.25
         C   0.41666666666   0.5   0.25
         C   0.58333333333   0.5   0.75
@@ -864,11 +864,23 @@ class Posinp(Sequence):
             of atoms).
         """
         try:
+            # Check that both cells are the same, but first make sure
+            # that the unimportant cell size are not compared
+            cell = deepcopy(self.cell)
+            other_cell = deepcopy(other.cell)
+            if self.BC == "surface":
+                cell[1] = 0.0
+            if other.BC == "surface":
+                other_cell[1] = 0.0
+            same_cell = cell == other_cell
+            # Check the other basic attributes
             same_base = self.BC == other.BC and len(self) == len(other) and \
-                self.units == other.units and self.cell == other._cell
+                self.units == other.units and same_cell
+            # Finally check the atoms only if the base is similar, as it
+            # might be time-consuming for large systems
             if same_base:
                 same_atoms = all([atom in other.atoms for atom in self.atoms])
-                return same_base and same_atoms
+                return same_atoms
             else:
                 return False
         except AttributeError:
@@ -890,8 +902,10 @@ class Posinp(Sequence):
         # Create the first two lines of the posinp file
         pos_str = "{}   {}\n".format(len(self), self.units)
         pos_str += self.BC
-        if self.cell is not None:
-            pos_str += "   {}   {}   {}\n".format(*self.cell)
+        cell = self.cell
+        if cell is not None:
+            cell = [coord if coord != ".inf" else 0.0 for coord in cell]
+            pos_str += "   {}   {}   {}\n".format(*cell)
         else:
             pos_str += "\n"
         # Add all the other lines, representing the atoms
