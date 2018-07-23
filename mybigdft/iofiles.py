@@ -9,7 +9,7 @@ from collections import Sequence, Mapping, MutableMapping
 import oyaml as yaml
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
-except ImportError:
+except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
 import numpy as np
 from .globals import input_variables
