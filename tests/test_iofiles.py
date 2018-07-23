@@ -279,9 +279,18 @@ C    7.327412521    0.000000000   3.461304757"""
         "missing_atom.xyz",
         "additional_atom.xyz",
     ])
-    def test_init_raises_AssertionError(self, fname):
-        with pytest.raises(AssertionError):
+    def test_init_raises_ValueError(self, fname):
+        with pytest.raises(ValueError):
             Posinp.from_file(os.path.join(tests_fol, fname))
+
+    @pytest.mark.parametrize("to_evaluate", [
+        "Posinp([Atom('C', [0, 0, 0])], 'bohr', 'periodic')",
+        "Posinp([Atom('C', [0, 0, 0])], 'bohr', 'periodic', cell=[1, 1])",
+        "Posinp([Atom('C', [0, 0, 0])], 'bohr', 'periodic', cell=[1,'inf',1])",
+    ])
+    def test_init_raises_ValueError2(self, to_evaluate):
+        with pytest.raises(ValueError):
+            eval(to_evaluate)
 
     def test___eq__(self):
         atom1 = Atom('N', [0.0, 0.0, 0.0])

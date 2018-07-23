@@ -438,10 +438,10 @@ class Logfile(Mapping):
             psp_ixc = self["psppar.{}".format(atom_type)]["Pseudopotential XC"]
             inp_ixc = self["dft"]["ixc"]
             if psp_ixc != inp_ixc:
-                warnings.warn("The XC of pseudo potentials ({}) is different "
-                              "from the input XC ({}) for the '{}' atoms"
-                              .format(psp_ixc, inp_ixc, atom_type),
-                              UserWarning)
+                warnings.warn(
+                    "The XC of pseudo potentials ({}) is different from the "
+                    "input XC ({}) for the '{}' atoms"
+                    .format(psp_ixc, inp_ixc, atom_type), UserWarning)
 
     @classmethod
     def from_file(cls, filename):
@@ -651,23 +651,43 @@ class Posinp(Sequence):
         "Atom('N', [0.0, 0.0, 1.1])"
         """
         # Check initial values
-        BC = BC.lower()
         units = units.lower()
-        if cell is None:
-            assert BC == "free"
-        else:
-            assert len(cell) == 3
+        BC = BC.lower()
+        self._check_initial_values(units, BC, cell)
+        if cell is not None:
             cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
                     for size in cell]
-        if BC == "periodic":
-            assert "inf" not in cell
-        elif BC == "free":
-            assert units != "reduced"
         # Set the attributes
         self._atoms = atoms
         self._units = units
-        self._cell = cell
         self._BC = BC
+        self._cell = cell
+
+    def _check_initial_values(self, units, BC, cell):
+        r"""
+        Raises
+        ------
+        ValueError
+            If some initial values are invalid, contradictory or
+            missing.
+        """
+        if cell is not None:
+            if len(cell) != 3:
+                raise ValueError(
+                    "The cell size must be of length 3 (one value per "
+                    "space coordinate)")
+        else:
+            if BC != "free":
+                raise ValueError(
+                    "You must give a cell size to use '{}' boundary conditions"
+                    .format(BC))
+        if BC == "periodic" and "inf" in cell:
+            raise ValueError(
+                "Cannot use periodic boundary conditions with a cell meant "
+                "for a surface calculation.")
+        elif BC == "free" and units == "reduced":
+            raise ValueError(
+                "Cannot use reduced units with free boundary conditions")
 
     @classmethod
     def _from_stream(cls, stream):
@@ -703,26 +723,11 @@ class Posinp(Sequence):
                 atom_type = content[0]
                 position = content[1:4]
                 atoms.append(Atom(atom_type, position))
-        assert n_at == len(atoms)
+        if n_at != len(atoms):
+            raise ValueError(
+                "The number of atoms provided '{}' differs from the expected "
+                "one '{}'".format(len(atoms), n_at))
         return cls(atoms, units, BC, cell=cell)
-
-    @classmethod
-    def from_string(cls, posinp):
-        r"""
-        Initialize the input positions from a string.
-
-        Parameters
-        ----------
-        posinp : str
-            Content of an xyz file as a string.
-
-        Returns
-        -------
-        Posinp
-            Posinp read from the string.
-        """
-        posinp = posinp.split("\n")
-        return cls._from_stream(posinp)
 
     @classmethod
     def from_file(cls, filename):
@@ -770,6 +775,39 @@ class Posinp(Sequence):
         -------
         Posinp
             Posinp initialized from an dictionary.
+
+
+        >>> pos_dict = {
+        ...     "units": "reduced",
+        ...     "cell": [8.07007483423, 'inf', 4.65925987792],
+        ...     "positions": [
+        ...         {'C': [0.08333333333, 0.5, 0.25]},
+        ...         {'C': [0.41666666666, 0.5, 0.25]},
+        ...         {'C': [0.58333333333, 0.5, 0.75]},
+        ...         {'C': [0.91666666666, 0.5, 0.75]},
+        ...     ]
+        ... }
+        >>> pos = Posinp.from_dict(pos_dict)
+        >>> pos.BC
+        'surface'
+
+        The value of the "cell" key allows to derive the boundary
+        conditions. Replacing 'inf' by a number gives a posinp with
+        periodic boundary conditions:
+        >>> pos_dict["cell"] = [8.07007483423, 10.0, 4.65925987792]
+        >>> pos = Posinp.from_dict(pos_dict)
+        >>> pos.BC
+        'periodic'
+
+        If there is no "cell" key, then the boundary conditions are set
+        to "free". Here, given that the units are reduced, this raises
+        an ValueError:
+
+        >>> del pos_dict["cell"]
+        >>> pos = Posinp.from_dict(pos_dict)
+        Traceback (most recent call last):
+        ...
+        ValueError: Cannot use reduced units with free boundary conditions
         """
         # Read data from the dictionary
         atoms = []  # atomic positions
@@ -787,6 +825,59 @@ class Posinp(Sequence):
             else:
                 BC = "periodic"
         return cls(atoms, units, BC, cell=cell)
+
+    @classmethod
+    def from_string(cls, posinp):
+        r"""
+        Initialize the input positions from a string.
+
+        Parameters
+        ----------
+        posinp : str
+            Content of an xyz file as a string.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from the string.
+
+
+        This method is mostly meant to allow the formatting of the
+        string representation of a posinp written as a string:
+
+        >>> pos_str = str(
+        ...     "4   reduced\n"
+        ...     "surface   {x}   inf   {z}\n"
+        ...     "C   0.08333333333   0.5   0.25\n"
+        ...     "C   0.41666666666   0.5   0.25\n"
+        ...     "C   0.58333333333   0.5   0.75\n"
+        ...     "C   0.91666666666   0.5   0.75"
+        ... )
+        >>> for aCC in [2.65, 2.7]:
+        ...     new_str = pos_str.format(x=3*aCC, z=np.sqrt(3)*aCC)
+        ...     pos = Posinp.from_string(new_str)
+        ...     print(pos.cell)
+        [7.95, 'inf', 4.58993464006]
+        [8.1, 'inf', 4.67653718044]
+
+        It would actually be possible to achieve the same thing without
+        having to go through the string formatting (which should be the
+        preferred way):
+        >>> atoms = [
+        ...     Atom('C', [0.08333333333, 0.5, 0.25]),
+        ...     Atom('C', [0.41666666666, 0.5, 0.25]),
+        ...     Atom('C', [0.58333333333, 0.5, 0.75]),
+        ...     Atom('C', [0.91666666666, 0.5, 0.75]),
+        ... ]
+        >>> for aCC in [2.65, 2.7]:
+        ...     cell = [3*aCC, 'inf', np.sqrt(3)*aCC]
+        ...     pos = Posinp(atoms, "reduced", "surface", cell=cell)
+        ...     print(pos.cell)
+        [7.949999999999999, 'inf', 4.589934640057525]
+        [8.100000000000001, 'inf', 4.676537180435969]
+        """
+        posinp = posinp.split("\n")
+        return cls._from_stream(posinp)
 
     @property
     def units(self):

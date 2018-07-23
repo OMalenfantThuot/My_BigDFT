@@ -160,6 +160,7 @@ class TestJob:
         assert job.logfile.boundary_conditions == 'surface'
 
     def test_run_raises_RuntimeError(self):
+        # Error because two ".inf" in cell
         inp = InputParams({"posinp": {
             "units": "angstroem",
             "cell": [40, ".inf", ".inf"],
@@ -174,7 +175,8 @@ class TestJob:
             with Job(inputparams=inp, run_dir="tests/dummy") as job:
                 job.run(force_run=True)
 
-    def test_dryrun_raises_RuntimeError(self):
+    def test_dry_run_raises_RuntimeError(self):
+        # Error because two ".inf" in cell
         inp = InputParams({"posinp": {
             "units": "angstroem",
             "cell": [40, ".inf", ".inf"],
