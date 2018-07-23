@@ -794,6 +794,7 @@ class Posinp(Sequence):
         The value of the "cell" key allows to derive the boundary
         conditions. Replacing 'inf' by a number gives a posinp with
         periodic boundary conditions:
+
         >>> pos_dict["cell"] = [8.07007483423, 10.0, 4.65925987792]
         >>> pos = Posinp.from_dict(pos_dict)
         >>> pos.BC
@@ -801,7 +802,7 @@ class Posinp(Sequence):
 
         If there is no "cell" key, then the boundary conditions are set
         to "free". Here, given that the units are reduced, this raises
-        an ValueError:
+        a ValueError:
 
         >>> del pos_dict["cell"]
         >>> pos = Posinp.from_dict(pos_dict)
@@ -863,6 +864,7 @@ class Posinp(Sequence):
         It would actually be possible to achieve the same thing without
         having to go through the string formatting (which should be the
         preferred way):
+
         >>> atoms = [
         ...     Atom('C', [0.08333333333, 0.5, 0.25]),
         ...     Atom('C', [0.41666666666, 0.5, 0.25]),
