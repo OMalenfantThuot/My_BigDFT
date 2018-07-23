@@ -378,7 +378,7 @@ class RamanSpectrum(AbstractWorkflow):
     modes. To that end, one must compute the polarizability tensor at
     each of the positons used to get the vibrational energies, and this
     means applying an external electric field along each coordinate.
-    One calculations per space coordinate lead to 3 extra calculations,
+    One calculation per space coordinate lead to 3 extra calculations,
     meaning that :math:`18 n_{at}` additional BigDFT standard
     calculations are required to obtain a Raman spectrum intensities,
     leading to :math:`24 n_{at}` calculations in total.
@@ -611,29 +611,3 @@ class RamanSpectrum(AbstractWorkflow):
         # Return the transpose of this array
         deriv_pts = deriv_pts.reshape(3*len(gs1.posinp), 9)
         return deriv_pts.T
-        # # Return the Hessian matrix as a symmetric numpy array
-        # h = h.reshape(3*n_at, 3*n_at)
-        # # Loop over the atoms
-        # for i_at, atom_dir in enumerate(self.atom_dirs):
-        #     # Loop over the displacement directions
-        #     for i, coord in enumerate(COORDS):
-        #         # Get the delta of the polarizability tensors
-        #         # corresponding to the two atomic displacements along
-        #         # the current direction
-        #         m = ATOMS_MASS[self.posinp.atoms[i_at]['Type']]
-        #        pts = [self.pol_tensors[atom_dir][coord][j] for j in range(2)]
-        #         delta_pol_tensor = (pts[0] - pts[1]) / np.sqrt(m*AMU_TO_EMU)
-        #         # Norm of the atom displacement in that direction (in
-        #         # bohr)
-        #         delta_x = 2 * self.displacements[i]
-        #         # Compute the derivative of each component of the
-        #         # polarizability tensor for a given direction
-        #         deriv = delta_pol_tensor / delta_x
-        #         # The polarizability tensor is flatten to make it a
-        #         # line of the derivative of the polarizability tensor
-        #         # array.
-        #         deriv_pol_tensors.append(deriv.flatten())
-        # # Convert the array into a numpy array and transpose it before
-        # # returning it
-        # deriv_pol_tensors = np.array(deriv_pol_tensors).T
-        # return deriv_pol_tensors
