@@ -602,11 +602,16 @@ class Job(object):
         command_msg = to_str.format(*command)+"..."
         print(command_msg)
         # Run the calculation
-        run = subprocess.Popen(command,
-                               stdout=subprocess.PIPE,
-                               stderr=subprocess.PIPE)
-        # Return a clean output message
+        run = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # Raise an error if the calculation ended badly, else return the
+        # decoded output message
         out, err = run.communicate()
+        error_msg = err.decode('unicode_escape')
+        if error_msg != '':
+            raise RuntimeError(
+                "The calculation ended with the following error message:{}"
+                .format(error_msg))
         output_msg = out.decode('unicode_escape')
         return output_msg
 
