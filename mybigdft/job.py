@@ -6,9 +6,8 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
-from copy import deepcopy
 from .globals import bigdft_path, bigdft_tool_path
-from .iofiles import InputParams, Posinp, Logfile, clean
+from .iofiles import InputParams, Logfile, clean
 
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -462,8 +461,6 @@ class Job(object):
             If the initial geometry of the job does not correspond to
             the one of the Logfile previously read from the disk.
         """
-        if self.posinp is None:
-            self._posinp = Posinp.from_InputParams(self.inputparams)
         if self.logfile.posinp != self.posinp:
             raise UserWarning(
                 "The initial geometry of this job do not correspond to the "
@@ -480,17 +477,14 @@ class Job(object):
             If the input parameters of the job does not correspond to
             the one used in the Logfile previously read from the disk.
         """
-        bare_inp = deepcopy(self.inputparams)
         log_inp = InputParams.from_Logfile(self.logfile)
-        # Clean the posinp from the input paramaters
-        if "posinp" in bare_inp:
-            del bare_inp['posinp']
-        # Clean the disablesym, if present only in the log_inp
+        base_inp = self.inputparams
+        # Clean the disablesym key, if present only in the log_inp
         if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
-            if 'dft' in bare_inp and 'disablesym' not in bare_inp['dft']:
+            if 'dft' in base_inp and 'disablesym' not in base_inp['dft']:
                 del log_inp['dft']['disablesym']
                 log_inp._params = clean(log_inp.params)
-        if bare_inp != log_inp:
+        if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "
                 "ones used in the Logfile.", UserWarning)
@@ -596,6 +590,11 @@ class Job(object):
         ----------
         command : list
             The command to run bigdft or bigdft-tool.
+
+        Raises
+        ------
+        RuntimeError
+            If the calculation ended with an error message.
         """
         # Print the command in a human readable way
         to_str = "{} "*len(command)
