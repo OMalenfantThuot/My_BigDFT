@@ -7,6 +7,10 @@ import warnings
 from copy import deepcopy
 from collections import Sequence, Mapping, MutableMapping
 import oyaml as yaml
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 import numpy as np
 from .globals import input_variables
 
@@ -189,7 +193,7 @@ class InputParams(MutableMapping):
         >>> InputParams.from_string("{'dft': {'rmult': [6, 8]}}")
         {'dft': {'rmult': [6, 8]}}
         """
-        params = yaml.safe_load(string)
+        params = yaml.load(string, Loader=CLoader)
         return cls(params=params)
 
     @property
@@ -268,7 +272,7 @@ class InputParams(MutableMapping):
         """
         with open(filename, "w") as f:
             self._params = clean(self.params)  # Make sure it is valid
-            yaml.safe_dump(self.params, stream=f)
+            yaml.dump(self.params, stream=f, Dumper=CDumper)
 
 
 PATHS = "paths"
@@ -483,7 +487,7 @@ class Logfile(Mapping):
         Logfile
             Logfile initialized from a stream.
         """
-        log = yaml.safe_load(stream)
+        log = yaml.load(stream, Loader=CLoader)
         return cls(log)
 
     @property
@@ -587,7 +591,7 @@ class Logfile(Mapping):
             Name of the logfile.
         """
         with open(filename, "w") as f:
-            yaml.safe_dump(self.log, stream=f)
+            yaml.dump(self.log, stream=f, Dumper=CDumper)
 
     @property
     def posinp(self):
