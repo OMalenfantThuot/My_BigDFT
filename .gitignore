@@ -22,4 +22,5 @@ tests/phonons_N2/
 # Extra files
 .ipynb_checkpoints
 *debug/
+*dummy/
 doc/build/

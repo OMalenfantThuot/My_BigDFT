@@ -158,3 +158,33 @@ class TestJob:
             job.run(nmpi=6, nomp=3, dry_run=True)
             job.clean()
         assert job.logfile.boundary_conditions == 'surface'
+
+    def test_run_raises_RuntimeError(self):
+        inp = InputParams({"posinp": {
+            "units": "angstroem",
+            "cell": [40, ".inf", ".inf"],
+            "positions": [
+                {'N': [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]},
+                {'N': [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154]},
+            ]
+        }})
+        with pytest.raises(RuntimeError):
+            with Job(inputparams=inp, run_dir="tests/dummy") as job:
+                job.run(force_run=True)
+
+    def test_dryrun_raises_RuntimeError(self):
+        inp = InputParams({"posinp": {
+            "units": "angstroem",
+            "cell": [40, ".inf", ".inf"],
+            "positions": [
+                {'N': [2.97630782434901e-23, 6.87220595204354e-23,
+                       0.0107161998748779]},
+                {'N': [-1.10434491945017e-23, -4.87342174483075e-23,
+                       1.10427379608154]},
+            ]
+        }})
+        with pytest.raises(RuntimeError):
+            with Job(inputparams=inp, run_dir="tests/dummy") as job:
+                job.run(dry_run=True)
