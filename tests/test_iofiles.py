@@ -41,6 +41,11 @@ class TestInputParams:
         inp["dft"] = {"hgrids": [0.45]*3}
         assert inp == {}
 
+    def test_set_posinp_raises_ValueError(self):
+        inp = InputParams()
+        with pytest.raises(ValueError):
+            inp.posinp = 1
+
     def test_set_posinp_key(self):
         inp = InputParams()
         inp["posinp"] = {"units": "angstroem",

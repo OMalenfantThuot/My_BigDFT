@@ -118,9 +118,9 @@ class InputParams(MutableMapping):
         if params is None:
             params = {}
         if "posinp" in params:
-            self._posinp = Posinp.from_dict(params.pop("posinp"))
+            self.posinp = Posinp.from_dict(params.pop("posinp"))
         else:
-            self._posinp = None
+            self.posinp = None
         self._params = clean(params)
 
     @classmethod
@@ -183,6 +183,14 @@ class InputParams(MutableMapping):
         """
         return self._posinp
 
+    @posinp.setter
+    def posinp(self, new):
+        if new is not None and not isinstance(new, Posinp):
+            raise ValueError(
+                "Update the posinp attribute with a Posinp instance")
+        else:
+            self._posinp = new
+
     def __getitem__(self, key):
         return self.params[key]
 
@@ -204,7 +212,7 @@ class InputParams(MutableMapping):
         """
         if key == "posinp":
             # Set the new posinp
-            self._posinp = Posinp.from_dict(value)
+            self.posinp = Posinp.from_dict(value)
         else:
             # Check that the key and its value are valid.
             params = {key: value}
