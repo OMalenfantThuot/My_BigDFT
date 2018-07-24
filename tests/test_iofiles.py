@@ -81,24 +81,6 @@ class TestInputParams:
         inp = InputParams.from_file(self.filename)
         assert inp == {}
 
-    @pytest.mark.filterwarnings("ignore::UserWarning")
-    def test_from_Logfile(self):
-        inp = InputParams.from_Logfile(log)
-        expected = InputParams({
-            'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
-                    'disablesym': True},
-            'posinp': {
-                'units': 'angstroem',
-                'positions':
-                    [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
-                            0.01071619987487793]},
-                     {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
-                            1.104273796081543]}],
-                'properties': {'format': 'xyz', 'source': 'N2.xyz'}
-            }
-        })
-        assert inp == expected
-
     def test_from_string(self):
         inp_str = "{'dft': {'hgrids': 0.3, 'rmult': [5, 7]}}"
         inp = InputParams.from_string(inp_str)
@@ -180,6 +162,24 @@ class TestLogfile:
     ])
     def test___dir__(self, attr):
         assert attr in dir(self.log) and "_"+attr not in dir(self.log)
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_inputparams(self):
+        inp = log.inputparams
+        expected = InputParams({
+            'dft': {'rmult': [2, 4], 'hgrids': 2.5, 'itermax': 1,
+                    'disablesym': True},
+            'posinp': {
+                'units': 'angstroem',
+                'positions':
+                    [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
+                            0.01071619987487793]},
+                     {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
+                            1.104273796081543]}],
+                'properties': {'format': 'xyz', 'source': 'N2.xyz'}
+            }
+        })
+        assert inp == expected
 
 
 class TestPosinp:

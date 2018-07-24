@@ -477,7 +477,7 @@ class Job(object):
             If the input parameters of the job does not correspond to
             the one used in the Logfile previously read from the disk.
         """
-        log_inp = InputParams.from_Logfile(self.logfile)
+        log_inp = self.logfile.inputparams
         base_inp = self.inputparams
         # Clean the disablesym key, if present only in the log_inp
         if 'dft' in log_inp and 'disablesym' in log_inp['dft']:

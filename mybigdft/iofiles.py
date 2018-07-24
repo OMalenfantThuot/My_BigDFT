@@ -142,39 +142,6 @@ class InputParams(MutableMapping):
             return cls.from_string(f)
 
     @classmethod
-    def from_Logfile(cls, logfile):
-        """
-        Initialize an InputParams instance from a BigDFT
-        :class:`Logfile`.
-
-        Parameters
-        ----------
-        logfile : Logfile
-            Logfile of a BigDFT calculation.
-
-        Returns
-        -------
-        InputParams
-            InputParams instance initialized from the logfile.
-
-
-        >>> inp = InputParams({
-        ...     'posinp': {'units': 'angstroem',
-        ...     'positions':
-        ...         [{'N': [2.9763078243490115e-23, 6.872205952043537e-23,
-        ...                 0.01071619987487793]},
-        ...          {'N': [-1.1043449194501671e-23, -4.873421744830746e-23,
-        ...                1.104273796081543]}],
-        ...     'properties': {'format': 'xyz', 'source': 'N2.xyz'}}
-        ... })
-        >>> log = Logfile.from_file("tests/log.yaml")
-        >>> inp == InputParams.from_Logfile(log)
-        True
-        """
-        params = {key: logfile[key] for key in input_variables}
-        return cls(params=params)
-
-    @classmethod
     def from_string(cls, string):
         r"""
         Initialize an InputParams instance from a string.
@@ -357,7 +324,8 @@ class Logfile(Mapping):
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        self._posinp = Posinp.from_dict(log['posinp'])
+        params = {key: log[key] for key in input_variables}
+        self._inputparams = InputParams(params=params)
         self._check_warnings()
 
     def _set_builtin_attributes(self):
@@ -601,7 +569,17 @@ class Logfile(Mapping):
         Posinp
             Posinp used during the calculation.
         """
-        return self._posinp
+        return self._inputparams.posinp
+
+    @property
+    def inputparams(self):
+        r"""
+        Returns
+        -------
+        InputParams
+            Input parameters used during the calculation.
+        """
+        return self._inputparams
 
 
 class Posinp(Sequence):

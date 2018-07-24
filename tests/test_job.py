@@ -10,8 +10,8 @@ class TestJob:
     # Extract the input and posinp from an N2 calculation of bad quality
     logname = os.path.join("tests", "log-warnings.yaml")
     log = Logfile.from_file(logname)
-    inp = InputParams.from_Logfile(log)
-    pos = Logfile.from_file(logname).posinp
+    inp = log.inputparams
+    pos = log.posinp
     job = Job(inputparams=inp, posinp=pos)
     job_with_name = Job(inputparams=inp, posinp=pos, name="test")
 
