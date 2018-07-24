@@ -638,7 +638,8 @@ class Job(object):
         logfiles : bool
             If `True`, removes the logfiles directory that might exist.
 
-        .. warning::
+
+        .. Warning::
 
             The directories are forced to be removed when the above-
             mentioned options are set to `True`: use with caution.

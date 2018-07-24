@@ -11,6 +11,7 @@ Welcome to MyBigDFT's documentation!
    :caption: Contents:
 
    code_doc
+   tutorials
 
 
 Indices and tables
