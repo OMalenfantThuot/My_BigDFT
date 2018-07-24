@@ -20,10 +20,10 @@ run:
         - dist/*.whl
 
 pages:
-    # before_script:
-    # # Install pandoc (to convert notebooks to html)
-    # - apt-get update -y
-    # - apt-get install -y pandoc
+    before_script:
+    # Install pandoc (to convert notebooks to html)
+    - apt-get update -y
+    - apt-get install -y pandoc
     script:
     # Build the SiegPy documentation
     - pip install -e .[doc]
