@@ -202,19 +202,23 @@ class InputParams(MutableMapping):
         UserWarning
             If the proposed update does not modify the input parameters.
         """
-        # Check that the key and its value are valid.
-        params = {key: value}
-        cleaned_params = clean(params)
-        # Set the input parameters with cleaned parameters
-        if cleaned_params == {}:
-            try:
-                # Update with default params
-                del self.params[key]
-            except KeyError:
-                warnings.warn("Nothing to update.", UserWarning)
+        if key == "posinp":
+            # Set the new posinp
+            self._posinp = Posinp.from_dict(value)
         else:
-            # Update with cleaned params
-            self.params[key] = cleaned_params[key]
+            # Check that the key and its value are valid.
+            params = {key: value}
+            cleaned_params = clean(params)
+            # Set the input parameters with cleaned parameters
+            if cleaned_params == {}:
+                try:
+                    # Update with default params
+                    del self.params[key]
+                except KeyError:
+                    warnings.warn("Nothing to update.", UserWarning)
+            else:
+                # Update with cleaned params
+                self.params[key] = cleaned_params[key]
 
     def __delitem__(self, key):
         del self.params[key]
@@ -819,42 +823,6 @@ class Posinp(Sequence):
         -------
         Posinp
             Posinp read from the string.
-
-
-        This method is mostly meant to allow the formatting of the
-        string representation of a posinp written as a string:
-
-        >>> pos_str = str(
-        ...     "4   reduced\n"
-        ...     "surface   {x}   inf   {z}\n"
-        ...     "C   0.08333333333   0.5   0.25\n"
-        ...     "C   0.41666666666   0.5   0.25\n"
-        ...     "C   0.58333333333   0.5   0.75\n"
-        ...     "C   0.91666666666   0.5   0.75"
-        ... )
-        >>> for aCC in [2.65, 2.7]:
-        ...     new_str = pos_str.format(x=3*aCC, z=np.sqrt(3)*aCC)
-        ...     pos = Posinp.from_string(new_str)
-        ...     print(pos.cell)
-        [7.95, 'inf', 4.58993464006]
-        [8.1, 'inf', 4.67653718044]
-
-        It would actually be possible to achieve the same thing without
-        having to go through the string formatting (which should be the
-        preferred way):
-
-        >>> atoms = [
-        ...     Atom('C', [0.08333333333, 0.5, 0.25]),
-        ...     Atom('C', [0.41666666666, 0.5, 0.25]),
-        ...     Atom('C', [0.58333333333, 0.5, 0.75]),
-        ...     Atom('C', [0.91666666666, 0.5, 0.75]),
-        ... ]
-        >>> for aCC in [2.65, 2.7]:
-        ...     cell = [3*aCC, 'inf', np.sqrt(3)*aCC]
-        ...     pos = Posinp(atoms, "reduced", "surface", cell=cell)
-        ...     print(pos.cell)
-        [7.949999999999999, 'inf', 4.589934640057525]
-        [8.100000000000001, 'inf', 4.676537180435969]
         """
         posinp = posinp.split("\n")
         return cls._from_stream(posinp)

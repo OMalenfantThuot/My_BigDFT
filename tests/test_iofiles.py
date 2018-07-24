@@ -25,6 +25,7 @@ class TestInputParams:
     @pytest.mark.parametrize("to_evaluate", [
         "InputParams({'dfpt': {'hgrids': 0.35}})",
         "InputParams({'dft': {'hgrid': 0.35}})",
+        "InputParams({'posinp': {}})",
     ])
     def test_init_raises_KeyError(self, to_evaluate):
         with pytest.raises(KeyError):
@@ -40,10 +41,20 @@ class TestInputParams:
         inp["dft"] = {"hgrids": [0.45]*3}
         assert inp == {}
 
+    def test_set_posinp_key(self):
+        inp = InputParams()
+        inp["posinp"] = {"units": "angstroem",
+                         "positions": [{'N': [0.0, 0.0, 0.0]},
+                                       {'N': [0.0, 0.0, 1.1]}]}
+        assert inp.posinp == Posinp(
+            [Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
+            units="angstroem", BC="free"
+        )
+
     def test_set_warns_UserWarning(self):
         inp = InputParams()
         with pytest.warns(UserWarning):
-            inp["posinp"] = {}
+            inp["dft"] = {"hgrids": [0.45]*3}
         assert inp == {}
 
     @pytest.mark.parametrize("key, value", [
