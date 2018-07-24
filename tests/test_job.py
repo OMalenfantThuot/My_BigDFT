@@ -96,10 +96,12 @@ class TestJob:
     def test_clean(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
             job.write_input_files()
-            job.clean()
+            job.clean(logfiles_dir=True, data_dir=True)
             assert not os.path.exists(job.posinp_name)
             assert not os.path.exists(job.input_name)
             assert not os.path.exists(job.logfile_name)
+            assert not os.path.exists("logfiles")
+            assert not os.path.exists("data-dry_run")
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_run_with_dry_run(self):

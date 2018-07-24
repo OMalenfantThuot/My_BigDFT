@@ -626,24 +626,37 @@ class Job(object):
         log = Logfile.from_stream(output_msg)
         log.write(self.logfile_name)
 
-    def clean(self):
+    def clean(self, data_dir=False, logfiles_dir=False):
         r"""
-        Delete all input and output files on disk.
-        """
-        filenames = [self.logfile_name, self.input_name, self.posinp_name]
-        for filename in filenames:
-            self._delete_file(filename)
-
-    def _delete_file(self, filename):
-        r"""
-        Delete a file, given a filename.
+        Delete all input and output files on disk as well as some
+        directories if required.
 
         Parameters
         ----------
-        filename : str
-            Name of the file to delete.
+        data_dir : bool
+            If `True`, removes the data directory that might exist.
+        logfiles : bool
+            If `True`, removes the logfiles directory that might exist.
+
+        .. warning::
+
+            The directories are forced to be removed when the above-
+            mentioned options are set to `True`: use with caution.
         """
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
+        # Delete the input and output files
+        filenames = [self.logfile_name, self.input_name, self.posinp_name,
+                     "forces_"+self.posinp_name, "forces.xyz",
+                     "input_minimal.yaml", "time.yaml"]
+        for filename in filenames:
+            try:
+                os.remove(filename)
+            except OSError:
+                pass
+        # Delete the required directories
+        directories = []
+        if data_dir:
+            directories += ["data", "data-"+self.name]
+        if logfiles_dir:
+            directories += ["logfiles"]
+        for directory in directories:
+            shutil.rmtree(directory, ignore_errors=True)
