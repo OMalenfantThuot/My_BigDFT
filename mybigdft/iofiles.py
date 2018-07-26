@@ -699,31 +699,36 @@ class Posinp(Sequence):
         """
         atoms = []
         for i, line in enumerate(stream):
+            content = line.split()
             if i == 0:
                 # Read the first line, containing the number of atoms
                 # and the units of the coordinates of each atom
-                content = line.split()
                 n_at = int(content[0])
                 units = content[1]
+                if units.endswith("d0"):
+                    units = units[:-2]
             elif i == 1:
                 # Read the second line, containing the boundary
                 # conditions and possibly the cell size.
-                content = line.split()
                 BC = content[0].lower()
                 if BC != "free":
                     cell = content[1:4]
                 else:
                     cell = None
-            else:
+            elif i <= n_at+1:
                 # Read the atom (type and position)
-                content = line.split()
                 atom_type = content[0]
                 position = content[1:4]
                 atoms.append(Atom(atom_type, position))
+            elif content[0] == "forces":
+                break
+            else:
+                raise ValueError("There are too many atoms.")
         if n_at != len(atoms):
             raise ValueError(
-                "The number of atoms provided '{}' differs from the expected "
-                "one '{}'".format(len(atoms), n_at))
+                "There are too few atoms (expected {}, got {})"
+                .format(n_at, len(atoms))
+            )
         return cls(atoms, units, BC, cell=cell)
 
     @classmethod
