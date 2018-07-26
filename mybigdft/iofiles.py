@@ -403,6 +403,13 @@ class Logfile(Mapping):
         """
         if self.WARNINGS is not None:
             for warning in self.WARNINGS:
+                if isinstance(warning, dict):  # pragma: no cover
+                    assert len(warning) == 1
+                    key, value = list(warning.items())[0]
+                    warning = "{}: {}".format(key, value)
+                elif not isinstance(warning, str):  # pragma: no cover
+                    print("MyBigDFT: weird error message found")
+                    warning = str(warning)
                 warnings.warn(warning, UserWarning)
         self._check_psppar()
 
