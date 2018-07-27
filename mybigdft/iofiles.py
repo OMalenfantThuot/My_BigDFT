@@ -486,16 +486,21 @@ class Logfile(Mapping):
         Logfile
             Logfile initialized from a stream.
         """
+        # The logfile might contain multiple documents
         docs = yaml.load_all(stream, Loader=Loader)
         logs = [cls(doc) for doc in docs]
         if len(logs) == 1:
+            # If only one document, return a Logfile instance
             return logs[0]
         else:
             warnings.warn(
                 "More than one document found in the logfile!", UserWarning)
             if logs[0].inputparams["geopt"] is not None:
+                # If the logfile corresponds to a geopt calculation,
+                # return a GeoptLogfile instance
                 return GeoptLogfile(logs)
             else:  # pragma: no cover
+                # In other cases, just return a MultipleLogfile instance
                 return MultipleLogfile(logs)
 
     @property
@@ -624,43 +629,79 @@ class Logfile(Mapping):
 
 class MultipleLogfile(Sequence):
     r"""
+    Class allowing to initialize, read, write and interact with an
+    output file of a BigDFT calculation containing multiple documents.
     """
 
     def __init__(self, logs):
         r"""
+        Parameters
+        ----------
+        logs : list
+            List of the various documents contained in the logfile of a
+            BigDFT calculation.
         """
         self._logs = logs
 
     @property
     def logs(self):
         r"""
+        Returns
+        -------
+        list
+            List of the documents read from a single output of a BigDFT
+            calculation.
         """
         return self._logs
 
     def __getitem__(self, index):
-        r"""
-        """
         return self.logs[index]
 
     def __len__(self):
-        r"""
-        """
         return len(self.logs)
+
+    def write(self, filename):
+        r"""
+        Write the logfile on disk.
+
+        Parameters
+        ----------
+        filename : str
+            Name of the logfile.
+        """
+        logs = [log.log for log in self.logs]
+        with open(filename, "w") as f:
+            yaml.dump_all(logs, stream=f, Dumper=Dumper, explicit_start=True)
 
 
 class GeoptLogfile(MultipleLogfile):
     r"""
+    Class allowing to initialize, read, write and interact with an
+    output file of a geometry optimization calculation.
     """
 
     def __init__(self, logs):
         r"""
+        Parameters
+        ----------
+        logs : list
+            List of the various documents contained in the logfile of a
+            geometry optimization calculation.
         """
-        # Initialize as a basic Multiple Logfile
         super(GeoptLogfile, self).__init__(logs)
-        # Update the input parameters and positions of the logs
+        # Update the input parameters and positions of the documents
         for log in self.logs[1:]:
-            log._inputparams = self.logs[0].inputparams
+            log._inputparams = self.inputparams
             log._posinp = Posinp.from_dict(log['Atomic structure'])
+        self._posinps = [log.posinp for log in self.logs]
+
+    @property
+    def inputparams(self):
+        return self.logs[0].inputparams
+
+    @property
+    def posinps(self):
+        return self._posinps
 
 
 class Posinp(Sequence):
