@@ -766,6 +766,8 @@ class Posinp(Sequence):
         """
         # Check initial values
         units = units.lower()
+        if units.endswith("d0"):
+            units = units[:-2]
         BC = BC.lower()
         self._check_initial_values(units, BC, cell)
         if cell is not None:
@@ -822,8 +824,6 @@ class Posinp(Sequence):
                 # and the units of the coordinates of each atom
                 n_at = int(content[0])
                 units = content[1]
-                if units.endswith("d0"):
-                    units = units[:-2]
             elif i == 1:
                 # Read the second line, containing the boundary
                 # conditions and possibly the cell size.
