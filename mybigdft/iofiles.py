@@ -345,6 +345,7 @@ class Logfile(Mapping):
         params = {key: log.get(key) for key in input_variables}
         params = clean(params)
         self._inputparams = InputParams(params=params)
+        self._posinp = self.inputparams.posinp
         self._check_warnings()
 
     def _set_builtin_attributes(self):
@@ -608,7 +609,7 @@ class Logfile(Mapping):
         Posinp
             Posinp used during the calculation.
         """
-        return self._inputparams.posinp
+        return self._posinp
 
     @property
     def inputparams(self):
@@ -832,6 +833,12 @@ class Posinp(Sequence):
         ...
         ValueError: Cannot use reduced units with free boundary conditions
         """
+        # Lower the keys of the posinp if needed
+        if "positions" not in posinp:
+            ref_posinp = deepcopy(posinp)
+            for key in ref_posinp:
+                posinp[key.lower()] = ref_posinp[key]
+                del posinp[key]
         # Read data from the dictionary
         atoms = []  # atomic positions
         for atom in posinp["positions"]:
