@@ -35,9 +35,11 @@ def check(params):
     for key, value in params.items():
         if key not in input_variables:
             raise KeyError("Unknown key '{}'".format(key))
-        for subkey in value.keys():
-            if subkey not in input_variables[key].keys():
-                raise KeyError("Unknown key '{}' in '{}'".format(subkey, key))
+        if value is not None:
+            for subkey in value.keys():
+                if subkey not in input_variables[key].keys():
+                    raise KeyError(
+                        "Unknown key '{}' in '{}'".format(subkey, key))
 
 
 def clean(params):
@@ -59,6 +61,10 @@ def clean(params):
     # Return the cleaned input parameters
     real_params = deepcopy(params)
     for key, value in params.items():
+        # The key might be empty (e.g.: logfile with many documents)
+        if value is None:
+            del real_params[key]
+            continue
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
             default_value = input_variables[key][child_key].get("default")
@@ -336,7 +342,8 @@ class Logfile(Mapping):
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        params = {key: log[key] for key in input_variables}
+        params = {key: log.get(key) for key in input_variables}
+        params = clean(params)
         self._inputparams = InputParams(params=params)
         self._check_warnings()
 
@@ -383,13 +390,15 @@ class Logfile(Mapping):
         r"""
         Clean the value of the built-in attributes.
         """
-        self._boundary_conditions = self._boundary_conditions.lower()
+        if self._boundary_conditions is not None:
+            self._boundary_conditions = self._boundary_conditions.lower()
         # Make the forces as a numpy array of shape (n_at, 3)
         if self.forces is not None:
             new_forces = np.array([])
             for force in self.forces:
                 new_forces = np.append(new_forces, list(force.values())[0])
-            new_forces = new_forces.reshape((self.n_at, 3))
+            n_at = len(self.forces)
+            new_forces = new_forces.reshape((n_at, 3))
             self._forces = new_forces
 
     def _check_warnings(self):
@@ -421,14 +430,16 @@ class Logfile(Mapping):
             If the XC of the potential is different from the XC of the
             input parameters.
         """
-        for atom_type in self.atom_types:
-            psp_ixc = self["psppar.{}".format(atom_type)]["Pseudopotential XC"]
-            inp_ixc = self["dft"]["ixc"]
-            if psp_ixc != inp_ixc:
-                warnings.warn(
-                    "The XC of pseudo potentials ({}) is different from the "
-                    "input XC ({}) for the '{}' atoms"
-                    .format(psp_ixc, inp_ixc, atom_type), UserWarning)
+        if self.atom_types is not None:
+            for atom_type in self.atom_types:
+                psp = "psppar.{}".format(atom_type)
+                psp_ixc = self[psp]["Pseudopotential XC"]
+                inp_ixc = self["dft"]["ixc"]
+                if psp_ixc != inp_ixc:
+                    warnings.warn(
+                        "The XC of pseudo potentials ({}) is different from "
+                        "the input XC ({}) for the '{}' atoms"
+                        .format(psp_ixc, inp_ixc, atom_type), UserWarning)
 
     @classmethod
     def from_file(cls, filename):
@@ -476,6 +487,15 @@ class Logfile(Mapping):
         """
         log = yaml.load(stream, Loader=Loader)
         return cls(log)
+        # try:
+        #         log = yaml.load(stream, Loader=Loader)
+        #         return cls(log)
+        #     except Exception:  # Should be ComposerError from yaml.composer
+        #         stream.close()
+        #         with open(stream.name, "r") as f:
+        #             whole_file = f.readlines()
+        #             logs = yaml.load_all(f, Loader=Loader)
+        #         return [cls(l) for l in logs]
 
     @property
     def log(self):
