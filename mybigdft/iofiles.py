@@ -835,9 +835,8 @@ class Posinp(Sequence):
         # Read data from the dictionary
         atoms = []  # atomic positions
         for atom in posinp["positions"]:
-            [(atom_type, position)] = atom.items()
-            atoms.append(Atom(atom_type, position))
-        units = posinp["units"]  # Units of the coordinates
+            atoms.append(Atom.from_dict(atom))
+        units = posinp.get("units", "atomic")  # Units of the coordinates
         cell = posinp.get("cell")  # Simulation cell size
         # Infer the boundary conditions from the value of cell
         if cell is None:
@@ -1075,6 +1074,11 @@ class Atom(object):
         assert len(position) == 3
         self._type = atom_type
         self._position = np.array(position, dtype=float)
+
+    @classmethod
+    def from_dict(cls, atom_dict):
+        [(atom_type, position)] = atom_dict.items()
+        return cls(atom_type, position)
 
     @property
     def type(self):
