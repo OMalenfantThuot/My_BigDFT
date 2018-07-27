@@ -486,8 +486,6 @@ class Logfile(Mapping):
         Logfile
             Logfile initialized from a stream.
         """
-        # log = yaml.load(stream, Loader=Loader)
-        # return cls(log)
         docs = yaml.load_all(stream, Loader=Loader)
         logs = [cls(doc) for doc in docs]
         if len(logs) == 1:
@@ -497,17 +495,8 @@ class Logfile(Mapping):
                 "More than one document found in the logfile!", UserWarning)
             if logs[0].inputparams["geopt"] is not None:
                 return GeoptLogfile(logs)
-            else:
+            else:  # pragma: no cover
                 return MultipleLogfile(logs)
-        # try:
-        #         log = yaml.load(stream, Loader=Loader)
-        #         return cls(log)
-        #     except Exception:  # Should be ComposerError from yaml.composer
-        #         stream.close()
-        #         with open(stream.name, "r") as f:
-        #             whole_file = f.readlines()
-        #             logs = yaml.load_all(f, Loader=Loader)
-        #         return [cls(l) for l in logs]
 
     @property
     def log(self):

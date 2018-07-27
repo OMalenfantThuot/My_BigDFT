@@ -3,6 +3,7 @@ import os
 import sys
 import pytest
 from mybigdft import InputParams, Posinp, Logfile, Atom
+from mybigdft.iofiles import GeoptLogfile
 
 tests_fol = "tests"
 # Result of an N2 calculation of very bad quality
@@ -197,6 +198,14 @@ class TestLogfile:
         })
         assert inp == expected
 
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_GeoptLogfile(self):
+        log = Logfile.from_file(
+            "doc/source/notebooks/HCN/geopt/v1/log-HCN.yaml")
+        assert isinstance(log, GeoptLogfile)
+        assert len(log) == 9
+        assert all([log[0].posinp != doc.posinp for doc in log[1:]])
+        assert all([log[0].inputparams == doc.inputparams for doc in log[1:]])
 
 class TestPosinp:
 
