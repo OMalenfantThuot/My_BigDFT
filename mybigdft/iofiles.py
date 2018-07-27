@@ -486,8 +486,19 @@ class Logfile(Mapping):
         Logfile
             Logfile initialized from a stream.
         """
-        log = yaml.load(stream, Loader=Loader)
-        return cls(log)
+        # log = yaml.load(stream, Loader=Loader)
+        # return cls(log)
+        docs = yaml.load_all(stream, Loader=Loader)
+        logs = [cls(doc) for doc in docs]
+        if len(logs) == 1:
+            return logs[0]
+        else:
+            warnings.warn(
+                "More than one document found in the logfile!", UserWarning)
+            if logs[0].inputparams["geopt"] is not None:
+                return GeoptLogfile(logs)
+            else:
+                return MultipleLogfile(logs)
         # try:
         #         log = yaml.load(stream, Loader=Loader)
         #         return cls(log)
@@ -620,6 +631,47 @@ class Logfile(Mapping):
             Input parameters used during the calculation.
         """
         return self._inputparams
+
+
+class MultipleLogfile(Sequence):
+    r"""
+    """
+
+    def __init__(self, logs):
+        r"""
+        """
+        self._logs = logs
+
+    @property
+    def logs(self):
+        r"""
+        """
+        return self._logs
+
+    def __getitem__(self, index):
+        r"""
+        """
+        return self.logs[index]
+
+    def __len__(self):
+        r"""
+        """
+        return len(self.logs)
+
+
+class GeoptLogfile(MultipleLogfile):
+    r"""
+    """
+
+    def __init__(self, logs):
+        r"""
+        """
+        # Initialize as a basic Multiple Logfile
+        super(GeoptLogfile, self).__init__(logs)
+        # Update the input parameters and positions of the logs
+        for log in self.logs[1:]:
+            log._inputparams = self.logs[0].inputparams
+            log._posinp = Posinp.from_dict(log['Atomic structure'])
 
 
 class Posinp(Sequence):
