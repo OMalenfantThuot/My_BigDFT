@@ -200,12 +200,26 @@ class TestLogfile:
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_GeoptLogfile(self):
-        log = Logfile.from_file(
-            "doc/source/notebooks/HCN/geopt/v1/log-HCN.yaml")
+        log = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
         assert isinstance(log, GeoptLogfile)
         assert len(log) == 9
-        assert all([log[0].posinp != doc.posinp for doc in log[1:]])
-        assert all([log[0].inputparams == doc.inputparams for doc in log[1:]])
+        assert all([pos != log[0].posinp for pos in log.posinps[1:]])
+        assert all([log.inputparams == doc.inputparams for doc in log])
+
+
+class TestMultipleLogfile:
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_write(self):
+        ref_log = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
+        logname = "dummy.yaml"
+        ref_log.write(logname)
+        log = Logfile.from_file(logname)
+        for log1, log2 in zip(ref_log, log):
+            assert log1.inputparams == log2.inputparams
+            assert log1.posinp == log2.posinp
+        os.remove(logname)
+
 
 class TestPosinp:
 
