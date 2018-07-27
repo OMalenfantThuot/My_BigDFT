@@ -19,8 +19,14 @@ tests/phonons_N2/
 *dry_run*
 *minimal.yaml
 
+# Doc files
+doc/build/
+doc/source/notebooks/Untitled*.ipynb
+doc/source/notebooks/test.yaml
+doc/source/notebooks/HCN
+doc/source/notebooks/NaF
+
 # Extra files
 .ipynb_checkpoints
 *debug/
 *dummy/
-doc/build/
