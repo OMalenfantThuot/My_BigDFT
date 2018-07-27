@@ -454,7 +454,7 @@ class Logfile(Mapping):
 
         Returns
         -------
-        Logfile
+        Logfile or GeoptLogfile or MultipleLogfile
             Logfile initialized from a file on disk.
 
 
@@ -483,7 +483,7 @@ class Logfile(Mapping):
 
         Returns
         -------
-        Logfile
+        Logfile or GeoptLogfile or MultipleLogfile
             Logfile initialized from a stream.
         """
         # The logfile might contain multiple documents
@@ -697,10 +697,24 @@ class GeoptLogfile(MultipleLogfile):
 
     @property
     def inputparams(self):
+        r"""
+        Returns
+        -------
+        InputParams
+            Input parameters used for each step of the geometry
+            optimization procedure.
+        """
         return self.logs[0].inputparams
 
     @property
     def posinps(self):
+        r"""
+        Returns
+        -------
+        list
+            List of the input positions for each step of the geometry
+            optimization procedure.
+        """
         return self._posinps
 
 
