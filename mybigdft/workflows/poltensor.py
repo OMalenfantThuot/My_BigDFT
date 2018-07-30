@@ -1,3 +1,7 @@
+r"""
+This module defines the PolTensor workflow, allowing to compute the
+polarizability tensor of a given system.
+"""
 from __future__ import print_function
 import warnings
 from copy import deepcopy
@@ -34,7 +38,7 @@ class PolTensor(AbstractWorkflow):
     along the :math:`j` direction
     """
 
-    def __init__(self, ground_state, ef_amplitudes=[1e-4]*3):
+    def __init__(self, ground_state, ef_amplitudes=None):
         r"""
         A PolTensor workflow is initialized by the job of the ground-
         state of the system and three electric field amplitudes.
@@ -48,6 +52,9 @@ class PolTensor(AbstractWorkflow):
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
         """
+        # Set a default value to ef_amplitudes
+        if ef_amplitudes is None:
+            ef_amplitudes = [1e-4]*3
         # Check the ground state has no electric field
         if 'dft' in ground_state.inputparams:
             efield = ground_state.inputparams['dft'].get('elecfield')

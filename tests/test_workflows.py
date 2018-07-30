@@ -62,24 +62,6 @@ class TestPhonons:
 
     gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
 
-# This test is redundant with the one below; it is kept commented in cas
-# This test is redundant with the one below; it is kept commented in cas
-# case there is 
-#     def test_run(self):
-#         N2_ref = """2  angstroem
-# free
-# N    2.976307744763e-23    6.872205902435e-23    1.071620018790e-02
-# N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
-#         pos = Posinp.from_string(N2_ref)
-#         gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
-#         ph = Phonons(gs)
-#         ph.run(nmpi=2, nomp=2)
-#         np.testing.assert_almost_equal(
-#             max(ph.energies['cm^-1']), 2.38632021e+03, decimal=6)
-#         # Test that running the workflow again warns a UserWarning
-#         with pytest.warns(UserWarning):
-#             ph.run()
-
     @pytest.mark.parametrize("to_evaluate", [
         "Phonons(self.gs, translation_amplitudes=1)",
         "Phonons(self.gs, translation_amplitudes=[3]*2)",
@@ -100,8 +82,8 @@ class TestRamanSpectrum:
 free
 N    2.976307744763e-23    6.872205902435e-23    1.071620018790e-02
 N   -1.104344885754e-23   -4.873421785298e-23    1.104273795769e+00"""
-        pos = Posinp.from_string(N2_ref)
-        gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
+        ref_pos = Posinp.from_string(N2_ref)
+        gs = Job(posinp=ref_pos, name='N2', run_dir='tests/phonons_N2')
         phonons = Phonons(gs)
         raman = RamanSpectrum(phonons)
         raman.run(nmpi=2, nomp=2)

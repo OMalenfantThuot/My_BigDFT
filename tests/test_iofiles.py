@@ -54,7 +54,7 @@ class TestInputParams:
                                        {'N': [0.0, 0.0, 1.1]}]}
         assert inp.posinp == Posinp(
             [Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
-            units="angstroem", BC="free"
+            units="angstroem", boundary_conditions="free"
         )
 
     def test_set_warns_UserWarning(self):
@@ -200,11 +200,11 @@ class TestLogfile:
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_GeoptLogfile(self):
-        log = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
+        log_HCN = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
         assert isinstance(log, GeoptLogfile)
-        assert len(log) == 9
-        assert all([pos != log[0].posinp for pos in log.posinps[1:]])
-        assert all([log.inputparams == doc.inputparams for doc in log])
+        assert len(log_HCN) == 9
+        assert all([pos != log_HCN[0].posinp for pos in log_HCN.posinps[1:]])
+        assert all([log_HCN.inputparams == doc.inputparams for doc in log_HCN])
 
 
 class TestMultipleLogfile:
@@ -212,13 +212,13 @@ class TestMultipleLogfile:
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_write(self):
         ref_log = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
-        logname = "dummy.yaml"
-        ref_log.write(logname)
-        log = Logfile.from_file(logname)
-        for log1, log2 in zip(ref_log, log):
+        lname = "dummy.yaml"
+        ref_log.write(lname)
+        new_log = Logfile.from_file(lname)
+        for log1, log2 in zip(ref_log, new_log):
             assert log1.inputparams == log2.inputparams
             assert log1.posinp == log2.posinp
-        os.remove(logname)
+        os.remove(lname)
 
 
 class TestPosinp:
@@ -261,7 +261,7 @@ C    7.327412521    0.000000000   3.461304757"""
 
     @pytest.mark.parametrize("value, expected", [
         (len(pos), 4), (pos.units, "reduced"), (len(pos), 4),
-        (pos.BC, "surface"),
+        (pos.boundary_conditions, "surface"),
         (pos.cell, [8.07007483423, 'inf', 4.65925987792]),
         (pos[0], Atom('C', [0.08333333333, 0.5, 0.25])),
     ])
@@ -270,7 +270,7 @@ C    7.327412521    0.000000000   3.461304757"""
 
     @pytest.mark.parametrize("value, expected", [
         (len(log_pos), 2), (log_pos.units, "angstroem"), (len(log_pos), 2),
-        (log_pos.BC, "free"),
+        (log_pos.boundary_conditions, "free"),
         (log_pos.cell, None),
         (log_pos[0], Atom('N', [2.9763078243490115e-23, 6.872205952043537e-23,
                                 0.01071619987487793])),
@@ -280,7 +280,7 @@ C    7.327412521    0.000000000   3.461304757"""
 
     @pytest.mark.parametrize("value, expected", [
         (len(surf_pos), 1), (surf_pos.units, "angstroem"), (len(surf_pos), 1),
-        (surf_pos.BC, "surface"),
+        (surf_pos.boundary_conditions, "surface"),
         (surf_pos.cell, [8, "inf", 8]),
         (surf_pos[0], Atom('C', [0, 0, 0])),
     ])
@@ -289,7 +289,7 @@ C    7.327412521    0.000000000   3.461304757"""
 
     @pytest.mark.parametrize("value, expected", [
         (len(per_pos), 1), (per_pos.units, "angstroem"), (len(per_pos), 1),
-        (per_pos.BC, "periodic"),
+        (per_pos.boundary_conditions, "periodic"),
         (per_pos.cell, [8, 1.0, 8]),
         (per_pos[0], Atom('C', [0, 0, 0])),
     ])
@@ -305,7 +305,7 @@ C    7.327412521    0.000000000   3.461304757"""
         assert self.pos == Posinp.from_file(fname)
         os.remove(fname)
 
-    def test_free_BC_has_no_cell(self):
+    def test_free_boundary_conditions_has_no_cell(self):
         assert self.free_pos.cell is None
 
     def test_translate_atom(self):
@@ -339,32 +339,34 @@ C    7.327412521    0.000000000   3.461304757"""
         assert pos1 == pos2  # The order of the atoms in the list do not count
         assert pos1 != 1  # No error if other object is not a posinp
 
-    def test_with_surface_BC(self):
+    def test_with_surface_boundary_conditions(self):
         # Two Posinp instances with surface BC are the same even if they
         # have a different cell size along y-axis
-        pos_with_inf = Posinp([
-            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
-                       0.0107161998748779]),
-            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
-                       1.10427379608154])],
+        pos_with_inf = Posinp(
+            [Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                        0.0107161998748779]),
+             Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                        1.10427379608154])],
             'angstroem', 'surface', cell=[40, ".inf", 40])
-        pos_wo_inf = Posinp([
-            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
-                       0.0107161998748779]),
-            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
-                       1.10427379608154])],
+        pos_wo_inf = Posinp(
+            [Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                        0.0107161998748779]),
+             Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                        1.10427379608154])],
             'angstroem', 'surface', cell=[40, 40, 40])
         assert pos_with_inf == pos_wo_inf
         # They are obviously different if the cell size along the other
         # directions are not the same
-        pos2_wo_inf = Posinp([
-            Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
-                       0.0107161998748779]),
-            Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
-                       1.10427379608154])],
+        pos2_wo_inf = Posinp(
+            [Atom('N', [2.97630782434901e-23, 6.87220595204354e-23,
+                        0.0107161998748779]),
+             Atom('N', [-1.10434491945017e-23, -4.87342174483075e-23,
+                        1.10427379608154])],
             'angstroem', 'surface', cell=[20, "inf", 40])
         assert pos_with_inf != pos2_wo_inf
-        assert pos2_wo_inf.BC == pos_with_inf.BC  # They still have the same BC
+        # They still have the same BC
+        assert \
+            pos2_wo_inf.boundary_conditions == pos_with_inf.boundary_conditions
         # You can only have a cell with ".inf" in 2nd positiion to
         # initialize a calculation with surface BC without using a
         # Posinp instance

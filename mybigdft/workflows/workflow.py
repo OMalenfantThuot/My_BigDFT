@@ -1,3 +1,16 @@
+r"""
+The workflows of the MyBigDFT package are meant to ease the calculation
+of some interesting quantities requiring to launch multiple BigDFT
+calculations by providing an API that focuses on the main parameters of
+such nested calculations.
+
+Here are defined an AbstractWorkflow class (meant to be the base class
+of all the other workflow classes implemented in the workflows module)
+and a Workflow class, which represents the simplest way of implementing
+such a child class (intended to be used when one wants to create a toy
+implementation of a new workflow).
+"""
+
 from __future__ import print_function, unicode_literals
 import sys
 import abc

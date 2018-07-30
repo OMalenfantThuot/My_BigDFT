@@ -12,7 +12,7 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
 import numpy as np
-from .globals import input_variables
+from .globals import INPUT_VARIABLES
 
 
 __all__ = ["check", "clean", "InputParams", "Logfile", "Posinp", "Atom"]
@@ -33,11 +33,11 @@ def check(params):
         If a key or a sub-key is not a BigDFT parameter.
     """
     for key, value in params.items():
-        if key not in input_variables:
+        if key not in INPUT_VARIABLES:
             raise KeyError("Unknown key '{}'".format(key))
         if value is not None:
             for subkey in value.keys():
-                if subkey not in input_variables[key].keys():
+                if subkey not in INPUT_VARIABLES[key].keys():
                     raise KeyError(
                         "Unknown key '{}' in '{}'".format(subkey, key))
 
@@ -67,7 +67,7 @@ def clean(params):
             continue
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
-            default_value = input_variables[key][child_key].get("default")
+            default_value = INPUT_VARIABLES[key][child_key].get("default")
             if child_value == default_value:
                 del real_params[key][child_key]
         # Delete the key if it is empty
@@ -144,8 +144,8 @@ class InputParams(MutableMapping):
         InputParams
             InputParams instance initialized from the file.
         """
-        with open(filename, "r") as f:
-            return cls.from_string(f)
+        with open(filename, "r") as stream:
+            return cls.from_string(stream)
 
     @classmethod
     def from_string(cls, string):
@@ -255,9 +255,9 @@ class InputParams(MutableMapping):
         filename : str
             Name of the input file.
         """
-        with open(filename, "w") as f:
+        with open(filename, "w") as stream:
             self._params = clean(self.params)  # Make sure it is valid
-            yaml.dump(self.params, stream=f, Dumper=Dumper)
+            yaml.dump(self.params, stream=stream, Dumper=Dumper)
 
 
 PATHS = "paths"
@@ -342,7 +342,7 @@ class Logfile(Mapping):
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        params = {key: log.get(key) for key in input_variables}
+        params = {key: log.get(key) for key in INPUT_VARIABLES}
         params = clean(params)
         self._inputparams = InputParams(params=params)
         self._posinp = self.inputparams.posinp
@@ -468,8 +468,8 @@ class Logfile(Mapping):
         >>> log.energy
         -19.884659235401838
         """
-        with open(filename, "r") as f:
-            return cls.from_stream(f)
+        with open(filename, "r") as stream:
+            return cls.from_stream(stream)
 
     @classmethod
     def from_stream(cls, stream):
@@ -533,7 +533,7 @@ class Logfile(Mapping):
         if name in ATTRIBUTES:
             return getattr(self, "_"+name)
         else:
-            super(Logfile, self).__getattr__(name)
+            return super(Logfile, self).__getattr__(name)
 
     def __setattr__(self, name, value):
         r"""
@@ -603,8 +603,8 @@ class Logfile(Mapping):
         filename : str
             Name of the logfile.
         """
-        with open(filename, "w") as f:
-            yaml.dump(self.log, stream=f, Dumper=Dumper)
+        with open(filename, "w") as stream:
+            yaml.dump(self.log, stream=stream, Dumper=Dumper)
 
     @property
     def posinp(self):
@@ -670,8 +670,9 @@ class MultipleLogfile(Sequence):
             Name of the logfile.
         """
         logs = [log.log for log in self.logs]
-        with open(filename, "w") as f:
-            yaml.dump_all(logs, stream=f, Dumper=Dumper, explicit_start=True)
+        with open(filename, "w") as stream:
+            yaml.dump_all(
+                logs, stream=stream, Dumper=Dumper, explicit_start=True)
 
 
 class GeoptLogfile(MultipleLogfile):
@@ -736,7 +737,7 @@ class Posinp(Sequence):
       coordinates (for :math:`x`, :math:`y` and :math:`z`).
     """
 
-    def __init__(self, atoms, units, BC, cell=None):
+    def __init__(self, atoms, units, boundary_conditions, cell=None):
         r"""
         Parameters
         ----------
@@ -744,7 +745,7 @@ class Posinp(Sequence):
             List of :class:`Atom` instances.
         units : str
             Units of the coordinate system.
-        BC : str
+        boundary_conditions : str
             Boundary conditions.
         cell : Sequence of length 3 or None
             Size of the simulation domain in the three space
@@ -755,7 +756,7 @@ class Posinp(Sequence):
         ...                 'angstroem', 'free')
         >>> len(posinp)
         2
-        >>> posinp.BC
+        >>> posinp.boundary_conditions
         'free'
         >>> posinp.units
         'angstroem'
@@ -768,18 +769,19 @@ class Posinp(Sequence):
         units = units.lower()
         if units.endswith("d0"):
             units = units[:-2]
-        BC = BC.lower()
-        self._check_initial_values(units, BC, cell)
+        boundary_conditions = boundary_conditions.lower()
+        self._check_initial_values(units, boundary_conditions, cell)
         if cell is not None:
             cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
                     for size in cell]
         # Set the attributes
         self._atoms = atoms
         self._units = units
-        self._BC = BC
+        self._boundary_conditions = boundary_conditions
         self._cell = cell
 
-    def _check_initial_values(self, units, BC, cell):
+    @staticmethod
+    def _check_initial_values(units, boundary_conditions, cell):
         r"""
         Raises
         ------
@@ -793,15 +795,15 @@ class Posinp(Sequence):
                     "The cell size must be of length 3 (one value per "
                     "space coordinate)")
         else:
-            if BC != "free":
+            if boundary_conditions != "free":
                 raise ValueError(
                     "You must give a cell size to use '{}' boundary conditions"
-                    .format(BC))
-        if BC == "periodic" and "inf" in cell:
+                    .format(boundary_conditions))
+        if boundary_conditions == "periodic" and "inf" in cell:
             raise ValueError(
                 "Cannot use periodic boundary conditions with a cell meant "
                 "for a surface calculation.")
-        elif BC == "free" and units == "reduced":
+        elif boundary_conditions == "free" and units == "reduced":
             raise ValueError(
                 "Cannot use reduced units with free boundary conditions")
 
@@ -827,8 +829,8 @@ class Posinp(Sequence):
             elif i == 1:
                 # Read the second line, containing the boundary
                 # conditions and possibly the cell size.
-                BC = content[0].lower()
-                if BC != "free":
+                boundary_conditions = content[0].lower()
+                if boundary_conditions != "free":
                     cell = content[1:4]
                 else:
                     cell = None
@@ -846,7 +848,7 @@ class Posinp(Sequence):
                 "There are too few atoms (expected {}, got {})"
                 .format(n_at, len(atoms))
             )
-        return cls(atoms, units, BC, cell=cell)
+        return cls(atoms, units, boundary_conditions, cell=cell)
 
     @classmethod
     def from_file(cls, filename):
@@ -876,8 +878,8 @@ class Posinp(Sequence):
         C   0.91666666666   0.5   0.75
         <BLANKLINE>
         """
-        with open(filename, "r") as f:
-            return cls._from_stream(f)
+        with open(filename, "r") as stream:
+            return cls._from_stream(stream)
 
     @classmethod
     def from_dict(cls, posinp):
@@ -907,7 +909,7 @@ class Posinp(Sequence):
         ...     ]
         ... }
         >>> pos = Posinp.from_dict(pos_dict)
-        >>> pos.BC
+        >>> pos.boundary_conditions
         'surface'
 
         The value of the "cell" key allows to derive the boundary
@@ -916,7 +918,7 @@ class Posinp(Sequence):
 
         >>> pos_dict["cell"] = [8.07007483423, 10.0, 4.65925987792]
         >>> pos = Posinp.from_dict(pos_dict)
-        >>> pos.BC
+        >>> pos.boundary_conditions
         'periodic'
 
         If there is no "cell" key, then the boundary conditions are set
@@ -943,13 +945,13 @@ class Posinp(Sequence):
         cell = posinp.get("cell")  # Simulation cell size
         # Infer the boundary conditions from the value of cell
         if cell is None:
-            BC = "free"
+            boundary_conditions = "free"
         else:
             if cell[1] in [".inf", "inf"]:
-                BC = "surface"
+                boundary_conditions = "surface"
             else:
-                BC = "periodic"
-        return cls(atoms, units, BC, cell=cell)
+                boundary_conditions = "periodic"
+        return cls(atoms, units, boundary_conditions, cell=cell)
 
     @classmethod
     def from_string(cls, posinp):
@@ -980,14 +982,14 @@ class Posinp(Sequence):
         return self._units
 
     @property
-    def BC(self):
+    def boundary_conditions(self):
         r"""
         Returns
         -------
         str
             Boundary conditions.
         """
-        return self._BC
+        return self._boundary_conditions
 
     @property
     def cell(self):
@@ -1049,13 +1051,14 @@ class Posinp(Sequence):
             # that the unimportant cell size are not compared
             cell = deepcopy(self.cell)
             other_cell = deepcopy(other.cell)
-            if self.BC == "surface":
+            if self.boundary_conditions == "surface":
                 cell[1] = 0.0
-            if other.BC == "surface":
+            if other.boundary_conditions == "surface":
                 other_cell[1] = 0.0
             same_cell = cell == other_cell
             # Check the other basic attributes
-            same_base = self.BC == other.BC and len(self) == len(other) and \
+            same_BC = self.boundary_conditions == other.boundary_conditions
+            same_base = same_BC and len(self) == len(other) and \
                 self.units == other.units and same_cell
             # Finally check the atoms only if the base is similar, as it
             # might be time-consuming for large systems
@@ -1082,7 +1085,7 @@ class Posinp(Sequence):
         """
         # Create the first two lines of the posinp file
         pos_str = "{}   {}\n".format(len(self), self.units)
-        pos_str += self.BC
+        pos_str += self.boundary_conditions
         if self.cell is not None:
             pos_str += "   {}   {}   {}\n".format(*self.cell)
         else:
@@ -1097,8 +1100,8 @@ class Posinp(Sequence):
         -------
             The string representation of a Posinp instance.
         """
-        r = "Posinp({0.atoms}, {0.units}, {0.BC}, cell={0.cell})".format(self)
-        return r
+        return ("Posinp({0.atoms}, {0.units}, {0.boundary_conditions}, "
+                "cell={0.cell})".format(self))
 
     def write(self, filename):
         r"""
@@ -1109,8 +1112,8 @@ class Posinp(Sequence):
         filename : str
             Name of the input positions file.
         """
-        with open(filename, "w") as f:
-            f.write(str(self))
+        with open(filename, "w") as stream:
+            stream.write(str(self))
 
     def translate_atom(self, i_at, vector):
         r"""
@@ -1180,6 +1183,14 @@ class Atom(object):
 
     @classmethod
     def from_dict(cls, atom_dict):
+        r"""
+        Parameters
+        ----------
+        atom_dict : dict
+            Information about an atom given by a dict whose only key is
+            the atom type and the value is the atomic position. This
+            format is mainly found in bigdft logfiles.
+        """
         [(atom_type, position)] = atom_dict.items()
         return cls(atom_type, position)
 

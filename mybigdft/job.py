@@ -6,7 +6,7 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
-from .globals import bigdft_path, bigdft_tool_path
+from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH
 from .iofiles import InputParams, Logfile, clean
 
 # Space coordinates
@@ -16,6 +16,10 @@ SIGNS = {"+": 1., "-": -1.}
 
 
 class Job(object):
+    r"""
+    This class is meant to define a BigDFT calculation. :meth:`run` is
+    its main method and it must be used in a context manager.
+    """
 
     def __init__(self, name="", inputparams=None, posinp=None, run_dir=None,
                  ref_job=None, skip=False):
@@ -340,11 +344,9 @@ class Job(object):
         Set the attributes regarding the directories used to store data.
         """
         # Set the data directory
-        DATA = "data"  # base name for the BigDFT data directory
+        data_dir = "data"  # base name for the BigDFT data directory
         if self.name != "":
-            data_dir = DATA+'-'+self.name
-        else:
-            data_dir = DATA
+            data_dir += '-'+self.name
         self._data_dir = os.path.join(self.run_dir, data_dir)
 
     def _set_cmd_attributes(self):
@@ -352,15 +354,15 @@ class Job(object):
         Set the base commands to run bigdft or bigdft-tool.
         """
         # The base bigdft-tool command is always the same
-        self._bigdft_tool_cmd = [bigdft_tool_path, "--name", self.name]
+        self._bigdft_tool_cmd = [BIGDFT_TOOL_PATH, "--name", self.name]
         # The base bigdft command depends on name and on skip
         skip_option = []
         if self.skip:
             skip_option += ["-s", "Yes"]
         if self.name != "":
-            self._bigdft_cmd = [bigdft_path, self.name] + skip_option
+            self._bigdft_cmd = [BIGDFT_PATH, self.name] + skip_option
         else:
-            self._bigdft_cmd = [bigdft_path] + skip_option
+            self._bigdft_cmd = [BIGDFT_PATH] + skip_option
 
     def _set_filename_attributes(self):
         r"""
@@ -514,7 +516,7 @@ class Job(object):
         # Check that there are wavefunction files
         wf_files = [f for f in os.listdir(self.data_dir)
                     if 'wavefunction' in f]
-        if len(wf_files) > 0:
+        if wf_files:
             # If there are wavefunction files, add the
             # option to read them from files.
             try:
@@ -531,7 +533,8 @@ class Job(object):
             except Exception:
                 pass
 
-    def _set_environment(self, nomp):
+    @staticmethod
+    def _set_environment(nomp):
         r"""
         Set the number of OpenMP threads.
 
@@ -582,7 +585,8 @@ class Job(object):
         if self.posinp is not None:
             self.posinp.write(self.posinp_name)
 
-    def _launch_calculation(self, command):
+    @staticmethod
+    def _launch_calculation(command):
         r"""
         Launch the command to run the bigdft or bigdft-tool command.
 

@@ -49,7 +49,7 @@ class Phonons(AbstractWorkflow):
     :math:`z`), 2 for the number of calculations per coordinates).
     """
 
-    def __init__(self, ground_state, translation_amplitudes=[0.45/64]*3):
+    def __init__(self, ground_state, translation_amplitudes=None):
         r"""
         From a ground state calculation, which must correspond to the
         equilibrium calculation geometry, the :math:`6 n_{at}` jobs
@@ -73,6 +73,9 @@ class Phonons(AbstractWorkflow):
             Amplitudes of the translations to be applied to each atom
             along each of the three space coordinates.
         """
+        # Set default translation amplitudes
+        if translation_amplitudes is None:
+            translation_amplitudes = [0.45/64]*3
         # Check the translation amplitudes
         if not isinstance(translation_amplitudes, Sequence) or \
                 len(translation_amplitudes) != 3:
@@ -264,9 +267,9 @@ class Phonons(AbstractWorkflow):
         # an array of the same size as the Hessian, there is nothing but
         # the ratio of both arrays to perform to get the dynamical
         # matrix.
-        h = self._compute_hessian()
+        hessian = self._compute_hessian()
         masses = self._compute_masses()
-        return h / masses
+        return hessian / masses
 
     def _compute_masses(self):
         r"""
@@ -306,7 +309,7 @@ class Phonons(AbstractWorkflow):
         # Initialization of variables
         gs = self.ground_state
         n_at = len(gs.posinp)
-        h = np.array([])  # Hessian matrix
+        hessian = np.array([])  # Hessian matrix
         for job1, job2 in zip(*[iter(self.queue)]*2):
             # Get the value of the delta of move amplitudes
             amp1 = job1.displacement.amplitude
@@ -320,10 +323,10 @@ class Phonons(AbstractWorkflow):
             forces2 = job2.logfile.forces.flatten()
             # Set a new line of the Hessian matrix
             new_line = (forces1 - forces2) / delta_x
-            h = np.append(h, new_line)
+            hessian = np.append(hessian, new_line)
         # Return the Hessian matrix as a symmetric numpy array
-        h = h.reshape(3*n_at, 3*n_at)
-        return (h + h.T) / 2.
+        hessian = hessian.reshape(3*n_at, 3*n_at)
+        return (hessian + hessian.T) / 2.
 
     def _solve_dyn_mat(self):
         r"""
@@ -343,12 +346,20 @@ class Phonons(AbstractWorkflow):
 
 class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
     r"""
+    This class defines an atomic displacement from the coordinate index
+    and the amplitude of the displacement in that direction.
     """
 
     __slots__ = ()
 
     @property
     def vector(self):
+        r"""
+        Returns
+        -------
+        list
+            Displacement vector.
+        """
         vector = [0.0] * 3
         vector[self.i_coord] = self.amplitude
         return vector
@@ -384,7 +395,7 @@ class RamanSpectrum(AbstractWorkflow):
     leading to :math:`24 n_{at}` calculations in total.
     """
 
-    def __init__(self, phonons, ef_amplitudes=[1e-4]*3):
+    def __init__(self, phonons, ef_amplitudes=None):
         r"""
         From a phonon calculation, one is able to compute the Raman
         spectrum of a given system by only specifying the electric field
@@ -399,18 +410,16 @@ class RamanSpectrum(AbstractWorkflow):
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
         """
-        # Check the electric field amplitudes
-        if not isinstance(ef_amplitudes, Sequence) or len(ef_amplitudes) != 3:
-            raise ValueError("You must provide three electric field "
-                             "amplitudes, one for each space coordinate.")
         # Initialize the attributes that are specific to this workflow
         self._phonons = phonons
-        self._ef_amplitudes = ef_amplitudes
-        # The phonon intensities are not yet computed
+        # The phonon intensities and other quantities are not yet computed
         self._intensities = None
-        self._depol_ratios = None
+        self._depolarization_ratios = None
+        self._alphas = np.array([])  # mean polarizability derivatives
+        self._betas_sq = np.array([])  # anisotropies of pol. tensor deriv.
         # Initialize the poltensor workflows, no need of a queue
-        self._poltensor_workflows = self._init_poltensor_workflows()
+        self._poltensor_workflows = \
+            self._init_poltensor_workflows(ef_amplitudes)
         super(RamanSpectrum, self).__init__(queue=[])
 
     @property
@@ -423,17 +432,6 @@ class RamanSpectrum(AbstractWorkflow):
             system under consideration.
         """
         return self._phonons
-
-    @property
-    def ef_amplitudes(self):
-        r"""
-        Returns
-        -------
-        list or numpy array of length 3
-            Amplitude of the electric field to be applied in the three
-            directions of space (:math:`x`, :math:`y`, :math:`z`).
-        """
-        return self._ef_amplitudes
 
     @property
     def energies(self):
@@ -476,15 +474,21 @@ class RamanSpectrum(AbstractWorkflow):
         """
         return self._poltensor_workflows
 
-    def _init_poltensor_workflows(self):
+    def _init_poltensor_workflows(self, ef_amplitudes):
         r"""
+        Parameters
+        ----------
+        ef_amplitudes : None or list or numpy array of length 3
+            Amplitude of the electric field to be applied in the three
+            directions of space (:math:`x`, :math:`y`, :math:`z`).
+
         Returns
         -------
         list
             Polarizability tensor workflows to be performed in order to
             compute the Raman intensities.
         """
-        return [PolTensor(job, ef_amplitudes=self.ef_amplitudes)
+        return [PolTensor(job, ef_amplitudes=ef_amplitudes)
                 for job in self.phonons.queue]
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
@@ -529,11 +533,6 @@ class RamanSpectrum(AbstractWorkflow):
         # - Set the derivatives of the polarizability tensors
         #   along each displacement directions
         deriv_pol_tensors = self._compute_deriv_pol_tensors()
-        # - Set the mean polarizability derivatives (alpha), the
-        #   anisotropies of the polarizability tensor derivative
-        #   (beta_sq) for each normal mode
-        self._alphas = np.array([])
-        self._betas_sq = np.array([])
         # - Loop over the normal modes
         for pt_flat in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
             # Reshape the derivative of the polarizability tensor
@@ -601,10 +600,10 @@ class RamanSpectrum(AbstractWorkflow):
             # Get the value of the delta of poltensors
             i_at = gs1.moved_atom
             assert i_at == gs2.moved_atom
-            m = ATOMS_MASS[gs1.posinp[i_at].type]
+            mass = ATOMS_MASS[gs1.posinp[i_at].type]
             delta_pol_tensor = pt1.poltensor - pt2.poltensor
             # Compute the derivative of the polarizability tensor
-            deriv = delta_pol_tensor / delta_x / np.sqrt(m*AMU_TO_EMU)
+            deriv = delta_pol_tensor / delta_x / np.sqrt(mass*AMU_TO_EMU)
             deriv_pts = np.append(deriv_pts, deriv.flatten())
         # Return the transpose of this array
         deriv_pts = deriv_pts.reshape(3*len(gs1.posinp), 9)
