@@ -340,7 +340,10 @@ class Phonons(AbstractWorkflow):
             eigenvectors (as a matrix).
         """
         eigs, vecs = np.linalg.eig(self.dyn_mat)
-        eigs = np.array([np.sqrt(-e) if e < 0 else np.sqrt(e) for e in eigs])
+        # eigs actually gives the square of the expected eigenvalues.
+        # Given they can be negative, enforce a positive value with
+        # np.where() before taking the square-root
+        eigs = np.sqrt(np.where(eigs < 0, -eigs, eigs))
         return eigs, vecs
 
 
