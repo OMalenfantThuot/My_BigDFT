@@ -201,7 +201,7 @@ class TestLogfile:
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_GeoptLogfile(self):
         log_HCN = Logfile.from_file(os.path.join(tests_fol, "log-HCN.yaml"))
-        assert isinstance(log, GeoptLogfile)
+        assert isinstance(log_HCN, GeoptLogfile)
         assert len(log_HCN) == 9
         assert all([pos != log_HCN[0].posinp for pos in log_HCN.posinps[1:]])
         assert all([log_HCN.inputparams == doc.inputparams for doc in log_HCN])
