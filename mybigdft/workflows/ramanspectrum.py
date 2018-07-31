@@ -310,6 +310,7 @@ class Phonons(AbstractWorkflow):
         gs = self.ground_state
         n_at = len(gs.posinp)
         hessian = np.array([])  # Hessian matrix
+        # for job1, job2 in zip(self.queue[::2], self.queue[1::2])
         for job1, job2 in zip(*[iter(self.queue)]*2):
             # Get the value of the delta of move amplitudes
             amp1 = job1.displacement.amplitude
@@ -591,6 +592,8 @@ class RamanSpectrum(AbstractWorkflow):
             Derivatives of the polarizability tensor.
         """
         deriv_pts = np.array([])
+        # pt_wfs = self.poltensor_workflows
+        # for job1, job2 in zip(pt_wfs[::2], pt_wfs[1::2])
         for pt1, pt2 in zip(*[iter(self.poltensor_workflows)]*2):
             # Get the value of the delta of move amplitudes
             gs1 = pt1.ground_state

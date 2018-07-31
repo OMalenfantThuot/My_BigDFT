@@ -7,7 +7,7 @@ import os
 import shutil
 import subprocess
 from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH
-from .iofiles import InputParams, Logfile, clean
+from .iofiles import InputParams, Logfile, clean, GeoptLogfile
 
 # Space coordinates
 COORDS = ["x", "y", "z"]
@@ -463,10 +463,16 @@ class Job(object):
             If the initial geometry of the job does not correspond to
             the one of the Logfile previously read from the disk.
         """
-        if self.logfile.posinp != self.posinp:
+        if isinstance(self.logfile, GeoptLogfile):
+            log_pos = self.logfile.posinps[0]
+        else:
+            log_pos = self.logfile.posinp
+        if log_pos != self.posinp:
             raise UserWarning(
                 "The initial geometry of this job do not correspond to the "
-                "one used in the Logfile")
+                "one used in the Logfile:\n"
+                "Logfile posinp:\n{}Actual posinp:\n{}"
+                .format(log_pos, self.posinp))
 
     def _check_logfile_inputparams(self):
         r"""

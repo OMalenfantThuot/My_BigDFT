@@ -1177,7 +1177,7 @@ class Atom(object):
         array([0., 0., 0.])
         """
         # TODO: Check that the atom type exists
-        assert len(position) == 3
+        assert len(position) == 3, "The position must have three components"
         self._type = atom_type
         self._position = np.array(position, dtype=float)
 
@@ -1233,7 +1233,7 @@ class Atom(object):
         >>> Atom('C', [0, 0, 0]).translate([0.5, 0.5, 0.5])
         Atom('C', [0.5, 0.5, 0.5])
         """
-        assert len(vector) == 3
+        assert len(vector) == 3, "The vector must have three components"
         new_atom = deepcopy(self)
         new_atom._position = self.position + np.array(vector)
         return new_atom
