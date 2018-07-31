@@ -607,7 +607,7 @@ class RamanSpectrum(AbstractWorkflow):
             i_at = gs1.moved_atom
             assert i_at == gs2.moved_atom
             mass = ATOMS_MASS[gs1.posinp[i_at].type]
-            delta_pol_tensor = pt1.poltensor - pt2.poltensor
+            delta_pol_tensor = pt1.pol_tensor - pt2.pol_tensor
             # Compute the derivative of the polarizability tensor
             deriv = delta_pol_tensor / delta_x / np.sqrt(mass*AMU_TO_EMU)
             deriv_pts = np.append(deriv_pts, deriv.flatten())

@@ -19,7 +19,8 @@ class TestPolTensor:
 
     @pytest.mark.parametrize("value, expected", [
         (pt.ground_state, gs),
-        (pt.poltensor, None),
+        (pt.pol_tensor, None),
+        (pt.mean_polarizability, None),
         (pt.ef_amplitudes, [1.e-4]*3),
         (os.path.basename(pt.ground_state.run_dir), "pol_tensor_N2"),
     ])
@@ -52,7 +53,8 @@ class TestPolTensor:
             [-2.00000000e-04, 1.05558000e+01, -2.00000000e-04],
             [0.00000000e+00, 0.00000000e+00, 1.50535000e+01]
         ]
-        np.testing.assert_almost_equal(pt2.poltensor, expected)
+        np.testing.assert_almost_equal(pt2.pol_tensor, expected)
+        np.testing.assert_almost_equal(pt2.mean_polarizability, 12.05503333333)
         # Test that running the workflow again warns a UserWarning
         with pytest.warns(UserWarning):
             pt2.run()

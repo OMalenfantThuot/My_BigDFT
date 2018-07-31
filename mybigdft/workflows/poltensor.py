@@ -14,8 +14,8 @@ from .workflow import AbstractWorkflow
 
 class PolTensor(AbstractWorkflow):
     r"""
-    This Workflow allows to compute the polarizability tensor of a given
-    system.
+    This Workflow allows to compute the (electronic) polarizability
+    tensor of a given system.
 
     The polarizability tensor represents the response of the charges of
     a system (its dipole) to the application of an external electric
@@ -68,7 +68,8 @@ class PolTensor(AbstractWorkflow):
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._ef_amplitudes = ef_amplitudes
-        self._poltensor = None  # The pol. tensor is not yet computed
+        self._pol_tensor = None  # The pol. tensor is not yet computed
+        self._mean_polarizability = None
         # Initialize the queue of jobs for this workflow
         queue = self._initialize_queue()
         super(PolTensor, self).__init__(queue=queue)
@@ -95,14 +96,24 @@ class PolTensor(AbstractWorkflow):
         return self._ef_amplitudes
 
     @property
-    def poltensor(self):
+    def pol_tensor(self):
         r"""
         Returns
         -------
         numpy.array
             Polarizability tensor of the system.
         """
-        return self._poltensor
+        return self._pol_tensor
+
+    @property
+    def mean_polarizability(self):
+        r"""
+        Returns
+        -------
+        float
+            Mean (electronic) polarizability of the system.
+        """
+        return self._mean_polarizability
 
     def _initialize_queue(self):
         r"""
@@ -147,7 +158,7 @@ class PolTensor(AbstractWorkflow):
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
         """
-        if self.poltensor is None:
+        if self.pol_tensor is None:
             super(PolTensor, self).run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
         else:
@@ -158,9 +169,9 @@ class PolTensor(AbstractWorkflow):
     def post_proc(self):
         r"""
         Compute the polarisability tensor and set its value (you can
-        access its value via the attribute :attr:`poltensor`).
+        access its value via the attribute :attr:`pol_tensor`).
         """
-        poltensor = np.zeros((3, 3))
+        pol_tensor = np.zeros((3, 3))
         # Ground state dipole
         d0 = np.array(self.ground_state.logfile.dipole)
         for i, job in enumerate(self.queue[1:]):
@@ -170,5 +181,6 @@ class PolTensor(AbstractWorkflow):
             # Dipole after application of the electric field
             d1 = np.array(job.logfile.dipole)
             # Update the polarizability tensor
-            poltensor[i] = (d1 - d0) / ef_amplitude
-        self._poltensor = poltensor
+            pol_tensor[i] = (d1 - d0) / ef_amplitude
+        self._pol_tensor = pol_tensor  # atomic units
+        self._mean_polarizability = pol_tensor.trace()/3  # atomic units
