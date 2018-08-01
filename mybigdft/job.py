@@ -495,7 +495,9 @@ class Job(object):
         if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "
-                "ones used in the Logfile.", UserWarning)
+                "ones used in the Logfile:\n"
+                "Logfile input parameters:\n{}\nActual input parameters:\n{}"
+                .format(log_inp, base_inp))
 
     def _copy_reference_data_dir(self):
         r"""
