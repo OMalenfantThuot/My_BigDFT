@@ -19,7 +19,9 @@ from .poltensor import PolTensor
 #       (found in $SRC_DIR/bigdft/src/orbitals/eleconf-inc.f90)
 ATOMS_MASS = {"H": 1.00794, "He": 4.002602, "Li": 6.941, "Be": 9.012182,
               "B": 10.811, "C": 12.011, "N": 14.00674, "O": 15.9994,
-              "F": 18.9984032, "Ne": 20.1797}
+              "F": 18.9984032, "Ne": 20.1797, "Na": 22.989768, "Mg": 24.3050,
+              "Al": 26.981539, "Si": 28.0855 , "P": 30.973762, "S": 32.066,
+              "Cl": 35.4527, "Ar": 39.948}
 # Conversion from atomic to electronic mass unit
 AMU_TO_EMU = 1.660538782e-27 / 9.10938215e-31
 # Conversion from electronic to atomic mass unit
