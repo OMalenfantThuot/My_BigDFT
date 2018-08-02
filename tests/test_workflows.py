@@ -73,6 +73,19 @@ class TestPhonons:
         with pytest.raises(ValueError):
             eval(to_evaluate)
 
+    def test_run_first_order(self):
+        N2_ref = """\
+2   angstroem
+free
+N   3.571946174   3.571946174   3.620526682
+N   3.571946174   3.571946174   4.71401439"""
+        ref_pos = Posinp.from_string(N2_ref)
+        gs = Job(posinp=ref_pos, name='N2', run_dir='tests/phonons_N2')
+        ph = Phonons(gs, order=1)
+        ph.run(nmpi=2, nomp=2)
+        # Test the only physically relevant phonon energy
+        np.testing.assert_almost_equal(
+            max(ph.energies['cm^-1']), 2386.9850607523636, decimal=6)
 
 class TestRamanSpectrum:
 

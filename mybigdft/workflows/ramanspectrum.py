@@ -20,7 +20,7 @@ from .poltensor import PolTensor
 ATOMS_MASS = {"H": 1.00794, "He": 4.002602, "Li": 6.941, "Be": 9.012182,
               "B": 10.811, "C": 12.011, "N": 14.00674, "O": 15.9994,
               "F": 18.9984032, "Ne": 20.1797, "Na": 22.989768, "Mg": 24.3050,
-              "Al": 26.981539, "Si": 28.0855 , "P": 30.973762, "S": 32.066,
+              "Al": 26.981539, "Si": 28.0855, "P": 30.973762, "S": 32.066,
               "Cl": 35.4527, "Ar": 39.948}
 # Conversion from atomic to electronic mass unit
 AMU_TO_EMU = 1.660538782e-27 / 9.10938215e-31
@@ -43,20 +43,30 @@ class Phonons(AbstractWorkflow):
     eigenvalues of the dynamical matrix, that is closely related to the
     Hessian. To build these matrices, one must find the derivatives of
     the forces when each coordinate of each atom is translated by a
-    small amount around the equilibrium positions. To get a better
-    precision on the derivative, each coodinate is translated
-    positively and negatively, so that the number of BigDFT calculations
-    amounts to :math:`2*3*n_{at} = 6 n_{at}`, where :math:`n_{at}` is
-    the number of atoms (3 for the coordinates (:math:`x`, :math:`y` and
-    :math:`z`), 2 for the number of calculations per coordinates).
+    small amount around the equilibrium positions. This derivative must
+    be performed numerically. For a first order evaluation of the
+    derivative, :math:`3 n_{at} + 1` DFT calculations must be performed,
+    where :math:`n_{at}` is the number of atoms of the system, the 3
+    factors comes from the translations along each space coordinate,
+    while the extra calculation corresponds to the ground state.
+    However, this might not be precise enough because you want the
+    ground state forces to be equal to 0, or at least negligible with
+    respect to the forces of the out of equilibrium positions. This can
+    be difficult to obtain. It is therefore advised to evaluate that
+    derivative with a second order scheme, where each coodinate is
+    translated positively and negatively, so that the number of BigDFT
+    calculations amounts to :math:`2*3*n_{at} = 6 n_{at}` (no
+    :math:`+ 1` here, because there is no need to compute the ground
+    state anymore).
     """
 
-    def __init__(self, ground_state, translation_amplitudes=None):
+    def __init__(self, ground_state, translation_amplitudes=None, order=2):
         r"""
         From a ground state calculation, which must correspond to the
-        equilibrium calculation geometry, the :math:`6 n_{at}` jobs
-        necessary for the calculation of the phonon energies are
-        prepared.
+        equilibrium calculation geometry, the :math:`3 n_{at}+1` or
+        :math:`6 n_{at}` jobs necessary for the calculation of the
+        phonon energies are prepared (depending on the order of the
+        calculation).
 
         The distance of the displacement in each direction is controlled
         by `translation_amplitudes` (one amplitude per space coordinate
@@ -71,13 +81,23 @@ class Phonons(AbstractWorkflow):
 
         Parameters
         ----------
+        ground_state : Job
+            Job of the ground state of the system under consideration.
         translation_amplitudes: Sequence of length 3
             Amplitudes of the translations to be applied to each atom
-            along each of the three space coordinates.
+            along each of the three space coordinates (in atomic units).
+        order : int
+            Order of the numerical differentiation used to compute the
+            Hessian matrix. If second order (resp. first), then six
+            (resp. three) calculations per atom are to be performed.
         """
         # Set default translation amplitudes
         if translation_amplitudes is None:
             translation_amplitudes = [0.45/64]*3
+        # Check the desired order
+        order = int(order)
+        if order not in [1, 2]:
+            raise NotImplementedError("Only first and second order available")
         # Check the translation amplitudes
         if not isinstance(translation_amplitudes, Sequence) or \
                 len(translation_amplitudes) != 3:
@@ -90,6 +110,7 @@ class Phonons(AbstractWorkflow):
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._translation_amplitudes = translation_amplitudes
+        self._order = order
         # The displacements define the 6 translation vectors each atom
         # must undergo
         self._displacements = self._init_displacements()
@@ -121,6 +142,17 @@ class Phonons(AbstractWorkflow):
             along each of the three space coordinates.
         """
         return self._translation_amplitudes
+
+    @property
+    def order(self):
+        r"""
+        Returns
+        -------
+        order : int
+            Order of the numerical differentiation used to compute the
+            Hessian matrix. If it is equal to 2 (resp. 1), then 6 (resp.
+        """
+        return self._order
 
     @property
     def energies(self):
@@ -173,9 +205,9 @@ class Phonons(AbstractWorkflow):
         """
         queue = []
         gs = self.ground_state
-        # # Add the ground state job to the queue after updating the run
-        # # directory if needed
-        # queue.append(gs)
+        # Add the ground state job to the queue if needed
+        if self.order == 1:
+            queue.append(gs)
         # Add the jobs where each atom is displaced along each space
         # coordinate
         for i_at in range(len(gs.posinp)):
@@ -195,14 +227,18 @@ class Phonons(AbstractWorkflow):
 
     def _init_displacements(self):
         r"""
-        Set the six displacements each atom must undergo from the
-        amplitudes of displacement in each direction.
+        Set the displacements each atom must undergo from the amplitudes
+        of displacement in each direction.
         """
         displacements = OrderedDict()
+        if self.order == 1:
+            signs = {"+": 1.}  # One displacement per coordinate
+        elif self.order == 2:
+            signs = SIGNS  # Two displacements per coordinate
         for i, coord in enumerate(COORDS):
-            for sign in SIGNS:
+            for sign in signs:
                 key = coord + sign
-                amplitude = SIGNS[sign] * self.translation_amplitudes[i]
+                amplitude = signs[sign] * self.translation_amplitudes[i]
                 if self.ground_state.posinp.units == 'angstroem':
                     amplitude *= B_TO_ANG
                 displacements[key] = Displacement(i, amplitude)
@@ -308,10 +344,53 @@ class Phonons(AbstractWorkflow):
         2D square numpy array of dimension :math:`3 n_{at}`
             Hessian matrix.
         """
-        # Initialization of variables
-        gs = self.ground_state
-        n_at = len(gs.posinp)
-        hessian = np.array([])  # Hessian matrix
+        # Compute the matrix elements according to the specified order
+        if self.order == 1:
+            hessian = self._compute_first_order_hessian_elements()
+        elif self.order == 2:
+            hessian = self._compute_second_order_hessian_elements()
+        # Convert to atomic units if needed
+        pos = self.ground_state.posinp
+        if pos.units == 'angstroem':
+            hessian /= ANG_TO_B
+        # Return the Hessian matrix as a symmetric numpy array
+        n_at = len(pos)
+        hessian = hessian.reshape(3*n_at, 3*n_at)
+        return (hessian + hessian.T) / 2.
+
+    def _compute_first_order_hessian_elements(self):
+        r"""
+        Compute the Hessian matrix elements using first order numerical
+        derivatives.
+
+        Returns
+        -------
+        numpy.array
+            Hessian matrix elements as a 1D numpy array
+        """
+        hessian = np.array([])
+        forces0 = self.ground_state.logfile.forces.flatten()
+        for job in self.queue[1:]:
+            # Get the value of the delta of move amplitudes
+            delta_x = job.displacement.amplitude
+            # Get the value of the delta of forces
+            forces = job.logfile.forces.flatten()
+            # Set a new line of the Hessian matrix
+            new_line = (forces - forces0) / delta_x
+            hessian = np.append(hessian, new_line)
+        return hessian
+
+    def _compute_second_order_hessian_elements(self):
+        r"""
+        Compute the Hessian matrix elements using second order numerical
+        derivatives.
+
+        Returns
+        -------
+        numpy.array
+            Hessian matrix elements as a 1D numpy array
+        """
+        hessian = np.array([])
         # for job1, job2 in zip(self.queue[::2], self.queue[1::2])
         for job1, job2 in zip(*[iter(self.queue)]*2):
             # Get the value of the delta of move amplitudes
@@ -319,17 +398,13 @@ class Phonons(AbstractWorkflow):
             amp2 = job2.displacement.amplitude
             assert amp1 == - amp2
             delta_x = amp1 - amp2
-            if self.ground_state.posinp.units == 'angstroem':
-                delta_x *= ANG_TO_B
             # Get the value of the delta of forces
             forces1 = job1.logfile.forces.flatten()
             forces2 = job2.logfile.forces.flatten()
             # Set a new line of the Hessian matrix
             new_line = (forces1 - forces2) / delta_x
             hessian = np.append(hessian, new_line)
-        # Return the Hessian matrix as a symmetric numpy array
-        hessian = hessian.reshape(3*n_at, 3*n_at)
-        return (hessian + hessian.T) / 2.
+        return hessian
 
     def _solve_dyn_mat(self):
         r"""
@@ -369,9 +444,6 @@ class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
         vector = [0.0] * 3
         vector[self.i_coord] = self.amplitude
         return vector
-
-    # def __str__(self):
-    #     return('Displacement: {}'.format(self.vector))
 
 
 class RamanSpectrum(AbstractWorkflow):
