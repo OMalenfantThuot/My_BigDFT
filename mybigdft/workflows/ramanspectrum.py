@@ -473,8 +473,8 @@ class RamanSpectrum(AbstractWorkflow):
         # The phonon intensities and other quantities are not yet computed
         self._intensities = None
         self._depolarization_ratios = None
-        self._alphas = np.array([])  # mean polarizability derivatives
-        self._betas_sq = np.array([])  # anisotropies of pol. tensor deriv.
+        self._alphas = None  # mean polarizability derivatives
+        self._betas_sq = None  # anisotropies of pol. tensor deriv.
         # Initialize the poltensor workflows to run
         self._poltensor_workflows = [
             PolTensor(job, ef_amplitudes=ef_amplitudes, order=order)
@@ -576,30 +576,25 @@ class RamanSpectrum(AbstractWorkflow):
         # - Set the derivatives of the polarizability tensors
         #   along each displacement directions
         deriv_pol_tensors = self._compute_deriv_pol_tensors()
-        # - Loop over the normal modes
-        for pt_flat in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
-            # Reshape the derivative of the polarizability tensor
-            # along the current normal mode
-            pt = pt_flat.reshape(3, 3)
-            # Find the principal values of polarizability
-            alphas = np.linalg.eigvals(pt)
-            # Mean polarizability derivative
-            alpha = np.sum(alphas) / 3.
-            self._alphas = np.append(self._alphas, alpha)
-            # Anisotropy of the polarizability tensor derivative
-            beta_sq = ((alphas[0]-alphas[1])**2 +
-                       (alphas[1]-alphas[2])**2 +
-                       (alphas[2]-alphas[0])**2) / 2.
-            self._betas_sq = np.append(self._betas_sq, beta_sq)
-            # # Mean polarizability derivative
-            # alpha = 1./3. * pt.trace()
-            # self._alphas.append(alpha)
-            # # Anisotropy of the polarizability tensor derivative
+        # - Loop over the normal modes to get the the mean
+        #   polarizability derivative (alphas) and of the anisotropy of
+        #   the polarizability tensor derivative (betas_sq)
+        alphas = []
+        betas_sq = []
+        for pt in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
+            alphas.append(pt.trace() / 3.)
+            evals = np.linalg.eigvals(pt)
+            beta_sq = ((evals[0]-evals[1])**2 +
+                       (evals[1]-evals[2])**2 +
+                       (evals[2]-evals[0])**2) / 2.
+            betas_sq.append(beta_sq)
             # beta_sq = 1./2. * ((pt[0][0]-pt[1][1])**2 +
             #                    (pt[0][0]-pt[2][2])**2 +
             #                    (pt[1][1]-pt[2][2])**2 +
             #                    6.*(pt[0][1]**2+pt[0][2]**2+pt[1][2]**2))
-            # self._betas_sq.append(beta_sq)
+            # betas_sq.append(beta_sq)
+        self._alphas = np.array(alphas)
+        self._betas_sq = np.array(betas_sq)
         # From the two previous quantities, it is possible to
         # compute the intensity (converted from atomic units
         # to Ang^4.amu^-1) and the depolarization ratio
@@ -630,10 +625,11 @@ class RamanSpectrum(AbstractWorkflow):
         2D np.array of shape :math:`(3 n_{at}, 9)`
             Derivatives of the polarizability tensor.
         """
-        deriv_pts = np.array([])
-        # pt_wfs = self.poltensor_workflows
-        # for job1, job2 in zip(pt_wfs[::2], pt_wfs[1::2])
-        for pt1, pt2 in zip(*[iter(self.poltensor_workflows)]*2):
+        n_at = len(self.phonons.ground_state.posinp)
+        deriv_pts = np.zeros((3*n_at, 3, 3))
+        pt_wfs = self.poltensor_workflows
+        # for i, (pt1, pt2) in enumerate(zip(pt_wfs[::2], pt_wfs[1::2]))
+        for i, (pt1, pt2) in enumerate(zip(*[iter(pt_wfs)]*2)):
             # Get the value of the delta of move amplitudes
             gs1 = pt1.ground_state
             gs2 = pt2.ground_state
@@ -645,11 +641,8 @@ class RamanSpectrum(AbstractWorkflow):
             # Get the value of the delta of poltensors
             i_at = gs1.moved_atom
             assert i_at == gs2.moved_atom
-            mass = ATOMS_MASS[gs1.posinp[i_at].type]
             delta_pol_tensor = pt1.pol_tensor - pt2.pol_tensor
             # Compute the derivative of the polarizability tensor
-            deriv = delta_pol_tensor / delta_x / np.sqrt(mass*AMU_TO_EMU)
-            deriv_pts = np.append(deriv_pts, deriv.flatten())
-        # Return the transpose of this array
-        deriv_pts = deriv_pts.reshape(3*len(gs1.posinp), 9)
+            mass = ATOMS_MASS[gs1.posinp[i_at].type] * AMU_TO_EMU
+            deriv_pts[i] = delta_pol_tensor / delta_x / np.sqrt(mass)
         return deriv_pts.T
