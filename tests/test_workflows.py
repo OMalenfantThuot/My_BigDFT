@@ -59,6 +59,23 @@ class TestPolTensor:
         with pytest.warns(UserWarning):
             pt2.run()
 
+    def test_run_second_order(self):
+        # Run a pol. tensor calculation
+        gs2 = Job(posinp=pos, name='N2', run_dir='tests/pol_tensor_N2')
+        pt2 = PolTensor(gs2, order=2)
+        pt2.run()
+        # Test the computed polarizability tensor
+        expected = [
+            [1.055590e+01, -3.000000e-04, -3.500000e-04],
+            [-3.000000e-04, 1.055590e+01, -3.500000e-04],
+            [0.000000e+00,  0.000000e+00, 1.505375e+01]
+        ]
+        np.testing.assert_almost_equal(pt2.pol_tensor, expected)
+        np.testing.assert_almost_equal(pt2.mean_polarizability, 12.05518333333)
+        # Test that running the workflow again warns a UserWarning
+        with pytest.warns(UserWarning):
+            pt2.run()
+
 
 class TestPhonons:
 

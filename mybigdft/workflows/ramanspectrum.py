@@ -88,7 +88,7 @@ class Phonons(AbstractWorkflow):
             along each of the three space coordinates (in atomic units).
         order : int
             Order of the numerical differentiation used to compute the
-            Hessian matrix. If second order (resp. first), then six
+            dynamical matrix. If second order (resp. first), then six
             (resp. three) calculations per atom are to be performed.
         """
         # Set default translation amplitudes
@@ -111,8 +111,8 @@ class Phonons(AbstractWorkflow):
         self._ground_state = ground_state
         self._translation_amplitudes = translation_amplitudes
         self._order = order
-        # The displacements define the 6 translation vectors each atom
-        # must undergo
+        # The displacements define the 3 or 6 translation vectors each
+        # atom must undergo
         self._displacements = self._init_displacements()
         # The phonon energies are not yet computed
         self._energies = None
@@ -150,7 +150,8 @@ class Phonons(AbstractWorkflow):
         -------
         order : int
             Order of the numerical differentiation used to compute the
-            Hessian matrix. If it is equal to 2 (resp. 1), then 6 (resp.
+            dynamical matrix. If second order (resp. first), then six
+            (resp. three) calculations per atom are to be performed.
         """
         return self._order
 
@@ -190,11 +191,13 @@ class Phonons(AbstractWorkflow):
         r"""
         Returns
         -------
-        OrderedDict of length 6
-            Displacements each atom of the system must undergo. There
-            are six of them (two per space coordinate) in order to be
-            able to compute the Hessian matrix by using the central
-            difference scheme.
+        OrderedDict of length 3 or 6
+            Displacements each atom of the system must undergo before
+            computing the dynamical matrix as post-processing. There are
+            three or six of them (one or two per space coordinate,
+            depending on the order of the numerical derivative
+            procedure) if the forward or central difference scheme is
+            used, respectively.
         """
         return self._displacements
 
@@ -344,67 +347,39 @@ class Phonons(AbstractWorkflow):
         2D square numpy array of dimension :math:`3 n_{at}`
             Hessian matrix.
         """
-        # Compute the matrix elements according to the specified order
+        gs = self.ground_state
+        pos = gs.posinp
+        n_at = len(pos)
+        hessian = np.zeros((3*n_at, 3*n_at))
         if self.order == 1:
-            hessian = self._compute_first_order_hessian_elements()
+            # Compute the first order matrix elements
+            gs_forces = gs.logfile.forces.flatten()
+            for i, job in enumerate(self.queue[1:]):
+                # Get the value of the delta of move amplitudes
+                delta_x = job.displacement.amplitude
+                # Get the value of the delta of forces
+                forces = job.logfile.forces.flatten()
+                # Set a new line of the Hessian matrix
+                hessian[i] = (forces - gs_forces) / delta_x
         elif self.order == 2:
-            hessian = self._compute_second_order_hessian_elements()
+            # Compute the second order matrix elements
+            # for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))
+            for i, (job1, job2) in enumerate(zip(*[iter(self.queue)]*2)):
+                # Get the value of the delta of move amplitudes
+                amp1 = job1.displacement.amplitude
+                amp2 = job2.displacement.amplitude
+                assert amp1 == - amp2
+                delta_x = amp1 - amp2
+                # Get the value of the delta of forces
+                forces1 = job1.logfile.forces.flatten()
+                forces2 = job2.logfile.forces.flatten()
+                # Set a new line of the Hessian matrix
+                hessian[i] = (forces1 - forces2) / delta_x
         # Convert to atomic units if needed
-        pos = self.ground_state.posinp
         if pos.units == 'angstroem':
             hessian /= ANG_TO_B
         # Return the Hessian matrix as a symmetric numpy array
-        n_at = len(pos)
-        hessian = hessian.reshape(3*n_at, 3*n_at)
         return (hessian + hessian.T) / 2.
-
-    def _compute_first_order_hessian_elements(self):
-        r"""
-        Compute the Hessian matrix elements using first order numerical
-        derivatives.
-
-        Returns
-        -------
-        numpy.array
-            Hessian matrix elements as a 1D numpy array
-        """
-        hessian = np.array([])
-        forces0 = self.ground_state.logfile.forces.flatten()
-        for job in self.queue[1:]:
-            # Get the value of the delta of move amplitudes
-            delta_x = job.displacement.amplitude
-            # Get the value of the delta of forces
-            forces = job.logfile.forces.flatten()
-            # Set a new line of the Hessian matrix
-            new_line = (forces - forces0) / delta_x
-            hessian = np.append(hessian, new_line)
-        return hessian
-
-    def _compute_second_order_hessian_elements(self):
-        r"""
-        Compute the Hessian matrix elements using second order numerical
-        derivatives.
-
-        Returns
-        -------
-        numpy.array
-            Hessian matrix elements as a 1D numpy array
-        """
-        hessian = np.array([])
-        # for job1, job2 in zip(self.queue[::2], self.queue[1::2])
-        for job1, job2 in zip(*[iter(self.queue)]*2):
-            # Get the value of the delta of move amplitudes
-            amp1 = job1.displacement.amplitude
-            amp2 = job2.displacement.amplitude
-            assert amp1 == - amp2
-            delta_x = amp1 - amp2
-            # Get the value of the delta of forces
-            forces1 = job1.logfile.forces.flatten()
-            forces2 = job2.logfile.forces.flatten()
-            # Set a new line of the Hessian matrix
-            new_line = (forces1 - forces2) / delta_x
-            hessian = np.append(hessian, new_line)
-        return hessian
 
     def _solve_dyn_mat(self):
         r"""
@@ -473,7 +448,7 @@ class RamanSpectrum(AbstractWorkflow):
     leading to :math:`24 n_{at}` calculations in total.
     """
 
-    def __init__(self, phonons, ef_amplitudes=None):
+    def __init__(self, phonons, ef_amplitudes=None, order=1):
         r"""
         From a phonon calculation, one is able to compute the Raman
         spectrum of a given system by only specifying the electric field
@@ -487,6 +462,11 @@ class RamanSpectrum(AbstractWorkflow):
         ef_amplitudes : list or numpy array of length 3
             Amplitude of the electric field to be applied in the three
             directions of space (:math:`x`, :math:`y`, :math:`z`).
+        order : int
+            Order of the numerical differentiation used to compute the
+            polarizability tensors that are then used to compute the
+            Raman intensities. If second order (resp. first), then six
+            (resp. three) calculations per atom are to be performed.
         """
         # Initialize the attributes that are specific to this workflow
         self._phonons = phonons
@@ -495,9 +475,11 @@ class RamanSpectrum(AbstractWorkflow):
         self._depolarization_ratios = None
         self._alphas = np.array([])  # mean polarizability derivatives
         self._betas_sq = np.array([])  # anisotropies of pol. tensor deriv.
-        # Initialize the poltensor workflows, no need of a queue
-        self._poltensor_workflows = \
-            self._init_poltensor_workflows(ef_amplitudes)
+        # Initialize the poltensor workflows to run
+        self._poltensor_workflows = [
+            PolTensor(job, ef_amplitudes=ef_amplitudes, order=order)
+            for job in self.phonons.queue
+        ]
         super(RamanSpectrum, self).__init__(queue=[])
 
     @property
@@ -551,23 +533,6 @@ class RamanSpectrum(AbstractWorkflow):
             compute the Raman intensities.
         """
         return self._poltensor_workflows
-
-    def _init_poltensor_workflows(self, ef_amplitudes):
-        r"""
-        Parameters
-        ----------
-        ef_amplitudes : None or list or numpy array of length 3
-            Amplitude of the electric field to be applied in the three
-            directions of space (:math:`x`, :math:`y`, :math:`z`).
-
-        Returns
-        -------
-        list
-            Polarizability tensor workflows to be performed in order to
-            compute the Raman intensities.
-        """
-        return [PolTensor(job, ef_amplitudes=ef_amplitudes)
-                for job in self.phonons.queue]
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
         r"""
