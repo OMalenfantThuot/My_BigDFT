@@ -1,5 +1,6 @@
 r"""
-File containing the InputParams, Posinp, Logfile and Atom classes.
+The :class:`Posinp` and :class:`Atom` classes are meant to represent the
+atomic systems used as input for a BigDFT calculation.
 """
 
 from __future__ import print_function

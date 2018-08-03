@@ -1,5 +1,18 @@
 r"""
-File containing the InputParams, Posinp, Logfile and Atom classes.
+The :class:`Logfile` class is the base class you want to be
+using all the time. It is mainly meant to manipulate the output of a BigDFT
+calculation (written using the YAML format).
+
+However, it might happen that the output actually contains many documents (for
+instance, one document per geometry optimization procedure). In such cases,
+the initialization of a ``Logfile`` actually gives another type of object,
+deriving from the :class:`MultipleLogfile` class. Be careful:
+these objects behave as a list of ``Logfile`` instances, not as a ``Logfile``
+instance (even though they are initialized *via* the ``Logfile`` class).
+To keep the same example as above, the output file of a geometry optimization
+calculation can be read via the :meth:`Logfile.from_file`
+method of the ``Logfile`` class, returning a
+:class:`GeoptLogfile` instance.
 """
 
 from __future__ import print_function
@@ -16,7 +29,7 @@ from .inputparams import InputParams, clean
 from .posinp import Posinp
 
 
-__all__ = ["Logfile"]
+__all__ = ["Logfile", "MultipleLogfile", "GeoptLogfile"]
 
 
 PATHS = "paths"

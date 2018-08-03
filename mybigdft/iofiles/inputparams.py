@@ -1,5 +1,13 @@
 r"""
-File containing the InputParams, Posinp, Logfile and Atom classes.
+The :class:`InputParams` class is meant to represent the input
+parameters of a BigDFT calculation in a yaml format.
+
+It also comes with two functions:
+
+* :func:`check` to check that a dictionary is only made of valid BigDFT
+  input parameters.
+* :func:`clean` to clean a dictionary of input parameters so that only
+  non-default values are kept in memory.
 """
 
 from __future__ import print_function
@@ -16,69 +24,6 @@ from .posinp import Posinp
 
 
 __all__ = ["check", "clean", "InputParams"]
-
-
-def check(params):
-    """
-    Check that the keys of `params` correspond to BigDFT parameters.
-
-    Parameters
-    ----------
-    params : dict
-        Trial input parameters.
-
-    Raises
-    ------
-    KeyError
-        If a key or a sub-key is not a BigDFT parameter.
-    """
-    for key, value in params.items():
-        if key not in INPUT_VARIABLES:
-            raise KeyError("Unknown key '{}'".format(key))
-        if value is not None:
-            for subkey in value.keys():
-                if subkey not in INPUT_VARIABLES[key].keys():
-                    raise KeyError(
-                        "Unknown key '{}' in '{}'".format(subkey, key))
-
-
-def clean(params):
-    """
-    Parameters
-    ----------
-    params : dict
-        Trial BigDFT input parameters.
-
-    Returns
-    -------
-    dict
-        Input parameters whose values are not their default, after
-        checking that all the keys in `params` correspond to actual
-        BigDFT parameters.
-    """
-    # Check the validity of the given input parameters
-    check(params)
-    # Return the cleaned input parameters
-    real_params = deepcopy(params)
-    for key, value in params.items():
-        # The key might be empty (e.g.: logfile with many documents)
-        if value is None:
-            del real_params[key]
-            continue
-        # Delete the child keys whose values are default
-        for child_key, child_value in value.items():
-            default_value = INPUT_VARIABLES[key][child_key].get("default")
-            if child_value == default_value:
-                del real_params[key][child_key]
-        # Delete the key if it is empty
-        if real_params[key] == {}:
-            del real_params[key]
-    # Remove the cumbersome geopt key if ncount_cluster_x is the only
-    # key (it happens when the input parameters are read from a Logfile)
-    dummy_value = {'ncount_cluster_x': 1}
-    if "geopt" in real_params and real_params["geopt"] == dummy_value:
-        del real_params["geopt"]
-    return real_params
 
 
 class InputParams(MutableMapping):
@@ -258,3 +203,66 @@ class InputParams(MutableMapping):
         with open(filename, "w") as stream:
             self._params = clean(self.params)  # Make sure it is valid
             yaml.dump(self.params, stream=stream, Dumper=Dumper)
+
+
+def check(params):
+    """
+    Check that the keys of `params` correspond to BigDFT parameters.
+
+    Parameters
+    ----------
+    params : dict
+        Trial input parameters.
+
+    Raises
+    ------
+    KeyError
+        If a key or a sub-key is not a BigDFT parameter.
+    """
+    for key, value in params.items():
+        if key not in INPUT_VARIABLES:
+            raise KeyError("Unknown key '{}'".format(key))
+        if value is not None:
+            for subkey in value.keys():
+                if subkey not in INPUT_VARIABLES[key].keys():
+                    raise KeyError(
+                        "Unknown key '{}' in '{}'".format(subkey, key))
+
+
+def clean(params):
+    """
+    Parameters
+    ----------
+    params : dict
+        Trial BigDFT input parameters.
+
+    Returns
+    -------
+    dict
+        Input parameters whose values are not their default, after
+        checking that all the keys in `params` correspond to actual
+        BigDFT parameters.
+    """
+    # Check the validity of the given input parameters
+    check(params)
+    # Return the cleaned input parameters
+    real_params = deepcopy(params)
+    for key, value in params.items():
+        # The key might be empty (e.g.: logfile with many documents)
+        if value is None:
+            del real_params[key]
+            continue
+        # Delete the child keys whose values are default
+        for child_key, child_value in value.items():
+            default_value = INPUT_VARIABLES[key][child_key].get("default")
+            if child_value == default_value:
+                del real_params[key][child_key]
+        # Delete the key if it is empty
+        if real_params[key] == {}:
+            del real_params[key]
+    # Remove the cumbersome geopt key if ncount_cluster_x is the only
+    # key (it happens when the input parameters are read from a Logfile)
+    dummy_value = {'ncount_cluster_x': 1}
+    if "geopt" in real_params and real_params["geopt"] == dummy_value:
+        del real_params["geopt"]
+    return real_params

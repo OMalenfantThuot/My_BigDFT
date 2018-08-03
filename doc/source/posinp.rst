@@ -1,9 +1,5 @@
 Posinp and Atom
 ---------------
 
-.. autoclass:: mybigdft.iofiles.Posinp
+.. automodule:: mybigdft.iofiles.posinp
     :special-members: __str__, __eq__
-
-
-.. autoclass:: mybigdft.iofiles.Atom
-    :special-members: __str__, __repr__, __eq__
