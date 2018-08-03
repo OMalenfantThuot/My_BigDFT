@@ -6,8 +6,10 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
+from mybigdft.iofiles import InputParams, Logfile
+from mybigdft.iofiles.logfiles import GeoptLogfile
+from mybigdft.iofiles.inputparams import clean
 from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH
-from .iofiles import InputParams, Logfile, clean, GeoptLogfile
 
 # Space coordinates
 COORDS = ["x", "y", "z"]

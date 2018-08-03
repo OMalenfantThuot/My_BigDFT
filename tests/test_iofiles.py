@@ -3,7 +3,7 @@ import os
 import sys
 import pytest
 from mybigdft import InputParams, Posinp, Logfile, Atom
-from mybigdft.iofiles import GeoptLogfile
+from mybigdft.iofiles.logfiles import GeoptLogfile
 
 tests_fol = "tests"
 # Result of an N2 calculation of very bad quality
