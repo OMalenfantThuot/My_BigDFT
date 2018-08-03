@@ -163,7 +163,7 @@ class Logfile(Mapping):
         r"""
         Clean the value of the built-in attributes.
         """
-        if self._boundary_conditions is not None:
+        if self.boundary_conditions is not None:
             self._boundary_conditions = self._boundary_conditions.lower()
         # Make the forces as a numpy array of shape (n_at, 3)
         if self.forces is not None:
