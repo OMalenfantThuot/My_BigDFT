@@ -808,49 +808,6 @@ class Posinp(Sequence):
                 "Cannot use reduced units with free boundary conditions")
 
     @classmethod
-    def _from_stream(cls, stream):
-        r"""
-        Initialize the input positions from a stream that mimics an xyz
-        file.
-
-        Returns
-        -------
-        Posinp
-            Posinp read from a stream.
-        """
-        atoms = []
-        for i, line in enumerate(stream):
-            content = line.split()
-            if i == 0:
-                # Read the first line, containing the number of atoms
-                # and the units of the coordinates of each atom
-                n_at = int(content[0])
-                units = content[1]
-            elif i == 1:
-                # Read the second line, containing the boundary
-                # conditions and possibly the cell size.
-                boundary_conditions = content[0].lower()
-                if boundary_conditions != "free":
-                    cell = content[1:4]
-                else:
-                    cell = None
-            elif i <= n_at+1:
-                # Read the atom (type and position)
-                atom_type = content[0]
-                position = content[1:4]
-                atoms.append(Atom(atom_type, position))
-            elif content[0] == "forces":
-                break
-            else:
-                raise ValueError("There are too many atoms.")
-        if n_at != len(atoms):
-            raise ValueError(
-                "There are too few atoms (expected {}, got {})"
-                .format(n_at, len(atoms))
-            )
-        return cls(atoms, units, boundary_conditions, cell=cell)
-
-    @classmethod
     def from_file(cls, filename):
         r"""
         Initialize the input positions from a file on disk.
@@ -879,7 +836,72 @@ class Posinp(Sequence):
         <BLANKLINE>
         """
         with open(filename, "r") as stream:
-            return cls._from_stream(stream)
+            lines = [line.split() for line in stream.readlines()]
+            return cls._from_lines(lines)
+
+    @classmethod
+    def from_string(cls, posinp):
+        r"""
+        Initialize the input positions from a string.
+
+        Parameters
+        ----------
+        posinp : str
+            Content of an xyz file as a string.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from the string.
+        """
+        lines = [line.split() for line in posinp.split("\n")]
+        lines = [line for line in lines if line]  # Remove empty lines
+        return cls._from_lines(lines)
+
+    @classmethod
+    def _from_lines(cls, lines):
+        r"""
+        Initialize the input positions from a list of lines that mimics
+        an xyz file.
+
+        Parameters
+        ----------
+        lines : list
+            List of the lines of the xyz file, each line being a list.
+
+        Returns
+        -------
+        Posinp
+            Posinp read from the list of lines.
+        """
+        # Decode the first line
+        line1 = lines.pop(0)
+        n_at = int(line1[0])
+        units = line1[1]
+        # Decode the second line
+        line2 = lines.pop(0)
+        boundary_conditions = line2[0].lower()
+        if boundary_conditions != "free":
+            cell = line2[1:4]
+        else:
+            cell = None
+        # Remove the lines about the forces, if there are some
+        first_elements = [line[0] for line in lines]
+        if "forces" in first_elements:
+            index = first_elements.index("forces")
+            lines = lines[:index]
+        # Check the number of atoms is correct
+        if n_at != len(lines):
+            raise ValueError(
+                "The number of atoms received is different from the "
+                "expected number of atoms ({} != {})".format(len(lines), n_at))
+        # Decode the atoms
+        atoms = []
+        for line in lines:
+            atom_type = line[0]
+            position = line[1:4]
+            atoms.append(Atom(atom_type, position))
+        return cls(atoms, units, boundary_conditions, cell=cell)
 
     @classmethod
     def from_dict(cls, posinp):
@@ -952,24 +974,6 @@ class Posinp(Sequence):
             else:
                 boundary_conditions = "periodic"
         return cls(atoms, units, boundary_conditions, cell=cell)
-
-    @classmethod
-    def from_string(cls, posinp):
-        r"""
-        Initialize the input positions from a string.
-
-        Parameters
-        ----------
-        posinp : str
-            Content of an xyz file as a string.
-
-        Returns
-        -------
-        Posinp
-            Posinp read from the string.
-        """
-        posinp = posinp.split("\n")
-        return cls._from_stream(posinp)
 
     @property
     def units(self):
