@@ -32,6 +32,16 @@ class TestInputParams:
         with pytest.raises(KeyError):
             eval(to_evaluate)
 
+    @pytest.mark.parametrize("to_evaluate", [
+        "InputParams({'dft': {'hgrids': 10}})",
+        "InputParams({'dft': {'qcharge': 1000}})",
+        "InputParams({'dft': {'nspin': 8}})",
+        "InputParams({'dft': {'nspin': 2, 'magnetic_torque': True}})",
+    ])
+    def test_init_raises_ValueError(self, to_evaluate):
+        with pytest.raises(ValueError):
+            print(eval(to_evaluate))
+
     def test_set(self):
         inp = InputParams()
         inp["dft"] = {"hgrids": 0.45}
@@ -381,3 +391,19 @@ C    7.327412521    0.000000000   3.461304757"""
             ]
         }})
         assert pos_with_inf == inp_with_inf.posinp
+
+    def test_to_centroid(self):
+        atoms = [Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])]
+        pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        expected_atoms = [Atom('N', [0, 0, -0.55]), Atom('N', [0, 0, 0.55])]
+        expected_pos = Posinp(expected_atoms, units="angstroem",
+                              boundary_conditions="free")
+        assert pos.to_centroid() == expected_pos
+
+    def test_to_barycenter(self):
+        atoms = [Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])]
+        pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        expected_atoms = [Atom('N', [0, 0, -0.55]), Atom('N', [0, 0, 0.55])]
+        expected_pos = Posinp(expected_atoms, units="angstroem",
+                              boundary_conditions="free")
+        assert pos.to_barycenter() == expected_pos

@@ -1,5 +1,5 @@
 Job
 ---
 
-.. autoclass:: mybigdft.job.Job
+.. automodule:: mybigdft.job
     :special-members: __enter__, __exit__

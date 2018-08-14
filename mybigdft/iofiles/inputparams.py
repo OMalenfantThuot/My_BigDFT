@@ -14,7 +14,7 @@ from __future__ import print_function
 import warnings
 from copy import deepcopy
 from collections import MutableMapping
-import oyaml as yaml
+import yaml
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -205,30 +205,6 @@ class InputParams(MutableMapping):
             yaml.dump(self.params, stream=stream, Dumper=Dumper)
 
 
-def check(params):
-    """
-    Check that the keys of `params` correspond to BigDFT parameters.
-
-    Parameters
-    ----------
-    params : dict
-        Trial input parameters.
-
-    Raises
-    ------
-    KeyError
-        If a key or a sub-key is not a BigDFT parameter.
-    """
-    for key, value in params.items():
-        if key not in INPUT_VARIABLES:
-            raise KeyError("Unknown key '{}'".format(key))
-        if value is not None:
-            for subkey in value.keys():
-                if subkey not in INPUT_VARIABLES[key].keys():
-                    raise KeyError(
-                        "Unknown key '{}' in '{}'".format(subkey, key))
-
-
 def clean(params):
     """
     Parameters
@@ -243,10 +219,15 @@ def clean(params):
         checking that all the keys in `params` correspond to actual
         BigDFT parameters.
     """
-    # Check the validity of the given input parameters
-    check(params)
-    # Return the cleaned input parameters
+#    # Make sure to convert hgrids to a list beforehand
+#    if "dft" in params and "hgrids" in params["dft"]:
+#        hgrids = deepcopy(params["dft"]["hgrids"])
+#        if not isinstance(hgrids, list):
+#            params["dft"]["hgrids"] = [hgrids]*3
     real_params = deepcopy(params)
+    # Check the validity of the given input parameters
+    check(real_params)
+    # Return the cleaned input parameters
     for key, value in params.items():
         # The key might be empty (e.g.: logfile with many documents)
         if value is None:
@@ -266,3 +247,107 @@ def clean(params):
     if "geopt" in real_params and real_params["geopt"] == dummy_value:
         del real_params["geopt"]
     return real_params
+
+
+def check(params):
+    """
+    Check that the keys of `params` correspond to BigDFT parameters.
+
+    Parameters
+    ----------
+    params : dict
+        Trial input parameters.
+
+    Raises
+    ------
+    KeyError
+        If a key or a sub-key is not a BigDFT parameter.
+    ValueError
+        If a value is invalid (not in the correct range, not in the
+        possible values, the value of the master key does not allow for
+        the key to be defined)
+    """
+    for key, value in params.items():
+        # Check the key
+        if key not in INPUT_VARIABLES:
+            raise KeyError("Unknown key '{}'".format(key))
+        if value is not None:
+            for subkey, subvalue in value.items():
+                # Check the subkey
+                key_definition = INPUT_VARIABLES[key]
+                if subkey not in key_definition:
+                    raise KeyError(
+                        "Unknown key '{}' in '{}'".format(subkey, key))
+                # Check the subvalue:
+                check_value(subkey, subvalue, key, value, key_definition)
+
+
+def check_value(subkey, subvalue, key, value, key_definition):
+    r"""
+    Check the value of an input parameter is valid
+
+    Parameters
+    ----------
+    subkey : str
+        Name of the BigDFT input parameter under consideration.
+    subvalue
+        Value of the BigDFT input parameter under consideration.
+    key : str
+        Base key of the BigDFT input parameter under consideration.
+    value : dict
+        Value of the base key.
+    key_definition : dict
+        Definition of the base key.
+
+    Raises
+    ------
+    ValueError
+        If a value is invalid (not in the correct range, not in the
+        possible values, the value of the master key does not allow for
+        the key to be defined)
+    """
+    subkey_definition = key_definition[subkey]
+    # If default value, no need to worry anymore
+    default = subkey_definition.get("default")
+    if subvalue == default:
+        return
+    # If the subkey is conditioned by the value of another subkey, check
+    # that this other subkey has a valid value
+    condition = subkey_definition.get("CONDITION")
+    if condition is not None:
+        master_key = condition["MASTER_KEY"]
+        possible_values = condition["WHEN"]
+        if value[master_key] not in possible_values:
+            raise ValueError(
+                "Condition '{} in {}' not met for '{}' in '{}' (got {})"
+                .format(master_key, possible_values, subkey, key, subvalue))
+    # It must be in the exclusive values
+    possible_values = subkey_definition.get("EXCLUSIVE")
+    if possible_values and subvalue not in possible_values:
+        raise ValueError(
+            "'{}' in '{}' not in the possible values (got {}, not in {})"
+            .format(subkey, subkey, subvalue, possible_values))
+    # It must be in the correct range
+    valid_range = subkey_definition.get("RANGE")
+    if valid_range:
+        if isinstance(subvalue, list):
+            value_in_range = all([in_range(val, valid_range)
+                                  for val in subvalue])
+        else:
+            value_in_range = in_range(subvalue, valid_range)
+        if not value_in_range:
+            raise ValueError(
+                "'{}' in '{}' not in valid range (got {}, not in {})"
+                .format(subkey, key, subvalue, valid_range))
+
+
+def in_range(value, valid_range):
+    r"""
+    Check if the value is in the expected range.
+
+    Returns
+    -------
+    bool
+        `True` if the value is in the valid range, else `False`
+    """
+    return float(valid_range[0]) <= float(value) <= float(valid_range[1])

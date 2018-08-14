@@ -13,8 +13,7 @@
 .tox
 tests/log-*yaml
 tests/logfiles
-tests/pol_tensor_N2/
-tests/phonons_N2/
+tests/*_N2/
 *runtest*
 *dry_run*
 *minimal.yaml
@@ -23,11 +22,13 @@ tests/phonons_N2/
 doc/build/
 doc/source/notebooks/Untitled*.ipynb
 doc/source/notebooks/test.yaml
+doc/source/notebooks/geopt
 doc/source/notebooks/N2
 doc/source/notebooks/HCN
 doc/source/notebooks/HCCH
 doc/source/notebooks/CH4
 doc/source/notebooks/NaF
+doc/source/notebooks/dissociation_curve_N2/
 
 # Extra files
 .ipynb_checkpoints
