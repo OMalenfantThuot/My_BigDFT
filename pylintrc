@@ -142,6 +142,13 @@ disable=print-statement,
         comprehension-escape,
         R1705,
         R0205,
+        W0201,  # initialize attribute outside __init__
+        W0212,  # access to protected members (e.g., _attribute)
+        W0511,  # TODO in the code
+        R0901,  # Too many ancestors
+        R0902,  # Too many instance attributes
+        R0913,  # Too many arguments
+        R0914,  # Too many local variables
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
@@ -244,7 +251,7 @@ function-naming-style=snake_case
 #function-rgx=
 
 # Good variable names which should always be accepted, separated by a comma.
-good-names=i,j,k,ex,Run,_,pt,d0,d1,d2,gs,ef
+good-names=i,j,k,ex,Run,_,pt,d0,d1,d2,gs,ef,en
         
 
 # Include a hint for the correct naming format with invalid-name.

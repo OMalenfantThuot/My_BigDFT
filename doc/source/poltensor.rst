@@ -1,4 +1,5 @@
 PolTensor (to compute the polarizability tensor)
 ------------------------------------------------
 
-.. autoclass:: mybigdft.workflows.poltensor.PolTensor
+.. automodule:: mybigdft.workflows.poltensor
+    :inherited-members:

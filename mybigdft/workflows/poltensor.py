@@ -1,6 +1,5 @@
 r"""
-This module defines the PolTensor workflow, allowing to compute the
-polarizability tensor of a given system.
+This module defines the :class:`PolTensor` workflow.
 """
 from __future__ import print_function
 import warnings
@@ -9,13 +8,13 @@ from copy import deepcopy
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 from mybigdft import Job
-from mybigdft.job import COORDS, SIGNS
+from mybigdft.globals import COORDS, SIGNS
 from .workflow import AbstractWorkflow
 
 
 class PolTensor(AbstractWorkflow):
     r"""
-    This Workflow allows to compute the (electronic) polarizability
+    This workflow allows to compute the (electronic) polarizability
     tensor of a given system.
 
     The polarizability tensor represents the response of the charges of
@@ -38,6 +37,8 @@ class PolTensor(AbstractWorkflow):
     :math:`\Delta E_j` is the variation of the electric field amplitude
     along the :math:`j` direction
     """
+
+    POST_PROCESSING_ATTRIBUTES = ["pol_tensor", "mean_polarizability"]
 
     def __init__(self, ground_state, ef_amplitudes=None, order=1):
         r"""
@@ -81,9 +82,6 @@ class PolTensor(AbstractWorkflow):
         # Depending on the desired order, there are 3 or 6 electric
         # fields to be applied on the system
         self._efields = self._init_efields()
-        # The pol. tensor is not yet computed
-        self._pol_tensor = None
-        self._mean_polarizability = None
         # Initialize the queue of jobs for this workflow
         queue = self._initialize_queue()
         super(PolTensor, self).__init__(queue=queue)
@@ -197,32 +195,6 @@ class PolTensor(AbstractWorkflow):
                 amplitude = signs[sign] * self.ef_amplitudes[i]
                 efields[key] = ElectricField(i, amplitude)
         return efields
-
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
-        r"""
-        Run the calculations allowing to compute the polarizability
-        tensor if the latter was not already computed.
-
-        Parameters
-        ----------
-        nmpi : int
-            Number of MPI tasks.
-        nomp : int
-            Number of OpenMP tasks.
-        force_run : bool
-            If `True`, the calculations are run even though a logfile
-            already exists.
-        dry_run : bool
-            If `True`, the input files are written on disk, but the
-            bigdft-tool command is run instead of the bigdft one.
-        """
-        if self.pol_tensor is None:
-            super(PolTensor, self).run(
-                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        else:
-            warning_msg = "Calculations already performed; set the argument "\
-                          "'force_run' to True to re-run them."
-            warnings.warn(warning_msg, UserWarning)
 
     def post_proc(self):
         r"""

@@ -1,37 +1,19 @@
 r"""
-File containing the class allowing to compute the Raman Spectrum of a
-molecular system with BigDFT.
+The :class:`Phonons` class allows to compute the normal modes of a
+system, while the :class:`RamanSpectrum` class allows to compute the
+intensities associated to these modes (allowing one to study the Raman
+spectrum).
 """
 
 from __future__ import print_function, absolute_import
-import warnings
 import os
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 from mybigdft import Job
-from mybigdft.job import COORDS, SIGNS
+from mybigdft.globals import (COORDS, SIGNS, ATOMS_MASS, AMU_TO_EMU,
+                              EMU_TO_AMU, B_TO_ANG, ANG_TO_B, HA_TO_CMM1)
 from .workflow import AbstractWorkflow
 from .poltensor import PolTensor
-
-
-# Mass of the different types of atoms in atomic mass units
-# TODO: Add more types of atoms
-#       (found in $SRC_DIR/bigdft/src/orbitals/eleconf-inc.f90)
-ATOMS_MASS = {"H": 1.00794, "He": 4.002602, "Li": 6.941, "Be": 9.012182,
-              "B": 10.811, "C": 12.011, "N": 14.00674, "O": 15.9994,
-              "F": 18.9984032, "Ne": 20.1797, "Na": 22.989768, "Mg": 24.3050,
-              "Al": 26.981539, "Si": 28.0855, "P": 30.973762, "S": 32.066,
-              "Cl": 35.4527, "Ar": 39.948}
-# Conversion from atomic to electronic mass unit
-AMU_TO_EMU = 1.660538782e-27 / 9.10938215e-31
-# Conversion from electronic to atomic mass unit
-EMU_TO_AMU = 1. / AMU_TO_EMU
-# Conversion factor from bohr to angstroem
-B_TO_ANG = 0.529177249
-# Conversion factor from angstroem to bohr
-ANG_TO_B = 1. / B_TO_ANG
-# Conversion factor from Hartree to cm^-1
-HA_TO_CMM1 = 219474.6313705
 
 
 class Phonons(AbstractWorkflow):
@@ -59,6 +41,8 @@ class Phonons(AbstractWorkflow):
     :math:`+ 1` here, because there is no need to compute the ground
     state anymore).
     """
+
+    POST_PROCESSING_ATTRIBUTES = ["dyn_mat", "energies", "normal_modes"]
 
     def __init__(self, ground_state, translation_amplitudes=None, order=2):
         r"""
@@ -114,10 +98,6 @@ class Phonons(AbstractWorkflow):
         # The displacements define the 3 or 6 translation vectors each
         # atom must undergo
         self._displacements = self._init_displacements()
-        # The phonon energies are not yet computed
-        self._energies = None
-        self._dyn_mat = None
-        self._normal_modes = None
         # Initialize the queue of jobs for this workflow
         queue = self._initialize_queue()
         super(Phonons, self).__init__(queue=queue)
@@ -247,32 +227,6 @@ class Phonons(AbstractWorkflow):
                 displacements[key] = Displacement(i, amplitude)
         return displacements
 
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
-        r"""
-        Run the calculations allowing to compute the phonon energies,
-        which are computed at the post-processing level.
-
-        Parameters
-        ----------
-        nmpi : int
-            Number of MPI tasks.
-        nomp : int
-            Number of OpenMP tasks.
-        force_run : bool
-            If `True`, the calculations are run even though a logfile
-            already exists.
-        dry_run : bool
-            If `True`, the input files are written on disk, but the
-            bigdft-tool command is run instead of the bigdft one.
-        """
-        if self.energies is None:
-            super(Phonons, self).run(
-                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        else:
-            warning_msg = "Calculations already performed; set the argument "\
-                          "'force_run' to True to re-run them."
-            warnings.warn(warning_msg, UserWarning)
-
     def post_proc(self):
         r"""
         Run the post-processing of the calculations, here:
@@ -330,8 +284,8 @@ class Phonons(AbstractWorkflow):
         # Build the masses matrix (the loops over range(3) are here
         # to ensure that masses has the same dimension as the Hessian)
         masses = [[ATOMS_MASS[atom1] * ATOMS_MASS[atom2]
-                   for atom2 in atom_types for j in range(3)]
-                  for atom1 in atom_types for i in range(3)]
+                   for atom2 in atom_types for _ in range(3)]
+                  for atom1 in atom_types for _ in range(3)]
         # Return the masses as a numpy array, converted in electronic
         # mass units
         return np.sqrt(masses) * AMU_TO_EMU
@@ -448,6 +402,8 @@ class RamanSpectrum(AbstractWorkflow):
     leading to :math:`24 n_{at}` calculations in total.
     """
 
+    POST_PROCESSING_ATTRIBUTES = ["intensities", "depolarization_ratios"]
+
     def __init__(self, phonons, ef_amplitudes=None, order=1):
         r"""
         From a phonon calculation, one is able to compute the Raman
@@ -470,9 +426,7 @@ class RamanSpectrum(AbstractWorkflow):
         """
         # Initialize the attributes that are specific to this workflow
         self._phonons = phonons
-        # The phonon intensities and other quantities are not yet computed
-        self._intensities = None
-        self._depolarization_ratios = None
+        # Some other quantities are not yet computed
         self._alphas = None  # mean polarizability derivatives
         self._betas_sq = None  # anisotropies of pol. tensor deriv.
         # Initialize the poltensor workflows to run
@@ -534,7 +488,7 @@ class RamanSpectrum(AbstractWorkflow):
         """
         return self._poltensor_workflows
 
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
+    def _run(self, nmpi, nomp, force_run, dry_run):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related intensities in order to be able to plot the Raman
@@ -553,18 +507,12 @@ class RamanSpectrum(AbstractWorkflow):
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
         """
-        if self.intensities is None:
-            self.phonons.run(
+        self.phonons.run(
+            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+        for pt in self.poltensor_workflows:
+            pt.run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-            for pt in self.poltensor_workflows:
-                pt.run(
-                    nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-            super(RamanSpectrum, self).run(
-                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        else:
-            warning_msg = "Calculations already performed; set the argument "\
-                          "'force_run' to True to re-run them."
-            warnings.warn(warning_msg, UserWarning)
+        super(RamanSpectrum, self)._run(nmpi, nomp, force_run, dry_run)
 
     def post_proc(self):
         r"""

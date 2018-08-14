@@ -4,15 +4,16 @@ of some interesting quantities requiring to launch multiple BigDFT
 calculations by providing an API that focuses on the main parameters of
 such nested calculations.
 
-Here are defined an AbstractWorkflow class (meant to be the base class
-of all the other workflow classes implemented in the workflows module)
-and a Workflow class, which represents the simplest way of implementing
-such a child class (intended to be used when one wants to create a toy
-implementation of a new workflow).
+Here are defined an :class:`AbstractWorkflow` class (meant to be the
+base class of all the other workflow classes implemented in the
+workflows module) and a :class:`Workflow` class, which represents the
+simplest way of implementing such a child class (intended to be used
+when one wants to create a toy implementation of a new workflow).
 """
 
 from __future__ import print_function, unicode_literals
 import sys
+import warnings
 import abc
 
 if sys.version_info >= (3, 4):  # pragma: no cover
@@ -29,6 +30,8 @@ class AbstractWorkflow(ABC):
     the :meth:`run` method is used.
     """
 
+    POST_PROCESSING_ATTRIBUTES = []
+
     def __init__(self, queue):
         r"""
         Parameters
@@ -36,7 +39,15 @@ class AbstractWorkflow(ABC):
         queue : list
             List of all the jobs to run.
         """
+        self._initialize_post_processing_attributes()
         self._queue = queue
+
+    def _initialize_post_processing_attributes(self):
+        r"""
+        Set all the completion attributes to their default value.
+        """
+        for attr in self.POST_PROCESSING_ATTRIBUTES:
+            setattr(self, "_"+attr, None)
 
     @property
     def queue(self):
@@ -61,6 +72,58 @@ class AbstractWorkflow(ABC):
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
         r"""
+        Run all the calculations if the post-processing was not already
+        performed.
+
+        .. Warning::
+
+            If `force_run` or `dry_run` is set to `True`, then any
+            previous value of the post-processing attributes is deleted
+            and set back to their default value, so that the
+            post-processing is not considered as being performed.
+
+
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        nomp : int
+            Number of OpenMP tasks.
+        force_run : bool
+            If `True`, the calculations are run even though a logfile
+            already exists.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
+
+        Warns
+        -----
+        UserWarning
+            If the post-processing was already completed.
+        """
+        if force_run or dry_run:
+            self._initialize_post_processing_attributes()
+        if not self.is_completed:
+            self._run(nmpi, nomp, force_run, dry_run)
+        else:
+            warning_msg = "Calculations already performed; set the argument "\
+                          "'force_run' to True to re-run them."
+            warnings.warn(warning_msg, UserWarning)
+
+    @property
+    def is_completed(self):
+        r"""
+        Returns
+        -------
+        bool
+            `True` if all the post-processing attributes are no longer
+            set to their default value.
+        """
+        return all([getattr(self, attr) is not None
+                    for attr in self.POST_PROCESSING_ATTRIBUTES])
+
+    def _run(self, nmpi, nomp, force_run, dry_run):
+        r"""
         This method runs all the jobs in the queue sequentially before
         running the post_proc method if not in `dry_run` mode.
 
@@ -79,8 +142,8 @@ class AbstractWorkflow(ABC):
         """
         for job in self.queue:
             with job as j:
-                j.run(nmpi=nmpi, nomp=nomp,
-                      force_run=force_run, dry_run=dry_run)
+                j.run(
+                    nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
         if not dry_run:
             self.post_proc()
 
@@ -100,6 +163,8 @@ class Workflow(AbstractWorkflow):
     processing. This means you can add jobs to the queue and run them as
     usual, but you must then code the post-processing yourself.
     """
+
+    POST_PROCESSING_ATTRIBUTES = ["completed"]
 
     def __init__(self, queue=None):
         r"""
@@ -121,8 +186,18 @@ class Workflow(AbstractWorkflow):
             queue = []
         super(Workflow, self).__init__(queue)
 
-    def post_proc(self):  # pragma: no cover
+    @property
+    def completed(self):
         r"""
-        Nothing is done here.
+        Returns
+        -------
+        bool
+            `True` if the post_proc method was run successfully.
         """
-        pass
+        return self._completed
+
+    def post_proc(self):
+        r"""
+        Set the post-processing attribute ``completed`` to `True`
+        """
+        self._completed = True

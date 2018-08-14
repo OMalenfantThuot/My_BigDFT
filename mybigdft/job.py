@@ -1,5 +1,5 @@
 """
-File containing the base class defining a BigDFT calculation.
+The :class:`Job` class is the base class defining a BigDFT calculation.
 """
 
 from __future__ import print_function, absolute_import
@@ -11,16 +11,12 @@ from mybigdft.iofiles.logfiles import GeoptLogfile
 from mybigdft.iofiles.inputparams import clean
 from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH
 
-# Space coordinates
-COORDS = ["x", "y", "z"]
-# Dictionary to convert the string of the signs to floats
-SIGNS = {"+": 1., "-": -1.}
-
 
 class Job(object):
     r"""
     This class is meant to define a BigDFT calculation. :meth:`run` is
-    its main method and it must be used in a context manager.
+    its main method and it must be used in a context manager to ensure
+    that the calculation is run the desired directory.
     """
 
     def __init__(self, name="", inputparams=None, posinp=None, run_dir=None,
@@ -134,6 +130,7 @@ class Job(object):
                 "inputparams and posinp do not define the same posinp.")
 
         # Set the base attributes
+        inputparams._params = clean(inputparams.params)
         self._inputparams = inputparams
         self._posinp = posinp
         self._logfile = None
@@ -356,7 +353,9 @@ class Job(object):
         Set the base commands to run bigdft or bigdft-tool.
         """
         # The base bigdft-tool command is always the same
-        self._bigdft_tool_cmd = [BIGDFT_TOOL_PATH, "--name", self.name]
+        self._bigdft_tool_cmd = [BIGDFT_TOOL_PATH]
+        if self.name:
+            self._bigdft_tool_cmd += ["--name", self.name]
         # The base bigdft command depends on name and on skip
         skip_option = []
         if self.skip:
@@ -443,6 +442,7 @@ class Job(object):
             if dry_run:
                 self._write_bigdft_tool_output(output_msg)
             else:
+                output_msg = output_msg.decode('unicode_escape')
                 print(output_msg)
             self._logfile = Logfile.from_file(self.logfile_name)
         else:
@@ -625,8 +625,7 @@ class Job(object):
             raise RuntimeError(
                 "The calculation ended with the following error message:{}"
                 .format(error_msg))
-        output_msg = out.decode('unicode_escape')
-        return output_msg
+        return out
 
     def _write_bigdft_tool_output(self, output_msg):
         r"""

@@ -10,5 +10,8 @@ that are used to automate some calculations.
     :maxdepth: 1
 
     workflow
+    convergences
     poltensor
     phonon_raman
+    geopt
+    dissociation

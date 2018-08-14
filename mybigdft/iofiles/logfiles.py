@@ -18,7 +18,8 @@ method of the ``Logfile`` class, returning a
 from __future__ import print_function
 import warnings
 from collections import Sequence, Mapping
-import oyaml as yaml
+from copy import deepcopy
+import yaml
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -33,68 +34,124 @@ __all__ = ["Logfile", "MultipleLogfile", "GeoptLogfile"]
 
 
 PATHS = "paths"
-PRINT = "print"
-GLOBAL = "global"
-FLOAT_SCALAR = "scalar"
+DOC = "doc"
+LAST_GROUND_STATE_OPTIMIZATION = ["Ground State Optimization", -1]
+LAST_SUBSPACE_OPTIMIZATION = LAST_GROUND_STATE_OPTIMIZATION + [
+    "Hamiltonian Optimization", -1, "Subspace Optimization"
+]
+
+
+def _get_value_from_last_optimizations(key):
+    r"""
+    """
+    l_1 = deepcopy(LAST_GROUND_STATE_OPTIMIZATION)
+    l_1.append(key)
+    l_2 = deepcopy(LAST_SUBSPACE_OPTIMIZATION)
+    l_2.append(key)
+    return [l_1, l_2]
+
+
 ATTRIBUTES = {
-    "n_at": {PATHS: [["Atomic System Properties", "Number of atoms"]],
-             PRINT: "Number of Atoms", GLOBAL: True},
-    "boundary_conditions": {PATHS: [["Atomic System Properties",
-                                     "Boundary Conditions"]],
-                            PRINT: "Boundary Conditions", GLOBAL: True},
-    "cell": {PATHS: [["Atomic System Properties", "Box Sizes (AU)"]],
-             PRINT: "Cell size", GLOBAL: True},
-    "energy": {PATHS: [["Last Iteration", "FKS"], ["Last Iteration", "EKS"],
-                       ["Energy (Hartree)"]],
-               PRINT: "Energy", GLOBAL: False},
-    "fermi_level": {PATHS: [["Ground State Optimization", -1,
-                             "Fermi Energy"],
-                            ["Ground State Optimization", -1,
-                             "Hamiltonian Optimization", -1,
-                             "Subspace Optimization", "Fermi Energy"]],
-                    PRINT: True, GLOBAL: False},
-    "astruct": {PATHS: [["Atomic structure"]]},
-    "evals": {PATHS: [["Complete list of energy eigenvalues"],
-                      ["Ground State Optimization", -1, "Orbitals"],
-                      ["Ground State Optimization", -1,
-                       "Hamiltonian Optimization", -1,
-                       "Subspace Optimization", "Orbitals"]]},
-    "kpts": {PATHS: [["K points"]], PRINT: False, GLOBAL: True},
-    "gnrm_cv": {PATHS: [["dft", "gnrm_cv"]],
-                PRINT: "Convergence criterion on Wfn. Residue",
-                GLOBAL: True},
-    "kpt_mesh": {PATHS: [["kpt", "ngkpt"]], PRINT: True, GLOBAL: True},
-    "forcemax": {PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "maxval"],
-                         ["Clean forces norm (Ha/Bohr)", "maxval"]],
-                 PRINT: "Max val of Forces"},
-    "pressure": {PATHS: [["Pressure", "GPa"]], PRINT: True},
-    "dipole": {PATHS: [["Electric Dipole Moment (AU)", "P vector"]]},
-    "forces": {PATHS: [["Atomic Forces (Ha/Bohr)"]]},
-    "forcemax_cv": {PATHS: [["geopt", "forcemax"]],
-                    PRINT: "Convergence criterion on forces",
-                    GLOBAL: True, FLOAT_SCALAR: True},
-    "force_fluct": {PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "fluct"]],
-                    PRINT: "Threshold fluctuation of Forces"},
-    "magnetization": {PATHS: [["Ground State Optimization", -1,
-                               "Total magnetization"],
-                              ["Ground State Optimization", -1,
-                               "Hamiltonian Optimization", -1,
-                               "Subspace Optimization",
-                               "Total magnetization"]],
-                      PRINT: "Total magnetization of the system"},
-    "support_functions": {PATHS: [["Gross support functions moments",
-                                   "Multipole coefficients", "values"]]},
-    "electrostatic_multipoles": {PATHS: [["Multipole coefficients",
-                                          "values"]]},
-    "sdos": {PATHS: [["SDos files"]], GLOBAL: True},
-    "symmetry": {PATHS: [["Atomic System Properties", "Space group"]],
-                 PRINT: "Symmetry group", GLOBAL: True},
-    "atom_types": {PATHS: [["Atomic System Properties", "Types of atoms"]],
-                   PRINT: "List of the atomic types present in the posinp"},
-    "walltime": {PATHS: [["Walltime since initialization"]],
-                 PRINT: "Walltime since initialization"},
-    "WARNINGS": {PATHS: [["WARNINGS"]],
-                 PRINT: "Warnings raised during the BigDFT run"},
+    "n_at": {
+        PATHS: [["Atomic System Properties", "Number of atoms"]],
+        DOC: "Number of Atoms"
+    },
+    "boundary_conditions": {
+        PATHS: [["Atomic System Properties", "Boundary Conditions"]],
+        DOC: "Boundary Conditions"
+    },
+    "cell": {
+        PATHS: [["Atomic System Properties", "Box Sizes (AU)"]],
+        DOC: "Cell size"
+    },
+    "symmetry": {
+        PATHS: [["Atomic System Properties", "Space group"]],
+        DOC: "Symmetry group"
+    },
+    "atom_types": {
+        PATHS: [["Atomic System Properties", "Types of atoms"]],
+        DOC: "List of the atomic types present in the posinp"
+    },
+    "energy": {
+        PATHS: [["Last Iteration", "FKS"], ["Last Iteration", "EKS"],
+                ["Energy (Hartree)"]],
+        DOC: "Energy (Hartree)"
+    },
+    "astruct": {
+        PATHS: [["Atomic structure"]],
+        DOC: "Atomic structure"
+    },
+    "evals": {
+        PATHS: [["Complete list of energy eigenvalues"]] +
+               _get_value_from_last_optimizations("Orbitals"),  # noqa
+        DOC: "Orbital energies and occupations"
+    },
+    "fermi_level": {
+        PATHS: _get_value_from_last_optimizations("Fermi Energy"),
+        DOC: "Fermi level"
+    },
+    "magnetization": {
+        PATHS: _get_value_from_last_optimizations("Total magnetization"),
+        DOC: "Total magnetization of the system"
+    },
+    "kpt_mesh": {
+        PATHS: [["kpt", "ngkpt"]],
+        DOC: "No. of Monkhorst-Pack grid points"
+    },
+    "kpts": {
+        PATHS: [["K points"]],
+        DOC: "Grid of k-points"
+    },
+    "gnrm_cv": {
+        PATHS: [["dft", "gnrm_cv"]],
+        DOC: "Convergence criterion on wavefunction residue"
+    },
+    "forcemax_cv": {
+        PATHS: [["geopt", "forcemax"]],
+        DOC: "Convergence criterion on forces",
+    },
+    "forcemax": {
+        PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "maxval"],
+                ["Clean forces norm (Ha/Bohr)", "maxval"]],
+        DOC: "Maximum value of forces"
+    },
+    "pressure": {
+        PATHS: [["Pressure", "GPa"]],
+        DOC: "Pressure (GPa)"
+    },
+    "dipole": {
+        PATHS: [["Electric Dipole Moment (AU)", "P vector"]],
+        DOC: "Electric Dipole Moment (AU)"
+    },
+    "forces": {
+        PATHS: [["Atomic Forces (Ha/Bohr)"]],
+        DOC: "Atomic Forces (Ha/Bohr)"
+    },
+    "force_fluct": {
+        PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "fluct"]],
+        DOC: "Threshold fluctuation of Forces"
+    },
+    "support_functions": {
+        PATHS: [["Gross support functions moments", "Multipole coefficients",
+                 "values"]],
+        DOC: "Support functions"
+    },
+    "electrostatic_multipoles": {
+        PATHS: [["Multipole coefficients", "values"]],
+        DOC: "Electrostatic multipoles"
+    },
+    "sdos": {
+        PATHS: [["SDos files"]],
+        DOC: "SDos files"
+    },
+    "walltime": {
+        PATHS: [["Walltime since initialization"]],
+        DOC: "Walltime since initialization"
+    },
+    "WARNINGS": {
+        PATHS: [["WARNINGS"]],
+        DOC: "Warnings raised during the BigDFT run"
+    },
 }
 
 
@@ -154,10 +211,20 @@ class Logfile(Mapping):
                             # possible path.
                             value = None
                             continue
-                # No need to look for other paths if a value is found
                 if value is not None:
+                    # A value was found: no need to look for other paths
                     break
+            # Set the value to the underscored attribute
             setattr(self, "_"+name, value)
+            # Set the attribute as a property
+            setattr(self.__class__, name,
+                    property(self._init_getter(name),
+                             doc=description.get(DOC, "")))
+
+    def _init_getter(self, name):
+        def getter(self):
+            return getattr(self, "_"+name)
+        return getter
 
     def _clean_attributes(self):
         r"""
@@ -285,50 +352,6 @@ class Logfile(Mapping):
         """
         return self._log
 
-    def __getattr__(self, name):
-        r"""
-        Make the base attributes look for their private counterpart
-        (whose name has an initial underscore) that actually stores the
-        value of the attribute.
-
-        All other attributes behave as they should by default.
-
-        Parameters
-        ----------
-        name : str
-            Name of the attribute.
-
-        Returns
-        -------
-            Value of the required attribute.
-        """
-        if name in ATTRIBUTES:
-            return getattr(self, "_"+name)
-        else:
-            return super(Logfile, self).__getattr__(name)
-
-    def __setattr__(self, name, value):
-        r"""
-        Make the base attributes behave like properties while keeping
-        the default behaviour for the other ones.
-
-        Parameters
-        ----------
-        name : str
-            Name of the attribute.
-        value
-            Value of the attribute.
-
-        Raises
-        ------
-        AttributeError
-            If one tries to update one of the base attribute.
-        """
-        if name in ATTRIBUTES:
-            raise AttributeError("can't set attribute")
-        else:
-            super(Logfile, self).__setattr__(name, value)
-
     def __dir__(self):
         r"""
         The base attributes are not found when doing `dir()` on a
@@ -348,11 +371,15 @@ class Logfile(Mapping):
             # Add the missing stuff
             base_dir += ["write", "log", "from_file", "from_stream",
                          "posinp", "values", "keys", "get", "items",
-                         "_check_psppar", "_check_warnings",
-                         "_clean_attributes", "_set_builtin_attributes"]
+                         "inputparams", "_check_psppar", "_check_warnings",
+                         "_clean_attributes", "_set_builtin_attributes",
+                         "_init_getter"]
+            base_dir += hidden_attributes
+        # Always remove the underscored attributes (so that there are less
+        # elements in the returned list)
         for name in hidden_attributes:
             base_dir.remove("_"+name)
-        return base_dir + hidden_attributes
+        return base_dir
 
     def __getitem__(self, key):
         return self.log[key]

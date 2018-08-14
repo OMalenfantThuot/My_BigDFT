@@ -7,6 +7,7 @@ from __future__ import print_function
 from copy import deepcopy
 from collections import Sequence
 import numpy as np
+from mybigdft.globals import ATOMS_MASS
 
 
 __all__ = ["Posinp", "Atom"]
@@ -67,11 +68,13 @@ class Posinp(Sequence):
         if cell is not None:
             cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
                     for size in cell]
-        # Set the attributes
+        # Set the base attributes
         self._atoms = atoms
         self._units = units
         self._boundary_conditions = boundary_conditions
         self._cell = cell
+        # Set extra attributes
+        self._positions = np.array([atom.position for atom in self.atoms])
 
     @staticmethod
     def _check_initial_values(units, boundary_conditions, cell):
@@ -269,6 +272,16 @@ class Posinp(Sequence):
         return cls(atoms, units, boundary_conditions, cell=cell)
 
     @property
+    def atoms(self):
+        r"""
+        Returns
+        -------
+        list
+            Atoms of the system (atomic type and positions).
+        """
+        return self._atoms
+
+    @property
     def units(self):
         r"""
         Returns
@@ -297,16 +310,6 @@ class Posinp(Sequence):
             Cell size.
         """
         return self._cell
-
-    @property
-    def atoms(self):
-        r"""
-        Returns
-        -------
-        list
-            Atoms of the system (atomic type and positions).
-        """
-        return self._atoms
 
     def __getitem__(self, index):
         r"""
@@ -397,7 +400,7 @@ class Posinp(Sequence):
         -------
             The string representation of a Posinp instance.
         """
-        return ("Posinp({0.atoms}, {0.units}, {0.boundary_conditions}, "
+        return ("Posinp({0.atoms}, '{0.units}', '{0.boundary_conditions}', "
                 "cell={0.cell})".format(self))
 
     def write(self, filename):
@@ -414,7 +417,7 @@ class Posinp(Sequence):
 
     def translate_atom(self, i_at, vector):
         r"""
-        Translate the `i_at` atom in the three space coordinates
+        Translate the `i_at` atom along the three space coordinates
         according to the value of `vector`.
 
         Parameters
@@ -427,8 +430,7 @@ class Posinp(Sequence):
         Returns
         -------
         Posinp
-            A new posinp where the `i_at` atom was translated by
-            `vector`.
+            New posinp where the `i_at` atom was translated by `vector`.
 
 
         .. Warning::
@@ -450,6 +452,60 @@ class Posinp(Sequence):
         new_posinp = deepcopy(self)
         new_posinp.atoms[i_at] = self[i_at].translate(vector)
         return new_posinp
+
+    def translate(self, vector):
+        r"""
+        Translate all the atoms along the three space coordinates
+        according to the value of `vector`.
+
+        Parameters
+        ----------
+        vector : list or numpy.array of length 3
+            Translation vector to apply.
+
+        Returns
+        -------
+        Posinp
+            New posinp where all the atoms were translated by `vector`.
+
+
+        .. Warning::
+
+            You have to make sure that the units of the vector match
+            those used by the posinp.
+        """
+        new_positions = self._positions + np.array(vector)
+        atoms = [Atom(atom.type, pos.tolist())
+                 for atom, pos in zip(self.atoms, new_positions)]
+        return Posinp(atoms, units=self.units, cell=self.cell,
+                      boundary_conditions=self.boundary_conditions)
+
+    def to_centroid(self):
+        r"""
+        Center the system to its centroid (*i.e.*, geometric center).
+
+        Returns
+        -------
+        Posinp
+            New posinp where all the atoms are centered on the geometric
+            center of the system.
+        """
+        centroid = np.average(self._positions, axis=0)
+        return self.translate(-centroid)
+
+    def to_barycenter(self):
+        r"""
+        Center the system to its barycenter (*i.e.*, center of mass).
+
+        Returns
+        -------
+        Posinp
+            New posinp where all the atoms are centered on the center
+            of mass of the system.
+        """
+        masses = np.array([ATOMS_MASS[atom.type] for atom in self.atoms])
+        barycenter = np.sum(self._positions.T*masses, axis=1) / np.sum(masses)
+        return self.translate(-barycenter)
 
 
 class Atom(object):
