@@ -252,8 +252,7 @@ class Logfile(Mapping):
         """
         if self.WARNINGS is not None:
             for warning in self.WARNINGS:
-                if isinstance(warning, dict):  # pragma: no cover
-                    assert len(warning) == 1
+                if isinstance(warning, dict):
                     key, value = list(warning.items())[0]
                     warning = "{}: {}".format(key, value)
                 elif not isinstance(warning, str):  # pragma: no cover
@@ -338,7 +337,7 @@ class Logfile(Mapping):
                 # If the logfile corresponds to a geopt calculation,
                 # return a GeoptLogfile instance
                 return GeoptLogfile(logs)
-            else:  # pragma: no cover
+            else:
                 # In other cases, just return a MultipleLogfile instance
                 return MultipleLogfile(logs)
 
@@ -390,7 +389,7 @@ class Logfile(Mapping):
     def __len__(self):
         return len(self.log)
 
-    def __repr__(self):
+    def __repr__(self):  # pragma: no cover
         return repr(self.log)
 
     def write(self, filename):

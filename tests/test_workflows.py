@@ -56,6 +56,10 @@ class TestPolTensor:
         with pytest.raises(ValueError):
             eval(to_evaluate)
 
+    def test_init_raises_NotImplementedError(self):
+        with pytest.raises(NotImplementedError):
+            PolTensor(self.gs, order=-1)
+
     def test_run(self):
         # Run a pol. tensor calculation
         gs2 = Job(posinp=pos, name='N2', run_dir='tests/pol_tensor_N2')
@@ -107,6 +111,10 @@ class TestPhonons:
     def test_init_raises_ValueError(self, to_evaluate):
         with pytest.raises(ValueError):
             eval(to_evaluate)
+
+    def test_init_raises_NotImplementedError(self):
+        with pytest.raises(NotImplementedError):
+            Phonons(self.gs, order=-1)
 
     def test_run_first_order(self):
         N2_ref = """\
@@ -192,6 +200,22 @@ class TestGeopt:
         # Test that running the workflow again warns a UserWarning
         with pytest.warns(UserWarning):
             gwf.run()
+
+    def test_dry_run(self, dry_gwf):
+        assert not dry_gwf.is_completed
+        dry_gwf.run(nomp=3, nmpi=6, dry_run=True)
+        assert not dry_gwf.is_completed
+
+    @pytest.fixture
+    def dry_gwf(self):
+        new_pos = Posinp([Atom('N', [0, 0, 0]), Atom('N', [0, 0, 1.1])],
+                         units="angstroem", boundary_conditions="free")
+        base_job = Job(posinp=new_pos, name="N2", run_dir="tests/geopt_N2/dry")
+        gwf = Geopt(base_job, maxrise=0.5)
+        yield gwf
+        with gwf.queue[0] as job:
+            job.clean()
+        os.rmdir(job.run_dir)
 
 
 class TestDissociation:
