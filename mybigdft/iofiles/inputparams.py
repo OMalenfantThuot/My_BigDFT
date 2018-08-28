@@ -225,6 +225,11 @@ def clean(params):
 #        if not isinstance(hgrids, list):
 #            params["dft"]["hgrids"] = [hgrids]*3
     real_params = deepcopy(params)
+    # Set real_params['output']['orbitals'] to 'None' when it is False
+    if 'output' in real_params and real_params['output'] is not None and \
+            'orbitals' in real_params['output'] and \
+            not real_params['output']['orbitals']:
+        real_params['output']['orbitals'] = 'None'
     # Check the validity of the given input parameters
     check(real_params)
     # Return the cleaned input parameters
