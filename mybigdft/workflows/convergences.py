@@ -169,7 +169,7 @@ class HgridsConvergence(AbstractWorkflow):
             converged.
         """
         min_index = np.argmin([job.logfile.energy for job in self.queue])
-        if min_index != 0:  # pragma: no cover
+        if min_index != 0:
             raise ValueError("The job with minimal energy does not correspond "
                              "to the job with minimal hgrid")
         # Check which job can be considered as converged, given the
@@ -347,7 +347,7 @@ class RmultConvergence(AbstractWorkflow):
         """
         n_jobs = len(self.queue)
         min_index = np.argmin([job.logfile.energy for job in self.queue])
-        if min_index != n_jobs-1:  # pragma: no cover
+        if min_index != n_jobs-1:
             warnings.warn("The job with minimal energy does not correspond "
                           "to the job with maximal rmult", UserWarning)
         # Check which job can be considered as converged, given the

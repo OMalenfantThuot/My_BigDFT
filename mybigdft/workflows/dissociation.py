@@ -72,7 +72,8 @@ class Dissociation(AbstractWorkflow):
         # Make sure both fragments use the same units (could actually be
         # implemented properly in the __add__ method of posinp)
         if fragment1.units != fragment2.units:
-            raise NotImplementedError("Unit conversion of positions needed")
+            raise NotImplementedError(
+                "Unit conversion of positions needed")  # pragma: no cover
         # Set the base attributes that are specific to this workflow
         self.fragment1 = fragment1
         self.fragment2 = fragment2

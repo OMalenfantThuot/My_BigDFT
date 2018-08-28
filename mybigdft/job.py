@@ -659,8 +659,8 @@ class Job(object):
         """
         # Delete the input and output files
         filenames = [self.logfile_name, self.input_name, self.posinp_name,
-                     "forces_"+self.posinp_name, "forces.xyz",
-                     "input_minimal.yaml", "time.yaml"]
+                     "forces_"+self.posinp_name, "forces.xyz", "time.yaml",
+                     "input_minimal.yaml", self.name+"_minimal.yaml"]
         for filename in filenames:
             try:
                 os.remove(filename)

@@ -309,6 +309,13 @@ C    7.327412521    0.000000000   3.461304757"""
     def test_from_string(self):
         assert self.str_pos == self.free_pos
 
+    def test_repr(self):
+        atoms = [Atom('C', [0, 0, 0]), Atom('N', [0, 0, 1])]
+        new_pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        msg = "Posinp([Atom('C', [0.0, 0.0, 0.0]), Atom('N', [0.0, 0.0, "\
+              "1.0])], 'angstroem', 'free', cell=None)"
+        assert repr(new_pos) == msg
+
     def test_write(self):
         fname = os.path.join(tests_fol, "test.xyz")
         self.pos.write(fname)

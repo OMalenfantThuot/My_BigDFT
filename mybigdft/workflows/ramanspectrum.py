@@ -90,7 +90,7 @@ class Phonons(AbstractWorkflow):
         translation_amplitudes = [amp if amp is not None else 0.0
                                   for amp in translation_amplitudes]
         if 0.0 in translation_amplitudes:
-            raise NotImplementedError()
+            raise NotImplementedError()  # pragma: no cover
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._translation_amplitudes = translation_amplitudes
