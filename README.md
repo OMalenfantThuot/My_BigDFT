@@ -27,9 +27,9 @@ needed by MyBigDFT before installing it.
 
 ### Extra steps you might need to follow
 
-* Make sure that the BIGDFT\_ROOT environment variables does lead to multiple
-directories. If so, choose only one of them (where BUILDDIR is the path to the
-actual BigDFT build directory you want to use):
+* Make sure that the BIGDFT\_ROOT environment variables does not lead to
+multiple directories. If so, choose only one of them (where BUILDDIR is the path
+to the actual BigDFT build directory you want to use):
 - export BIGDFT\_ROOT='BUILDDIR/install/bin'
 
 * If your default python version is python3, modify the first line of 
