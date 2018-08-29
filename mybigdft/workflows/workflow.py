@@ -68,7 +68,7 @@ class AbstractWorkflow(ABC):
             A dictionary of all the logfiles of the workflow, with the
             name of the associated job as key.
         """
-        return {job.name: job.logfiles for job in self.queue}
+        return {job.name: job.logfile for job in self.queue}
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
         r"""

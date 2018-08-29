@@ -27,6 +27,12 @@ try:
         source = yaml.load_all(f)
         INPUT_VARIABLES = next(source)
         PROFILES = next(source)
+    # Add the CheSS input parameters
+    input_variables_file = os.path.join(
+        BIGDFT_SOURCES,
+        "../chess/src/chess_input_variables_definition.yaml")
+    with open(input_variables_file, "r") as f:
+        INPUT_VARIABLES["chess"] = yaml.load(f)
     # Path to the BigDFT and BigDFT-tool executables
     BIGDFT_ROOT = os.environ["BIGDFT_ROOT"]
     BIGDFT_PATH = os.path.join(BIGDFT_ROOT, "bigdft")

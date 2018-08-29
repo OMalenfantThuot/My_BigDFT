@@ -415,6 +415,31 @@ class Posinp(Sequence):
         with open(filename, "w") as stream:
             stream.write(str(self))
 
+    def distance(self, i_at_1, i_at_2):
+        r"""
+        Evaluate the distance between two atoms.
+
+        Parameters
+        ----------
+        i_at_1: int
+            Index of the first atom.
+        i_at_2: int
+            Index of the second atom.
+
+        Returns
+        -------
+        float
+            Distance between both atoms.
+
+
+        >>> atoms = [Atom('N', [0, 0, 0]), Atom('N', [3, 4, 0])]
+        >>> pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        >>> assert pos.distance(0, 1) == 5.0
+        """
+        pos_1 = self[i_at_1].position
+        pos_2 = self[i_at_2].position
+        return np.sqrt(sum([(pos_1[i]-pos_2[i])**2 for i in range(3)]))
+
     def translate_atom(self, i_at, vector):
         r"""
         Translate the `i_at` atom along the three space coordinates
