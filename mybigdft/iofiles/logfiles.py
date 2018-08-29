@@ -335,13 +335,13 @@ class Logfile(Mapping):
             # If only one document, return a Logfile instance
             return logs[0]
         else:
-            warnings.warn(
-                "More than one document found in the logfile!", UserWarning)
             if logs[0].inputparams["geopt"] is not None:
                 # If the logfile corresponds to a geopt calculation,
                 # return a GeoptLogfile instance
                 return GeoptLogfile(logs)
             else:
+                warnings.warn("More than one document found in the logfile!",
+                              UserWarning)
                 # In other cases, just return a MultipleLogfile instance
                 return MultipleLogfile(logs)
 
