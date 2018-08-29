@@ -22,7 +22,6 @@ tests/*_N2/
 doc/build/
 doc/source/notebooks/Untitled*.ipynb
 doc/source/notebooks/test.yaml
-doc/source/notebooks/geopt
 doc/source/notebooks/N2
 doc/source/notebooks/HCN
 doc/source/notebooks/HCCH
