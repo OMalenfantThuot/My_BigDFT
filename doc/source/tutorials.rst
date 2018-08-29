@@ -12,6 +12,8 @@ MyBigDFT tutorials
     :maxdepth: 1
     :caption: Workflows:
 
-    notebooks/convergences
+    notebooks/Convergences
     notebooks/PolTensor
     notebooks/Phonons_and_RamanSpectrum
+    notebooks/Dissociation_curve
+    notebooks/Geopt

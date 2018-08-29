@@ -205,12 +205,15 @@ class InputParams(MutableMapping):
             yaml.dump(self.params, stream=stream, Dumper=Dumper)
 
 
-def clean(params):
+def clean(params, keyword=None):
     """
     Parameters
     ----------
     params : dict
         Trial BigDFT input parameters.
+    keyword: NoneType or str
+        Main key of input variables key to be checked (used to check
+        CheSS input variables).
 
     Returns
     -------
@@ -224,14 +227,20 @@ def clean(params):
 #        hgrids = deepcopy(params["dft"]["hgrids"])
 #        if not isinstance(hgrids, list):
 #            params["dft"]["hgrids"] = [hgrids]*3
+    # Use a copy of params to update the input parameters while looping
+    # on params. This copy will be returned.
     real_params = deepcopy(params)
+    # Use the correct reference for the input variables
+    variables = INPUT_VARIABLES
+    if keyword is not None:
+        variables = variables[keyword]
     # Set real_params['output']['orbitals'] to 'None' when it is False
     if 'output' in real_params and real_params['output'] is not None and \
             'orbitals' in real_params['output'] and \
             not real_params['output']['orbitals']:
         real_params['output']['orbitals'] = 'None'
     # Check the validity of the given input parameters
-    check(real_params)
+    check(real_params, keyword=keyword)
     # Return the cleaned input parameters
     for key, value in params.items():
         # The key might be empty (e.g.: logfile with many documents)
@@ -240,12 +249,19 @@ def clean(params):
             continue
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
-            default_value = INPUT_VARIABLES[key][child_key].get("default")
+            default_value = variables[key][child_key].get("default")
             if child_value == default_value:
                 del real_params[key][child_key]
         # Delete the key if it is empty
         if real_params[key] == {}:
             del real_params[key]
+    # Clean the chess input variables as well
+    if 'chess' in real_params:
+        chess_params = clean(real_params['chess'], keyword='chess')
+        if chess_params != {}:
+            real_params['chess'] = chess_params
+        else:
+            del real_params['chess']
     # Remove the cumbersome geopt key if ncount_cluster_x is the only
     # key (it happens when the input parameters are read from a Logfile)
     dummy_value = {'ncount_cluster_x': 1}
@@ -254,7 +270,7 @@ def clean(params):
     return real_params
 
 
-def check(params):
+def check(params, keyword=None):
     """
     Check that the keys of `params` correspond to BigDFT parameters.
 
@@ -272,14 +288,17 @@ def check(params):
         possible values, the value of the master key does not allow for
         the key to be defined)
     """
+    variables = INPUT_VARIABLES
+    if keyword is not None:
+        variables = variables[keyword]
     for key, value in params.items():
         # Check the key
-        if key not in INPUT_VARIABLES:
+        if key not in variables:
             raise KeyError("Unknown key '{}'".format(key))
         if value is not None:
             for subkey, subvalue in value.items():
                 # Check the subkey
-                key_definition = INPUT_VARIABLES[key]
+                key_definition = variables[key]
                 if subkey not in key_definition:
                     raise KeyError(
                         "Unknown key '{}' in '{}'".format(subkey, key))

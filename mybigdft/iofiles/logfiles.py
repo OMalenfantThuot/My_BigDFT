@@ -253,6 +253,10 @@ class Logfile(Mapping):
         if self.WARNINGS is not None:
             for warning in self.WARNINGS:
                 if isinstance(warning, dict):
+                    # It might happen that a ":" symbol is in the
+                    # description of a warning, hence it is decoded as a
+                    # dictionary; make sure to treat it as a string
+                    # instead
                     key, value = list(warning.items())[0]
                     warning = "{}: {}".format(key, value)
                 elif not isinstance(warning, str):  # pragma: no cover
@@ -331,13 +335,13 @@ class Logfile(Mapping):
             # If only one document, return a Logfile instance
             return logs[0]
         else:
-            warnings.warn(
-                "More than one document found in the logfile!", UserWarning)
             if logs[0].inputparams["geopt"] is not None:
                 # If the logfile corresponds to a geopt calculation,
                 # return a GeoptLogfile instance
                 return GeoptLogfile(logs)
             else:
+                warnings.warn("More than one document found in the logfile!",
+                              UserWarning)
                 # In other cases, just return a MultipleLogfile instance
                 return MultipleLogfile(logs)
 
