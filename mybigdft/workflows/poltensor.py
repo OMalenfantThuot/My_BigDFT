@@ -35,7 +35,7 @@ class PolTensor(AbstractWorkflow):
     where :math:`i, j \in \{x, y, z\}`, :math:`\Delta D_i` is the
     variation of the dipole along the :math:`i` direction and
     :math:`\Delta E_j` is the variation of the electric field amplitude
-    along the :math:`j` direction
+    along the :math:`j` direction.
     """
 
     POST_PROCESSING_ATTRIBUTES = ["pol_tensor", "mean_polarizability"]

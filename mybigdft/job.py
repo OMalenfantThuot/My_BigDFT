@@ -493,7 +493,7 @@ class Job(object):
         if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
             if 'dft' in base_inp and 'disablesym' not in base_inp['dft']:
                 del log_inp['dft']['disablesym']
-                log_inp._params = clean(log_inp.params)
+                self.logfile.inputparams._params = clean(log_inp.params)
         if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "

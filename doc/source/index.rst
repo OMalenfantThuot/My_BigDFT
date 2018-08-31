@@ -14,6 +14,7 @@ Welcome to MyBigDFT's documentation!
 
    code_doc
    tutorials
+   exercises
 
 
 Indices and tables
