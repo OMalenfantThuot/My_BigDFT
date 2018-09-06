@@ -208,7 +208,7 @@ class PolTensor(AbstractWorkflow):
                 delta_ef = job.efield.amplitude
                 d1 = np.array(job.logfile.dipole)
                 # Update the polarizability tensor
-                pol_tensor[i] = (d1 - d0) / delta_ef
+                pol_tensor[:, i] = (d1 - d0) / delta_ef
         elif self.order == 2:
             # Compute the second order tensor elements
             # for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))
@@ -222,7 +222,7 @@ class PolTensor(AbstractWorkflow):
                 d1 = np.array(job1.logfile.dipole)
                 d2 = np.array(job2.logfile.dipole)
                 # Update the polarizability tensor
-                pol_tensor[i] = (d1 - d2) / delta_ef
+                pol_tensor[:, i] = (d1 - d2) / delta_ef
         # Set some attributes
         self._pol_tensor = pol_tensor  # atomic units
         self._mean_polarizability = pol_tensor.trace()/3  # atomic units
