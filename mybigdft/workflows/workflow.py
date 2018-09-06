@@ -159,9 +159,24 @@ class AbstractWorkflow(ABC):
 
 class Workflow(AbstractWorkflow):
     r"""
-    This is a usable workflow that one can play with, but without post-
-    processing. This means you can add jobs to the queue and run them as
-    usual, but you must then code the post-processing yourself.
+    This is a usable workflow that one can play with, but without
+    post-processing. This means you can add jobs to the queue and run
+    them as usual, but you must then code the post-processing yourself,
+    in a separate function taking the workflow as parameter.
+
+    This latter scheme can even be part of the development cycle of a
+    new workflow that could be later added to the MyBigDFT project: you
+    first define roughly the jobs to be added to the queue for your
+    workflow, and then develop a post-processing function taking your
+    workflow as argument. When you are happy with the result, it is
+    then easy to re-use most of the code to create a workflow class
+    deriving from the :class:`AbstractWorkflow` class.
+
+    To do that, you only have to make sure that you override the
+    `__init__` method to create the queue of jobs, then define which are
+    the post-processing arguments and create properties to access them,
+    and finally override the `post_proc` method to make sure these
+    attributes are properly initialized.
     """
 
     POST_PROCESSING_ATTRIBUTES = ["completed"]
