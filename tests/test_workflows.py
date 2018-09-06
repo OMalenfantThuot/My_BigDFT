@@ -69,9 +69,9 @@ class TestPolTensor:
         assert pt2.is_completed
         # Test the computed polarizability tensor
         expected = [
-            [1.05558000e+01, -2.00000000e-04, -2.00000000e-04],
-            [-2.00000000e-04, 1.05558000e+01, -2.00000000e-04],
-            [0.00000000e+00, 0.00000000e+00, 1.50535000e+01]
+            [1.05558000e+01, -2.00000000e-04, 0.00000000e+00],
+            [-2.00000000e-04, 1.05558000e+01, 0.00000000e+00],
+            [-2.00000000e-04, -2.00000000e-04, 1.50535000e+01]
         ]
         np.testing.assert_almost_equal(pt2.pol_tensor, expected)
         np.testing.assert_almost_equal(pt2.mean_polarizability, 12.05503333333)
@@ -88,9 +88,9 @@ class TestPolTensor:
         assert pt2.is_completed
         # Test the computed polarizability tensor
         expected = [
-            [1.055590e+01, -3.000000e-04, -3.500000e-04],
-            [-3.000000e-04, 1.055590e+01, -3.500000e-04],
-            [0.000000e+00, 0.000000e+00, 1.505375e+01]
+            [1.055590e+01, -3.000000e-04, 0.000000e+00],
+            [-3.000000e-04, 1.055590e+01, 0.000000e+00],
+            [-3.500000e-04, -3.500000e-04, 1.505375e+01]
         ]
         np.testing.assert_almost_equal(pt2.pol_tensor, expected)
         np.testing.assert_almost_equal(pt2.mean_polarizability, 12.05518333333)
