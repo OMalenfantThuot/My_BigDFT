@@ -311,6 +311,16 @@ class Posinp(Sequence):
         """
         return self._cell
 
+    @property
+    def positions(self):
+        r"""
+        Returns
+        -------
+        2D numpy array of shape (math:`n_{at}`, 3)
+            Position of all the atoms in the system.
+        """
+        return np.array([atom.position for atom in self])
+
     def __getitem__(self, index):
         r"""
         The items of a Posinp instance actually are the atoms (so as to
@@ -588,7 +598,7 @@ class Atom(object):
         Returns
         -------
         list or numpy.array of length 3
-            Position of the atom.
+            Position of the atom in cartesian coordinates.
         """
         return self._position
 

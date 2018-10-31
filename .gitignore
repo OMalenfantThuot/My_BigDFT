@@ -23,10 +23,16 @@ doc/build/
 doc/source/notebooks/Untitled*.ipynb
 doc/source/notebooks/test.yaml
 doc/source/notebooks/N2
+doc/source/notebooks/H2O
 doc/source/notebooks/HCN
+doc/source/notebooks/H3CNC
+doc/source/notebooks/H3CCN
 doc/source/notebooks/HCCH
 doc/source/notebooks/CH4
+doc/source/notebooks/Na2
 doc/source/notebooks/NaF
+doc/source/notebooks/NF3
+doc/source/notebooks/SiF4
 
 # Extra files
 .ipynb_checkpoints

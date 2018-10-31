@@ -20,7 +20,7 @@ class Job(object):
     """
 
     def __init__(self, name="", inputparams=None, posinp=None, run_dir=None,
-                 ref_job=None, skip=False):
+                 ref_data_dir=None, skip=False):
         r"""
         You may pass input parameters and/or initial geometry (posinp).
         Make sure to at least provide initial positions, either via the
@@ -47,8 +47,9 @@ class Job(object):
         run_dir : str or None
             Folder where to run the calculation (default to current
             directory).
-        ref_job : Job or None
-            Other BigDFT calculation, taken as reference.
+        ref_data_dir : str
+            Path to the data directory of a reference BigDFT
+            calculation.
         skip : bool
             If `True`, the calculation will be skipped. (Note: Might not
             be useful now, since we check for the existence of the
@@ -134,7 +135,7 @@ class Job(object):
         self._inputparams = inputparams
         self._posinp = posinp
         self._logfile = None
-        self._ref_job = ref_job
+        self._ref_data_dir = ref_data_dir
         self._name = str(name)
         self._skip = bool(skip)
 
@@ -186,14 +187,13 @@ class Job(object):
         return self._logfile
 
     @property
-    def ref_job(self):
+    def ref_data_dir(self):
         r"""
         Returns
         -------
-        Job
-            Job of the reference calculation.
+        str
         """
-        return self._ref_job
+        return self._ref_data_dir
 
     @property
     def skip(self):
@@ -424,13 +424,12 @@ class Job(object):
             bigdft-tool command is run instead of the bigdft one.
         """
         # Copy the data directory of a reference calculation
-        if self.ref_job is not None:
+        if self.ref_data_dir is not None:
             self._copy_reference_data_dir()
-
-        # Update the input file, so that it reads the reference
-        # wavefunctions in the data directory
-        if os.path.exists(self.data_dir):
-            self._read_wavefunctions_from_data_dir()
+            # Update the input file, so that it reads the reference
+            # wavefunctions in the data directory
+            if os.path.exists(self.data_dir):
+                self._read_wavefunctions_from_data_dir()
 
         if dry_run or force_run or not os.path.exists(self.logfile_name):
             # Run bigdft (if dry_run is False) or bigdft-tool (if
@@ -493,7 +492,12 @@ class Job(object):
         if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
             if 'dft' in base_inp and 'disablesym' not in base_inp['dft']:
                 del log_inp['dft']['disablesym']
-                self.logfile.inputparams._params = clean(log_inp.params)
+                log_inp._params = clean(log_inp.params)
+        # Clean the disablesym key, if present only in the base_inp
+        if 'dft' in log_inp and 'disablesym' not in log_inp['dft']:
+            if 'dft' in base_inp and 'disablesym' in base_inp['dft']:
+                del base_inp['dft']['disablesym']
+                base_inp._params = clean(log_inp.params)
         if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "
@@ -507,14 +511,13 @@ class Job(object):
         directory so as to restart the new calculation from the result
         of the reference calculation.
         """
-        ref = self.ref_job
-        if os.path.exists(ref.data_dir):
+        if os.path.exists(self.ref_data_dir):
             if os.path.basename(self.data_dir) in os.listdir(os.curdir):
                 # Remove the previously existing data directory before
                 # copying the reference data directory (otherwise,
                 # shutil.copytree raises an error).
                 shutil.rmtree(self.data_dir)
-            shutil.copytree(ref.data_dir, self.data_dir)
+            shutil.copytree(self.ref_data_dir, self.data_dir)
         else:
             print("Data directory not found for reference calculation.")
 

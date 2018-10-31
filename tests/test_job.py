@@ -19,10 +19,10 @@ class TestJob:
         ("inputparams", inp), ("posinp", pos),
         ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
         ("logfile", None), ("logfile_name", "log.yaml"),
-        ("data_dir", "data"), ("ref_job", None), ("run_dir", "MyBigDFT")
+        ("data_dir", "data"), ("ref_data_dir", None), ("run_dir", "MyBigDFT")
     ])
     def test_init(self, attr, expected):
-        if "_dir" in attr:
+        if "_dir" in attr and attr != "ref_data_dir":
             value = getattr(self.job, attr)
             value = os.path.basename(os.path.normpath(value))
             assert value == expected
@@ -33,11 +33,11 @@ class TestJob:
         ("inputparams", inp), ("posinp", pos),
         ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
         ("logfile", None), ("logfile_name", "log-test.yaml"),
-        ("data_dir", "data-test"), ("ref_job", None),
+        ("data_dir", "data-test"), ("ref_data_dir", None),
         ("run_dir", "MyBigDFT"),
     ])
     def test_init_with_name(self, attr, expected):
-        if "_dir" in attr:
+        if "_dir" in attr and attr != "ref_data_dir":
             value = getattr(self.job_with_name, attr)
             value = os.path.basename(os.path.normpath(value))
             assert value == expected
@@ -64,7 +64,7 @@ class TestJob:
                 posinp=Posinp.from_file("tests/surface.xyz"))
 
     @pytest.mark.parametrize("attr", [
-        "inputparams", "posinp", "logfile", "ref_job",
+        "inputparams", "posinp", "logfile", "ref_data_dir",
         "input_name", "posinp_name", "logfile_name",
         "bigdft_cmd", "bigdft_tool_cmd",
         "init_dir", "run_dir", "data_dir",

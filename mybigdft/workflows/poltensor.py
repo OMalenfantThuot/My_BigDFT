@@ -174,7 +174,7 @@ class PolTensor(AbstractWorkflow):
                 inp['dft'] = {'elecfield': efield.vector}
             run_dir = os.path.join(gs.run_dir, "EF_along_{}".format(key))
             job = Job(name=gs.name, inputparams=inp, posinp=gs.posinp,
-                      run_dir=run_dir, skip=gs.skip, ref_job=gs)
+                      run_dir=run_dir, skip=gs.skip, ref_data_dir=gs.data_dir)
             job.efield = efield
             queue.append(job)
         return queue
