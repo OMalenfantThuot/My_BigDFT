@@ -201,7 +201,7 @@ class Phonons(AbstractWorkflow):
                 new_posinp = gs.posinp.translate_atom(i_at, disp.vector)
                 job = Job(inputparams=gs.inputparams, posinp=new_posinp,
                           name=gs.name, run_dir=run_dir, skip=gs.skip,
-                          ref_job=gs)
+                          ref_data_dir=gs.data_dir)
                 # Add attributes to the job to facilitate post-processing
                 job.moved_atom = i_at
                 job.displacement = disp
@@ -333,7 +333,7 @@ class Phonons(AbstractWorkflow):
         if pos.units == 'angstroem':
             hessian /= ANG_TO_B
         # Return the Hessian matrix as a symmetric numpy array
-        return (hessian + hessian.T) / 2.
+        return -(hessian + hessian.T) / 2.
 
     def _solve_dyn_mat(self):
         r"""
@@ -349,8 +349,8 @@ class Phonons(AbstractWorkflow):
         eigs, vecs = np.linalg.eig(self.dyn_mat)
         # eigs actually gives the square of the expected eigenvalues.
         # Given they can be negative, enforce a positive value with
-        # np.where() before taking the square-root
-        eigs = np.sqrt(np.where(eigs < 0, -eigs, eigs))
+        # np.where() before taking the signed square-root
+        eigs = np.sign(eigs) * np.sqrt(np.where(eigs < 0, -eigs, eigs))
         return eigs, vecs
 
 

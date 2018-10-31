@@ -2,6 +2,7 @@ from __future__ import absolute_import
 import os
 import sys
 import pytest
+import numpy as np
 from mybigdft import InputParams, Posinp, Logfile, Atom
 from mybigdft.iofiles.logfiles import GeoptLogfile
 
@@ -347,6 +348,14 @@ C    7.327412521    0.000000000   3.461304757"""
     def test_init_raises_ValueError2(self, to_evaluate):
         with pytest.raises(ValueError):
             eval(to_evaluate)
+
+    def test_positions(self):
+        expected = [7.327412521, 0.0, 3.461304757]
+        pos1 = Posinp([Atom('C', expected)], units="angstroem",
+                      boundary_conditions="free")
+        pos2 = pos1.translate_atom(0, [-7.327412521, 0.0, -3.461304757])
+        assert np.allclose(pos1.positions, expected)
+        assert np.allclose(pos2.positions, [0, 0, 0])
 
     def test___eq__(self):
         atom1 = Atom('N', [0.0, 0.0, 0.0])
