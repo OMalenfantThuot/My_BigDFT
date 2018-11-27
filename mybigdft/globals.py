@@ -13,7 +13,8 @@ import yaml
 
 __all__ = ["INPUT_VARIABLES", "PROFILES", "BIGDFT_PATH", "BIGDFT_TOOL_PATH",
            "ATOMS_MASS", "AMU_TO_EMU", "EMU_TO_AMU", "HA_TO_CMM1", "ANG_TO_B",
-           "B_TO_ANG", "HA_TO_EV", "EV_TO_HA", "COORDS", "SIGNS"]
+           "B_TO_ANG", "HA_TO_EV", "EV_TO_HA", "AU_TO_DEBYE", "DEBYE_TO_AU",
+           "COORDS", "SIGNS"]
 
 
 # Read the definition of the input variables from the BigDFT sources
@@ -90,3 +91,7 @@ HA_TO_CMM1 = 219474.6313705
 HA_TO_EV = 27.21138602
 # Conversion factor from electron-Volt to Hartree
 EV_TO_HA = 1 / HA_TO_EV
+# Conversion factor from Debye to atomic units of dipole moment
+DEBYE_TO_AU = 0.393430307
+# Conversion factor from atomic units of dipole moment to Debye
+AU_TO_DEBYE = 1 / DEBYE_TO_AU

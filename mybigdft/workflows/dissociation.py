@@ -27,11 +27,11 @@ class Dissociation(AbstractWorkflow):
     def __init__(self, fragment1, fragment2, distances, inputparams=None,
                  name="", run_dir=None):
         r"""
-        A queue of :class:`Job` instances is initialized, one per
-        distance between the fragments. For each job, the system is made
-        of both fragments, where each atom of the second fragment
-        is translated along the :math:`y` direction by the value of the
-        distance.
+        A queue of :class:`~mybigdft.job.Job` instances is initialized,
+        one per distance between the fragments. For each job, the system
+        is made of both fragments, where each atom of the second
+        fragment is translated along the :math:`y` direction by the
+        value of the distance.
 
         .. Warning::
 

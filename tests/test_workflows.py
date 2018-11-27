@@ -4,7 +4,8 @@ import pytest
 import numpy as np
 from mybigdft import Atom, Posinp, Job, InputParams
 from mybigdft.workflows import (
-    PolTensor, Phonons, RamanSpectrum, Geopt, Dissociation,
+    PolTensor, Phonons, RamanSpectrum, Geopt, Dissociation, InfraredSpectrum,
+    VibPolTensor,
 )
 from mybigdft.workflows.workflow import Workflow
 
@@ -177,6 +178,54 @@ N   3.571946174   3.571946174   4.71401439"""
     def test_init_raises_ValueError(self, to_evaluate):
         with pytest.raises(ValueError):
             eval(to_evaluate)
+
+
+class TestInfraredSpectrum:
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_run(self):
+        atoms = [Atom('N', [3.571946174, 3.571946174, 3.620526682]),
+                 Atom('N', [3.571946174, 3.571946174, 4.71401439])]
+        pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
+        ph = Phonons(gs)
+        ir = InfraredSpectrum(ph)
+        assert not ir.is_completed
+        ir.run()
+        assert ir.is_completed
+        # Test the only physically relevant infrared intensity
+        i = np.argmax(ir.energies['cm^-1'])
+        np.testing.assert_almost_equal(ir.intensities[i], 1.100446469749e-06)
+        # Test that running the workflow again warns a UserWarning
+        with pytest.warns(UserWarning):
+            ir.run()
+
+
+class TestVibPolTensor:
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_run(self):
+        atoms = [Atom('N', [3.571946174, 3.571946174, 3.620526682]),
+                 Atom('N', [3.571946174, 3.571946174, 4.71401439])]
+        pos = Posinp(atoms, units="angstroem", boundary_conditions="free")
+        gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
+        ph = Phonons(gs)
+        ir = InfraredSpectrum(ph)
+        vpt = VibPolTensor(ir)
+        assert not vpt.is_completed
+        vpt.run()
+        assert vpt.is_completed
+        # Test the mean vibrational polarizability
+        np.testing.assert_almost_equal(vpt.mean_polarizability,
+                                       1.092296473682357e-08)
+        # Changing the value of e_cut changes the value of the mean
+        # vibrational polarizability
+        vpt.e_cut = 0
+        np.testing.assert_almost_equal(vpt.mean_polarizability,
+                                       0.0007775548377767935)
+        # Test that running the workflow again warns a UserWarning
+        with pytest.warns(UserWarning):
+            vpt.run()
 
 
 class TestGeopt:

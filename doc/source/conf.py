@@ -76,8 +76,22 @@ language = None
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path .
 exclude_patterns = [
-    'build', 'Thumbs.db', '.DS_Store', 'notebooks/.ipynb*',
-    'notebooks/Untitled*.ipynb'
+    'build', 'Thumbs.db', '.DS_Store',
+    # 'notebooks/*.ipynb*',
+    'notebooks/*/*.ipynb*',
+    'notebooks/*/*/*.ipynb*',
+    'notebooks/*/*/*/*.ipynb*',
+    'notebooks/*/*/*/*/*.ipynb*',
+    'notebooks/.ipynb_checkpoints/*ipynb',
+    'notebooks/*/.ipynb_checkpoints/*ipynb',
+    'notebooks/*/*/.ipynb_checkpoints/*ipynb',
+    'notebooks/*/*/*/.ipynb_checkpoints/*ipynb',
+    'notebooks/*/*/*/*/.ipynb_checkpoints/*ipynb',
+    'notebooks/*/*/*/*/*/.ipynb_checkpoints/*ipynb',
+    'notebooks/link_with_ase/',
+    'notebooks/vib_pol_tensor/',
+    'notebooks/Untitled*.ipynb',
+    'notebooks/*test*.ipynb',
 ]
 # exclude_patterns = ['build']
 

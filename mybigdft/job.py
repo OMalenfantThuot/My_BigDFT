@@ -192,6 +192,8 @@ class Job(object):
         Returns
         -------
         str
+            Reference directory where some relevant data (such as
+            wavefunctions) is stored.
         """
         return self._ref_data_dir
 
@@ -425,9 +427,11 @@ class Job(object):
         """
         # Copy the data directory of a reference calculation
         if self.ref_data_dir is not None:
-            self._copy_reference_data_dir()
-            # Update the input file, so that it reads the reference
-            # wavefunctions in the data directory
+            # Copy the data directory only when bigdft has to run
+            if force_run or not os.path.exists(self.logfile_name):
+                self._copy_reference_data_dir()
+            # Always update the input file, so that it reads the
+            # reference wavefunctions in the data directory
             if os.path.exists(self.data_dir):
                 self._read_wavefunctions_from_data_dir()
 
