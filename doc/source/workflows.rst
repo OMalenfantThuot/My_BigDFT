@@ -11,7 +11,7 @@ that are used to automate some calculations.
 
     workflow
     convergences
-    poltensor
-    phonon_raman
+    poltensors
+    phonons_infrared_raman
     geopt
     dissociation

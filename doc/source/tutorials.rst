@@ -15,5 +15,7 @@ MyBigDFT tutorials
     notebooks/Convergences
     notebooks/PolTensor
     notebooks/Phonons_and_RamanSpectrum
+    notebooks/Phonons_and_InfraredSpectrum
+    notebooks/VibPolTensor
     notebooks/Dissociation_curve
     notebooks/Geopt

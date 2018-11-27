@@ -125,7 +125,8 @@ class PolTensor(AbstractWorkflow):
         Returns
         -------
         numpy.array
-            Polarizability tensor of the system.
+            Polarizability tensor of the system (units: atomic, that is,
+            bohr^3).
         """
         return self._pol_tensor
 
@@ -135,7 +136,8 @@ class PolTensor(AbstractWorkflow):
         Returns
         -------
         float
-            Mean (electronic) polarizability of the system.
+            Mean (electronic) polarizability of the system (units:
+            atomic, that is, bohr^3).
         """
         return self._mean_polarizability
 
