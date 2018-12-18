@@ -108,7 +108,7 @@ class VibPolTensor(AbstractWorkflow):
         """
         return self._mean_polarizability
 
-    def _run(self, nmpi, nomp, force_run, dry_run):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to compute
@@ -127,10 +127,16 @@ class VibPolTensor(AbstractWorkflow):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
         """
         self.infrared.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        super(VibPolTensor, self)._run(nmpi, nomp, force_run, dry_run)
+            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete)
+        super(VibPolTensor, self)._run(
+            nmpi, nomp, force_run, dry_run,
+            restart_if_incomplete=restart_if_incomplete)
 
     def post_proc(self):
         r"""

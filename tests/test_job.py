@@ -1,5 +1,7 @@
 from __future__ import absolute_import
 import os
+from copy import deepcopy
+import shutil
 import pytest
 import numpy as np
 from mybigdft import InputParams, Posinp, Logfile, Job
@@ -16,9 +18,9 @@ class TestJob:
     job_with_name = Job(inputparams=inp, posinp=pos, name="test")
 
     @pytest.mark.parametrize("attr, expected", [
-        ("inputparams", inp), ("posinp", pos),
+        ("inputparams", inp), ("posinp", pos), ("is_completed", False),
         ("input_name", "input.yaml"), ("posinp_name", "posinp.xyz"),
-        ("logfile", None), ("logfile_name", "log.yaml"),
+        ("logfile", {}), ("logfile_name", "log.yaml"),
         ("data_dir", "data"), ("ref_data_dir", None), ("run_dir", "MyBigDFT")
     ])
     def test_init(self, attr, expected):
@@ -30,9 +32,9 @@ class TestJob:
             assert getattr(self.job, attr) == expected
 
     @pytest.mark.parametrize("attr, expected", [
-        ("inputparams", inp), ("posinp", pos),
+        ("inputparams", inp), ("posinp", pos), ("is_completed", False),
         ("input_name", "test.yaml"), ("posinp_name", "test.xyz"),
-        ("logfile", None), ("logfile_name", "log-test.yaml"),
+        ("logfile", {}), ("logfile_name", "log-test.yaml"),
         ("data_dir", "data-test"), ("ref_data_dir", None),
         ("run_dir", "MyBigDFT"),
     ])
@@ -64,7 +66,7 @@ class TestJob:
                 posinp=Posinp.from_file("tests/surface.xyz"))
 
     @pytest.mark.parametrize("attr", [
-        "inputparams", "posinp", "logfile", "ref_data_dir",
+        "inputparams", "posinp", "logfile", "ref_data_dir", "is_completed",
         "input_name", "posinp_name", "logfile_name",
         "bigdft_cmd", "bigdft_tool_cmd",
         "init_dir", "run_dir", "data_dir",
@@ -78,20 +80,84 @@ class TestJob:
         with Job(inputparams=self.inp, run_dir="tests",
                  name='warnings') as job:
             job.run()
-        assert np.allclose([job.logfile.energy], [-191.74377352940274])
+        assert job.is_completed
+        assert self.inp["dft"].get("inputpsiid") is None
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_run_with_force_run(self):
-        with Job(inputparams=self.inp, run_dir="tests", name="runtest") as job:
+        new_inp = deepcopy(self.inp)
+        new_inp["output"] = {"orbitals": "binary"}
+        with Job(inputparams=new_inp, run_dir="tests",
+                 name="write_orbs") as job:
+            assert not job.is_completed
             job.run(force_run=True, nmpi=2, nomp=4)
-        assert np.allclose([job.logfile.energy], [-191.74377352940274])
+            assert job.is_completed
+            job.clean()
+        assert self.inp["dft"].get("inputpsiid") is None
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_run_with_force_run_and_inp_and_pos(self):
         with Job(inputparams=self.inp, posinp=self.pos,
                  run_dir="tests", name="runtest") as job:
+            assert not job.is_completed
             job.run(force_run=True)
-        assert np.allclose([job.logfile.energy], [-191.74377352940274])
+            assert job.is_completed
+        assert self.inp["dft"].get("inputpsiid") is None
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_run_with_ref_data_dir(self):
+        with Job(inputparams=self.inp, posinp=self.pos,
+                 ref_data_dir="data-write_orbs",
+                 run_dir="tests", name="with_ref_data_dir") as job:
+            assert self.inp["dft"].get("inputpsiid") is None
+            assert job.inputparams["dft"].get("inputpsiid") is None
+            assert not job.is_completed
+            job.run(force_run=True)
+            assert job.is_completed
+            assert job.inputparams["dft"].get("inputpsiid") == 2
+            assert self.inp["dft"].get("inputpsiid") is None
+            job.run(force_run=True)
+            assert job.is_completed
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_run_with_non_existing_ref_data_dir(self):
+        with Job(inputparams=self.inp, posinp=self.pos,
+                 ref_data_dir="unknown_data_dir",
+                 run_dir="tests",
+                 name="with_unknown_ref_data_dir") as job:
+            assert self.inp["dft"].get("inputpsiid") is None
+            assert job.inputparams["dft"].get("inputpsiid") is None
+            assert not job.is_completed
+            assert job.ref_data_dir is not None
+            assert not os.path.exists(job.ref_data_dir)
+            job.run(force_run=True)
+            assert job.is_completed
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
+
+    def test_run_raises_ValueErro_when_incomplete_logfile(self):
+        with Job(inputparams=self.inp, posinp=self.pos,
+                 run_dir="tests",
+                 name="incomplete") as job:
+            shutil.copyfile(job.logfile_name+".ref", job.logfile_name)
+            with pytest.raises(ValueError,
+                               message="The logfile is incomplete!"):
+                job.run(restart_if_incomplete=False)
+
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_run_restart_if_incomplete(self):
+        with Job(inputparams=self.inp, posinp=self.pos,
+                 run_dir="tests",
+                 name="incomplete") as job:
+            shutil.copyfile(job.logfile_name+".ref", job.logfile_name)
+            assert not job.is_completed
+            job.run(restart_if_incomplete=True)
+            assert job.is_completed
+            job.clean()
+        assert np.isclose(job.logfile.energy, -191.74377352940274)
 
     def test_clean(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
@@ -102,13 +168,16 @@ class TestJob:
             assert not os.path.exists(job.logfile_name)
             assert not os.path.exists("logfiles")
             assert not os.path.exists("data-dry_run")
+            assert not job.is_completed
 
     @pytest.mark.filterwarnings("ignore::UserWarning")
     def test_run_with_dry_run(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
             # Run the calculation
             job.clean()
+            assert not job.is_completed
             job.run(dry_run=True, nmpi=2, nomp=4)
+            assert job.is_completed
             # There must be input and output files afterwards
             new_inp = InputParams.from_file(job.input_name)
             assert new_inp == self.inp
@@ -122,7 +191,9 @@ class TestJob:
         with Job(inputparams=self.inp, posinp=self.pos, name="dry_run",
                  run_dir="tests") as job:
             job.clean()
+            assert not job.is_completed
             job.run(dry_run=True, nmpi=2, nomp=4)
+            assert job.is_completed
             # Make sure that input, posinp and output files are created
             new_inp = InputParams.from_file(job.input_name)
             assert new_inp == self.inp
@@ -146,7 +217,7 @@ class TestJob:
                 job.run()
 
     def test_posinp_with_inf(self):
-        inp = InputParams({"posinp": {
+        new_inp = InputParams({"posinp": {
             "units": "angstroem",
             "cell": [40, ".inf", 40],
             "positions": [
@@ -156,14 +227,14 @@ class TestJob:
                        1.10427379608154]},
             ]
         }})
-        with Job(inputparams=inp, name="test") as job:
+        with Job(inputparams=new_inp, name="test") as job:
             job.run(nmpi=6, nomp=3, dry_run=True)
             job.clean()
         assert job.logfile.boundary_conditions == 'surface'
 
     def test_run_raises_RuntimeError(self):
         # Error because two ".inf" in cell
-        inp = InputParams({"posinp": {
+        new_inp = InputParams({"posinp": {
             "units": "angstroem",
             "cell": [40, ".inf", ".inf"],
             "positions": [
@@ -174,12 +245,12 @@ class TestJob:
             ]
         }})
         with pytest.raises(RuntimeError):
-            with Job(inputparams=inp, run_dir="tests/dummy") as job:
+            with Job(inputparams=new_inp, run_dir="tests/dummy") as job:
                 job.run(force_run=True)
 
     def test_dry_run_raises_RuntimeError(self):
         # Error because two ".inf" in cell
-        inp = InputParams({"posinp": {
+        new_inp = InputParams({"posinp": {
             "units": "angstroem",
             "cell": [40, ".inf", ".inf"],
             "positions": [
@@ -190,5 +261,5 @@ class TestJob:
             ]
         }})
         with pytest.raises(RuntimeError):
-            with Job(inputparams=inp, run_dir="tests/dummy") as job:
+            with Job(inputparams=new_inp, run_dir="tests/dummy") as job:
                 job.run(dry_run=True)

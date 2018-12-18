@@ -70,7 +70,8 @@ class AbstractWorkflow(ABC):
         """
         return {job.name: job.logfile for job in self.queue}
 
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
+    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False,
+            restart_if_incomplete=False):
         r"""
         Run all the calculations if the post-processing was not already
         performed.
@@ -95,6 +96,9 @@ class AbstractWorkflow(ABC):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
 
         Warns
         -----
@@ -104,11 +108,14 @@ class AbstractWorkflow(ABC):
         if force_run or dry_run:
             self._initialize_post_processing_attributes()
         if not self.is_completed:
-            self._run(nmpi, nomp, force_run, dry_run)
+            self._run(nmpi, nomp, force_run, dry_run, restart_if_incomplete)
         else:
             warning_msg = "Calculations already performed; set the argument "\
                           "'force_run' to True to re-run them."
             warnings.warn(warning_msg, UserWarning)
+        if any([not job.is_completed for job in self.queue]):
+            warnings.warn("Some jobs of the workflow were not run.",
+                          UserWarning)
 
     @property
     def is_completed(self):
@@ -122,7 +129,7 @@ class AbstractWorkflow(ABC):
         return all([getattr(self, attr) is not None
                     for attr in self.POST_PROCESSING_ATTRIBUTES])
 
-    def _run(self, nmpi, nomp, force_run, dry_run):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
         r"""
         This method runs all the jobs in the queue sequentially before
         running the post_proc method if not in `dry_run` mode.
@@ -139,22 +146,28 @@ class AbstractWorkflow(ABC):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
         """
         for job in self.queue:
             with job as j:
                 j.run(
-                    nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+                    nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
+                    restart_if_incomplete=restart_if_incomplete)
         if not dry_run:
             self.post_proc()
+            assert self.is_completed, ("You must define all post-processing "
+                                       "attributes in post_proc.")
 
     @abc.abstractmethod
-    def post_proc(self):  # pragma: no cover
+    def post_proc(self):
         r"""
         This should be an abstract method used to post-process the
         output of the calculations and get some meaningful results out of
         them.
         """
-        pass
+        raise NotImplementedError
 
 
 class Workflow(AbstractWorkflow):

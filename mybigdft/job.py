@@ -6,10 +6,11 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
+from copy import deepcopy
 from mybigdft.iofiles import InputParams, Logfile
 from mybigdft.iofiles.logfiles import GeoptLogfile
 from mybigdft.iofiles.inputparams import clean
-from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH
+from .globals import BIGDFT_PATH, BIGDFT_TOOL_PATH, DEFAULT_PARAMETERS
 
 
 class Job(object):
@@ -102,7 +103,7 @@ class Job(object):
 
         There is no logfile associated to the job yet as it was not run:
 
-        >>> job.logfile is None
+        >>> job.logfile == {}
         True
 
         To run the job, do it from a context manager:
@@ -116,7 +117,7 @@ class Job(object):
 
         A logfile being found, it is read and not computed again:
 
-        >>> job.logfile is None
+        >>> job.logfile == {}
         False
         """
         # Check the input parameters of the calculation
@@ -132,12 +133,13 @@ class Job(object):
 
         # Set the base attributes
         inputparams._params = clean(inputparams.params)
-        self._inputparams = inputparams
+        self._inputparams = deepcopy(inputparams)
         self._posinp = posinp
-        self._logfile = None
+        self._logfile = Logfile()
         self._ref_data_dir = ref_data_dir
         self._name = str(name)
         self._skip = bool(skip)
+        self._is_completed = False
 
         # Derive the rest of the attributes from the other arguments
         self._set_directory_attributes(run_dir)
@@ -291,6 +293,16 @@ class Job(object):
         """
         return self._logfile_name
 
+    @property
+    def is_completed(self):
+        r"""
+        Returns
+        -------
+        bool
+            `True` if the job has already run successfully.
+        """
+        return self._is_completed
+
     def _set_directory_attributes(self, run_dir):
         r"""
         Set the attributes regarding the directories used to run the
@@ -402,15 +414,21 @@ class Job(object):
         """
         os.chdir(self.init_dir)
 
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False):
+    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False,
+            restart_if_incomplete=False):
         r"""
         Run the BigDFT calculation if it was not already performed.
+        The number of MPI and OpenMP tasks may be specified.
 
-        You may force the calculation by setting force_run to `True`.
+        You may force the calculation to run even though it was
+        previously successful (*e.g.*, a logfile already exists) by
+        setting `force_run` to `True`.
 
-        If `dry_run` is set to `True`, then bigdft-tool is run instead.
+        If `dry_run` is set to `True`, then bigdft-tool is run instead
+        of the BigDFT executable.
 
-        The number of MPI and OpenMP tasks may also be specified.
+        If `restart_if_incomplete` is set to `True`, the previously
+        existing logfile is removed and the calculation restarts.
 
         Parameters
         ----------
@@ -424,6 +442,9 @@ class Job(object):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
         """
         # Copy the data directory of a reference calculation
         if self.ref_data_dir is not None:
@@ -448,14 +469,108 @@ class Job(object):
                 output_msg = output_msg.decode('unicode_escape')
                 print(output_msg)
             self._logfile = Logfile.from_file(self.logfile_name)
+            if os.path.exists(self.data_dir):
+                self._clean_data_dir()
         else:
             # The logfile already exists: the initial positions and the
             # initial parameters used to perform that calculation must
             # correspond to the ones used to initialize the current job.
             print("Logfile {} already exists!\n".format(self.logfile_name))
-            self._logfile = Logfile.from_file(self.logfile_name)
-            self._check_logfile_posinp()
-            self._check_logfile_inputparams()
+            try:
+                self._logfile = Logfile.from_file(self.logfile_name)
+            except ValueError as e:
+                incomplete_log = str(e).endswith(
+                    "The logfile is incomplete!")
+                if incomplete_log and restart_if_incomplete:
+                    # Remove the logfile and restart the calculation
+                    print("The logfile was incomplete, restart calculation")
+                    os.remove(self.logfile_name)
+                    self.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
+                             dry_run=dry_run, restart_if_incomplete=False)
+                else:
+                    raise e
+            else:
+                self._check_logfile_posinp()
+                self._check_logfile_inputparams()
+        self._is_completed = True
+
+    def _copy_reference_data_dir(self):
+        r"""
+        Copy the reference data directory to the current calculation
+        directory so as to restart the new calculation from the result
+        of the reference calculation.
+        """
+        if os.path.exists(self.ref_data_dir):
+            if os.path.basename(self.data_dir) in os.listdir(os.curdir):
+                # Remove the previously existing data directory before
+                # copying the reference data directory (otherwise,
+                # shutil.copytree raises an error).
+                shutil.rmtree(self.data_dir)
+            shutil.copytree(self.ref_data_dir, self.data_dir)
+            print("Data directory copied from {}.".format(self.ref_data_dir))
+        else:
+            print("Data directory {} not found.".format(self.ref_data_dir))
+
+    def _read_wavefunctions_from_data_dir(self):
+        r"""
+        Set the input parameters to read the wavefunctions from the data
+        directory if they exist.
+        """
+        # Check that there are wavefunction files
+        wf_files = [f for f in os.listdir(self.data_dir)
+                    if 'wavefunction' in f]
+        if wf_files:
+            # If there are wavefunction files, add the
+            # option to read them from files.
+            try:
+                self.inputparams['dft']['inputpsiid'] = 2
+            except KeyError:
+                self.inputparams['dft'] = {'inputpsiid': 2}
+        else:
+            # Else, delete the option from the input file, if
+            # it is equal to 2 (might be better than completely
+            # removing inputpsiid ?).
+            try:
+                if self.inputparams['dft']['inputpsiid'] == 2:
+                    del self.inputparams['dft']['inputpsiid']
+            except KeyError:
+                pass
+
+    def _clean_data_dir(self):
+        r"""
+        Clean the data directory, namely delete the wavefunctions in
+        the data folder if it was not requested to output them, and
+        delete the output files of a geopt calculation if a geopt
+        was not performed.
+        """
+        # Delete the wavefunction files in the data directory and
+        # replace them by empty files if needed.
+        inp = self.inputparams
+        default = DEFAULT_PARAMETERS["output"]["orbitals"]
+        write_orbitals = ("output" in inp and "orbitals" in inp["output"]
+                          and inp["output"]["orbitals"] != default)
+        if "output" not in inp or not write_orbitals:
+            wf_files = [os.path.join(self.data_dir, filename)
+                        for filename in os.listdir(self.data_dir)
+                        if filename.startswith("wavefunction")]
+            for wf_file in wf_files:
+                os.remove(wf_file)
+                # Equivalent to touch wf_file in bash
+                with open(wf_file, 'a'):
+                    os.utime(wf_file, None)
+        # Delete geopt data if no geopt was required
+        if "geopt" not in inp:
+            # Delete the posout files
+            posout_files = [os.path.join(self.data_dir, filename)
+                            for filename in os.listdir(self.data_dir)
+                            if filename.startswith("posout")]
+            for posout_file in posout_files:
+                os.remove(posout_file)
+            # Delete the geopt.mon file
+            try:
+                os.remove(os.path.join(self.data_dir, "geopt.mon"))
+            except OSError:
+                pass
 
     def _check_logfile_posinp(self):
         r"""
@@ -492,63 +607,29 @@ class Job(object):
         """
         log_inp = self.logfile.inputparams
         base_inp = self.inputparams
-        # Clean the disablesym key, if present only in the log_inp
-        if 'dft' in log_inp and 'disablesym' in log_inp['dft']:
-            if 'dft' in base_inp and 'disablesym' not in base_inp['dft']:
-                del log_inp['dft']['disablesym']
-                log_inp._params = clean(log_inp.params)
-        # Clean the disablesym key, if present only in the base_inp
-        if 'dft' in log_inp and 'disablesym' not in log_inp['dft']:
-            if 'dft' in base_inp and 'disablesym' in base_inp['dft']:
-                del base_inp['dft']['disablesym']
-                base_inp._params = clean(log_inp.params)
+        # Clean the disablesym key:
+        disablesym_in_log_inp = ('dft' in log_inp and
+                                 'disablesym' in log_inp['dft'])
+        disablesym_not_in_log_inp = ('dft' in log_inp and
+                                     'disablesym' not in log_inp['dft'])
+        disablesym_in_base_inp = ('dft' in base_inp and
+                                  'disablesym' in base_inp['dft'])
+        disablesym_not_in_base_inp = ('dft' in base_inp and
+                                      'disablesym' not in base_inp['dft'])
+        # - if present only in the log_inp
+        if disablesym_in_log_inp and disablesym_not_in_base_inp:
+            del log_inp['dft']['disablesym']
+            log_inp._params = clean(log_inp.params)
+        # - if present only in the base_inp
+        if disablesym_not_in_log_inp and disablesym_in_base_inp:
+            del base_inp['dft']['disablesym']
+            base_inp._params = clean(log_inp.params)
         if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "
                 "ones used in the Logfile:\n"
                 "Logfile input parameters:\n{}\nActual input parameters:\n{}"
                 .format(log_inp, base_inp))
-
-    def _copy_reference_data_dir(self):
-        r"""
-        Copy the reference data directory to the current calculation
-        directory so as to restart the new calculation from the result
-        of the reference calculation.
-        """
-        if os.path.exists(self.ref_data_dir):
-            if os.path.basename(self.data_dir) in os.listdir(os.curdir):
-                # Remove the previously existing data directory before
-                # copying the reference data directory (otherwise,
-                # shutil.copytree raises an error).
-                shutil.rmtree(self.data_dir)
-            shutil.copytree(self.ref_data_dir, self.data_dir)
-        else:
-            print("Data directory not found for reference calculation.")
-
-    def _read_wavefunctions_from_data_dir(self):
-        r"""
-        Set the input parameters to read the wavefunctions from the data
-        directory if they exist.
-        """
-        # Check that there are wavefunction files
-        wf_files = [f for f in os.listdir(self.data_dir)
-                    if 'wavefunction' in f]
-        if wf_files:
-            # If there are wavefunction files, add the
-            # option to read them from files.
-            try:
-                self.inputparams['dft']['inputpsiid'] = 2
-            except KeyError:
-                self.inputparams['dft'] = {'inputpsiid': 2}
-        else:
-            # Else, delete the option from the input file, if
-            # it is equal to 2 (might be better than completely
-            # removing inputpsiid ?).
-            try:
-                if self.inputparams['dft']['inputpsiid'] == 2:
-                    del self.inputparams['dft']['inputpsiid']
-            except Exception:
-                pass
 
     @staticmethod
     def _set_environment(nomp):

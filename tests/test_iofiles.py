@@ -147,12 +147,34 @@ class TestLogfile:
         assert getattr(self.log, attr) == value
         assert getattr(self.log, attr[1:]) == value
 
+    @pytest.mark.parametrize("attr, value", [
+        ("_walltime", None),
+        ("_energy", None),
+        ("_n_at", None),
+        ("_boundary_conditions", None),
+        ("_dipole", None),
+        ("_sdos", None),
+        ("_magnetization", None),
+        ("_pressure", None),
+        ("_atom_types", None),
+    ])
+    def test_empty_logfile_attributes(self, attr, value):
+        empty = Logfile()
+        # Two asserts as one can get both attributes (say, _n_at and n_at)
+        assert getattr(empty, attr) == value
+        assert getattr(empty, attr[1:]) == value
+
     @pytest.mark.parametrize("name", [
         "n_at", "forces", "walltime"
     ])
     def test_set_base_attributes_raises_AttributeError(self, name):
         with pytest.raises(AttributeError):
             setattr(self.log, name, getattr(self.log, name))
+
+    def test_init_raises_ValueError(self):
+        incomplete_log = os.path.join(tests_fol, "log-incomplete.yaml.ref")
+        with pytest.raises(ValueError):
+            Logfile.from_file(incomplete_log)
 
     def test_cannot_set_values_of_log_attr(self):
         with pytest.raises(TypeError):

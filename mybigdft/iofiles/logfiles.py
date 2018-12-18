@@ -25,7 +25,7 @@ try:
 except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
 import numpy as np
-from mybigdft.globals import INPUT_VARIABLES
+from mybigdft.globals import INPUT_PARAMETERS_DEFINITIONS
 from .inputparams import InputParams, clean
 from .posinp import Posinp
 
@@ -161,17 +161,22 @@ class Logfile(Mapping):
     output file of a BigDFT calculation.
     """
 
-    def __init__(self, log):
+    def __init__(self, log=None):
         r"""
         Parameters
         ----------
         log : dict
             Output of the BigDFT code as a yaml dictionary.
         """
+        if log is None:
+            log = {}
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        params = {key: log.get(key) for key in INPUT_VARIABLES}
+        if self.log != {} and (self.energy is None and self.forces is None and
+                               self.walltime is None):
+            raise ValueError("The logfile is incomplete!")
+        params = {key: log.get(key) for key in INPUT_PARAMETERS_DEFINITIONS}
         params = clean(params)
         self._inputparams = InputParams(params=params)
         self._posinp = self.inputparams.posinp
@@ -251,18 +256,18 @@ class Logfile(Mapping):
             parameters.
         """
         if self.WARNINGS is not None:
-            for warning in self.WARNINGS:
-                if isinstance(warning, dict):
+            for message in self.WARNINGS:
+                if isinstance(message, dict):
                     # It might happen that a ":" symbol is in the
                     # description of a warning, hence it is decoded as a
                     # dictionary; make sure to treat it as a string
                     # instead
-                    key, value = list(warning.items())[0]
-                    warning = "{}: {}".format(key, value)
-                elif not isinstance(warning, str):  # pragma: no cover
+                    key, value = list(message.items())[0]
+                    message = "{}: {}".format(key, value)
+                elif not isinstance(message, str):  # pragma: no cover
                     print("MyBigDFT: weird error message found")
-                    warning = str(warning)
-                warnings.warn(warning, UserWarning)
+                    message = str(message)
+                warnings.warn(message, UserWarning)
         self._check_psppar()
 
     def _check_psppar(self):

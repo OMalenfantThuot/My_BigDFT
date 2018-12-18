@@ -1,7 +1,7 @@
 r"""
-Define some global variables such as:
+Define some global parameters such as:
 
-- the BigDFT input variables and some profiles (defining a set of basic
+- the BigDFT input parameters and some profiles (defining a set of basic
 input parameters that can be used in input files for brevity) initalized
 from a BigDFT source file,
 - the path to the bigdft and the bigdft-tool executables.
@@ -11,29 +11,31 @@ import warnings
 import yaml
 
 
-__all__ = ["INPUT_VARIABLES", "PROFILES", "BIGDFT_PATH", "BIGDFT_TOOL_PATH",
+__all__ = ["INPUT_PARAMETERS_DEFINITIONS", "DEFAULT_PARAMETERS", "PROFILES",
+           "BIGDFT_PATH", "BIGDFT_TOOL_PATH",
            "ATOMS_MASS", "AMU_TO_EMU", "EMU_TO_AMU", "HA_TO_CMM1", "ANG_TO_B",
            "B_TO_ANG", "HA_TO_EV", "EV_TO_HA", "AU_TO_DEBYE", "DEBYE_TO_AU",
            "COORDS", "SIGNS"]
 
 
-# Read the definition of the input variables from the BigDFT sources
+# Read the definition of the input parameters from the BigDFT sources
 try:
     # Path to the BigDFT sources
     BIGDFT_SOURCES = os.environ["BIGDFT_SOURCES"]
-    # Read the input variables and available profiles
-    input_variables_file = os.path.join(BIGDFT_SOURCES,
-                                        "src/input_variables_definition.yaml")
-    with open(input_variables_file, "r") as f:
+    # Read the input parameters and available profiles
+    input_parameters_file = os.path.join(
+        BIGDFT_SOURCES, "src/input_variables_definition.yaml")
+    with open(input_parameters_file, "r") as f:
         source = yaml.load_all(f)
-        INPUT_VARIABLES = next(source)
+        INPUT_PARAMETERS_DEFINITIONS = next(source)
         PROFILES = next(source)
     # Add the CheSS input parameters
-    input_variables_file = os.path.join(
+    input_parameters_file = os.path.join(
         BIGDFT_SOURCES,
         "../chess/src/chess_input_variables_definition.yaml")
-    with open(input_variables_file, "r") as f:
-        INPUT_VARIABLES["chess"] = yaml.load(f)
+    with open(input_parameters_file, "r") as f:
+        chess_parameters_definition = yaml.load(f)
+    INPUT_PARAMETERS_DEFINITIONS["chess"] = chess_parameters_definition
     # Path to the BigDFT and BigDFT-tool executables
     BIGDFT_ROOT = os.environ["BIGDFT_ROOT"]
     BIGDFT_PATH = os.path.join(BIGDFT_ROOT, "bigdft")
@@ -45,17 +47,31 @@ except KeyError:  # pragma: no cover
                   "installed, run 'source bigdftvars.sh' in the same folder "
                   "as the bigdft executable.",
                   RuntimeWarning)
-    INPUT_VARIABLES = {}
+    INPUT_PARAMETERS_DEFINITIONS = {}
+    chess_parameters_definition = {}
     PROFILES = {}
     BIGDFT_PATH = "bigdft"
     BIGDFT_TOOL_PATH = "bigdft-tool"
 
-# Add the posinp key (as it is not in input_variables_definition.yaml)
-INPUT_VARIABLES["posinp"] = {
+# Add the posinp key (as it is not in input_parameters_definition.yaml)
+INPUT_PARAMETERS_DEFINITIONS["posinp"] = {
     "units": {"default": "atomic"},
     "cell": {"default": None},
     "positions": {"default": None},
     "properties": {"default": {"format": "xyz", "source": "posinp.xyz"}}
+}
+
+# Define a dictionary containing the default value of all the input
+# parameters
+DEFAULT_PARAMETERS = {
+    key: {subkey: subval.get("default")
+          for subkey, subval in val.items() if subkey != "DESCRIPTION"}
+    for key, val in INPUT_PARAMETERS_DEFINITIONS.items() if key != "chess"
+}
+DEFAULT_PARAMETERS["chess"] = {
+    key: {subkey: subval.get("default")
+          for subkey, subval in val.items() if subkey != "DESCRIPTION"}
+    for key, val in chess_parameters_definition.items()
 }
 
 # Mass of the different types of atoms in atomic mass units

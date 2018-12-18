@@ -61,10 +61,10 @@ class TestPolTensor:
         with pytest.raises(NotImplementedError):
             PolTensor(self.gs, order=-1)
 
-    def test_run(self):
+    def test_run_first_order(self):
         # Run a pol. tensor calculation
         gs2 = Job(posinp=pos, name='N2', run_dir='tests/pol_tensor_N2')
-        pt2 = PolTensor(gs2)
+        pt2 = PolTensor(gs2, order=1)
         assert not pt2.is_completed
         pt2.run()
         assert pt2.is_completed
@@ -139,7 +139,7 @@ class TestRamanSpectrum:
     gs = Job(posinp=pos, name='N2', run_dir='tests/phonons_N2')
     ph = Phonons(gs)
 
-    def test_run(self):
+    def test_run_first_order_phonons(self):
         N2_ref = """\
 2   angstroem
 free
@@ -147,7 +147,38 @@ N   3.571946174   3.571946174   3.620526682
 N   3.571946174   3.571946174   4.71401439"""
         ref_pos = Posinp.from_string(N2_ref)
         gs = Job(posinp=ref_pos, name='N2', run_dir='tests/phonons_N2')
-        phonons = Phonons(gs)
+        phonons = Phonons(gs, order=1)
+        raman = RamanSpectrum(phonons)
+        assert not phonons.is_completed
+        assert not raman.is_completed
+        raman.run(nmpi=2, nomp=2)
+        assert phonons.is_completed
+        assert raman.is_completed
+        # Test the only physically relevant phonon energy
+        np.testing.assert_almost_equal(
+            max(raman.energies['cm^-1']), 2386.9850607466974, decimal=6)
+        # Test the only physically relevant intensity
+        np.testing.assert_almost_equal(
+            max(raman.intensities), 22.561427637014187)
+        # Test the only physically relevant depolarization ratio
+        i = np.argmax(raman.energies['cm^-1'])
+        np.testing.assert_almost_equal(
+            raman.depolarization_ratios[i], 0.09412532271275614)
+        # Test that running the workflow again warns a UserWarning
+        with pytest.warns(UserWarning):
+            phonons.run()
+        with pytest.warns(UserWarning):
+            raman.run()
+
+    def test_run_second_order_phonons(self):
+        N2_ref = """\
+2   angstroem
+free
+N   3.571946174   3.571946174   3.620526682
+N   3.571946174   3.571946174   4.71401439"""
+        ref_pos = Posinp.from_string(N2_ref)
+        gs = Job(posinp=ref_pos, name='N2', run_dir='tests/phonons_N2')
+        phonons = Phonons(gs, order=2)
         raman = RamanSpectrum(phonons)
         assert not phonons.is_completed
         assert not raman.is_completed
