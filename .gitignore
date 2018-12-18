@@ -17,6 +17,11 @@ tests/*_N2/
 *runtest*
 *dry_run*
 *minimal.yaml
+tests/data-*
+tests/forces*.xyz
+tests/time*.yaml
+tests/with_*dir.xyz
+tests/with_*dir.yaml
 
 # Doc files
 doc/build/
@@ -30,5 +35,6 @@ doc/source/notebooks/link_with_ASE
 
 # Extra files
 .ipynb_checkpoints
+*.DS_Store
 *debug/
 *dummy/

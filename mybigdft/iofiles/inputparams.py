@@ -19,7 +19,7 @@ try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
     from yaml import Loader, Dumper
-from mybigdft.globals import INPUT_VARIABLES
+from mybigdft.globals import DEFAULT_PARAMETERS, INPUT_PARAMETERS_DEFINITIONS
 from .posinp import Posinp
 
 
@@ -143,6 +143,8 @@ class InputParams(MutableMapping):
             self._posinp = new
 
     def __getitem__(self, key):
+        r"""
+        """
         return self.params[key]
 
     def __setitem__(self, key, value):
@@ -212,8 +214,8 @@ def clean(params, keyword=None):
     params : dict
         Trial BigDFT input parameters.
     keyword: NoneType or str
-        Main key of input variables key to be checked (used to check
-        CheSS input variables).
+        Main key of input parameters key to be checked (used to check
+        CheSS input parameters).
 
     Returns
     -------
@@ -231,9 +233,9 @@ def clean(params, keyword=None):
     # on params. This copy will be returned.
     real_params = deepcopy(params)
     # Use the correct reference for the input variables
-    variables = INPUT_VARIABLES
+    default = DEFAULT_PARAMETERS
     if keyword is not None:
-        variables = variables[keyword]
+        default = default[keyword]
     # Set real_params['output']['orbitals'] to 'None' when it is False
     if 'output' in real_params and real_params['output'] is not None and \
             'orbitals' in real_params['output'] and \
@@ -249,7 +251,7 @@ def clean(params, keyword=None):
             continue
         # Delete the child keys whose values are default
         for child_key, child_value in value.items():
-            default_value = variables[key][child_key].get("default")
+            default_value = default[key][child_key]
             if child_value == default_value:
                 del real_params[key][child_key]
         # Delete the key if it is empty
@@ -288,17 +290,17 @@ def check(params, keyword=None):
         possible values, the value of the master key does not allow for
         the key to be defined)
     """
-    variables = INPUT_VARIABLES
+    parameters = INPUT_PARAMETERS_DEFINITIONS
     if keyword is not None:
-        variables = variables[keyword]
+        parameters = parameters[keyword]
     for key, value in params.items():
         # Check the key
-        if key not in variables:
+        if key not in parameters:
             raise KeyError("Unknown key '{}'".format(key))
         if value is not None:
             for subkey, subvalue in value.items():
                 # Check the subkey
-                key_definition = variables[key]
+                key_definition = parameters[key]
                 if subkey not in key_definition:
                     raise KeyError(
                         "Unknown key '{}' in '{}'".format(subkey, key))

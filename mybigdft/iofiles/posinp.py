@@ -58,6 +58,8 @@ class Posinp(Sequence):
         ...     repr(atom)
         "Atom('N', [0.0, 0.0, 0.0])"
         "Atom('N', [0.0, 0.0, 1.1])"
+        >>> posinp.masses
+        array([14.00674, 14.00674])
         """
         # Check initial values
         units = units.lower()
@@ -316,10 +318,20 @@ class Posinp(Sequence):
         r"""
         Returns
         -------
-        2D numpy array of shape (math:`n_{at}`, 3)
+        2D numpy array of shape (:math:`n_{at}`, 3)
             Position of all the atoms in the system.
         """
         return np.array([atom.position for atom in self])
+
+    @property
+    def masses(self):
+        r"""
+        Returns
+        -------
+        numpy array of length :math:`n_{at}`
+            Masses of all the atoms in the system.
+        """
+        return np.array([atom.mass for atom in self])
 
     def __getitem__(self, index):
         r"""
@@ -538,8 +550,8 @@ class Posinp(Sequence):
             New posinp where all the atoms are centered on the center
             of mass of the system.
         """
-        masses = np.array([ATOMS_MASS[atom.type] for atom in self.atoms])
-        barycenter = np.sum(self._positions.T*masses, axis=1) / np.sum(masses)
+        m = self.masses
+        barycenter = np.sum(m*self._positions.T, axis=1) / np.sum(m)
         return self.translate(-barycenter)
 
 
@@ -563,11 +575,14 @@ class Atom(object):
         'C'
         >>> a.position
         array([0., 0., 0.])
+        >>> a.mass
+        12.011
         """
         # TODO: Check that the atom type exists
         assert len(position) == 3, "The position must have three components"
         self._type = atom_type
         self._position = np.array(position, dtype=float)
+        self._mass = ATOMS_MASS[self.type]
 
     @classmethod
     def from_dict(cls, atom_dict):
@@ -601,6 +616,16 @@ class Atom(object):
             Position of the atom in cartesian coordinates.
         """
         return self._position
+
+    @property
+    def mass(self):
+        r"""
+        Returns
+        -------
+        float
+            Mass of the atom in atomic mass units.
+        """
+        return self._mass
 
     def translate(self, vector):
         r"""

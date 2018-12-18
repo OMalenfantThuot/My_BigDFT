@@ -6,8 +6,7 @@ spectrum.
 
 from __future__ import print_function, absolute_import
 import numpy as np
-from mybigdft.globals import (ATOMS_MASS, AMU_TO_EMU, EMU_TO_AMU, B_TO_ANG,
-                              ANG_TO_B)
+from mybigdft.globals import AMU_TO_EMU, EMU_TO_AMU, B_TO_ANG, ANG_TO_B
 from .workflow import AbstractWorkflow
 from .poltensor import PolTensor
 
@@ -125,7 +124,7 @@ class RamanSpectrum(AbstractWorkflow):
         """
         return self._poltensor_workflows
 
-    def _run(self, nmpi, nomp, force_run, dry_run):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related Raman intensities in order to be able to plot the
@@ -143,13 +142,20 @@ class RamanSpectrum(AbstractWorkflow):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
         """
         self.phonons.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
+            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete)
         for pt in self.poltensor_workflows:
             pt.run(
-                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        super(RamanSpectrum, self)._run(nmpi, nomp, force_run, dry_run)
+                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
+                restart_if_incomplete=restart_if_incomplete)
+        super(RamanSpectrum, self)._run(
+            nmpi, nomp, force_run, dry_run,
+            restart_if_incomplete=restart_if_incomplete)
 
     def post_proc(self):
         r"""
@@ -193,7 +199,7 @@ class RamanSpectrum(AbstractWorkflow):
     def _compute_deriv_pol_tensors(self):
         r"""
         Compute the derivative of the polarizability tensor along all
-        the atom displacements.
+        the atomic displacements.
 
         All the elements of the derivative of the polarizability tensor
         along one displacement direction are represented by a line of
@@ -213,21 +219,27 @@ class RamanSpectrum(AbstractWorkflow):
         n_at = len(self.phonons.ground_state.posinp)
         deriv_pts = np.zeros((3*n_at, 3, 3))
         pt_wfs = self.poltensor_workflows
-        # for i, (pt1, pt2) in enumerate(zip(pt_wfs[::2], pt_wfs[1::2]))
-        for i, (pt1, pt2) in enumerate(zip(*[iter(pt_wfs)]*2)):
+        if self.phonons.order == 1:
+            ref_pt = pt_wfs.pop(0)
+            pol_tensors = (pt_wfs, [ref_pt]*len(pt_wfs))
+        elif self.phonons.order == 2:
+            pol_tensors = (pt_wfs[::2], pt_wfs[1::2])
+        else:
+            raise NotImplementedError
+        for i, (pt1, pt2) in enumerate(zip(*pol_tensors)):
             # Get the value of the delta of move amplitudes
             gs1 = pt1.ground_state
-            gs2 = pt2.ground_state
             amp = gs1.displacement.amplitude
-            assert amp == - gs2.displacement.amplitude
-            delta_x = 2 * amp
+            if self.phonons.order == 1:
+                delta_x = amp
+            elif self.phonons.order == 2:
+                delta_x = 2 * amp
             if gs1.posinp.units == 'angstroem':
                 delta_x *= ANG_TO_B
             # Get the value of the delta of poltensors
             i_at = gs1.moved_atom
-            assert i_at == gs2.moved_atom
             delta_pol_tensor = pt1.pol_tensor - pt2.pol_tensor
             # Compute the derivative of the polarizability tensor
-            mass = ATOMS_MASS[gs1.posinp[i_at].type] * AMU_TO_EMU
+            mass = gs1.posinp[i_at].mass * AMU_TO_EMU
             deriv_pts[i] = delta_pol_tensor / delta_x / np.sqrt(mass)
         return deriv_pts.T

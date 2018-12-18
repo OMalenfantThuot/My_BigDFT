@@ -8,7 +8,7 @@ from copy import deepcopy
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 from mybigdft import Job
-from mybigdft.globals import COORDS, SIGNS
+from mybigdft.globals import COORDS, SIGNS, DEFAULT_PARAMETERS
 from .workflow import AbstractWorkflow
 
 
@@ -125,8 +125,7 @@ class PolTensor(AbstractWorkflow):
         Returns
         -------
         numpy.array
-            Polarizability tensor of the system (units: atomic, that is,
-            bohr^3).
+            Polarizability tensor of the system (units: atomic).
         """
         return self._pol_tensor
 
@@ -137,7 +136,7 @@ class PolTensor(AbstractWorkflow):
         -------
         float
             Mean (electronic) polarizability of the system (units:
-            atomic, that is, bohr^3).
+            atomic).
         """
         return self._mean_polarizability
 
@@ -174,9 +173,17 @@ class PolTensor(AbstractWorkflow):
                 inp['dft']['elecfield'] = efield.vector
             else:
                 inp['dft'] = {'elecfield': efield.vector}
+            # Set the correct reference data directory
+            default = DEFAULT_PARAMETERS["output"]["orbitals"]
+            write_orbitals = ("output" in gs.inputparams and
+                              gs.inputparams["output"] != default)
+            if self.order == 1 and write_orbitals:
+                ref_data_dir = gs.data_dir  # pragma: no cover
+            else:
+                ref_data_dir = gs.ref_data_dir
             run_dir = os.path.join(gs.run_dir, "EF_along_{}".format(key))
             job = Job(name=gs.name, inputparams=inp, posinp=gs.posinp,
-                      run_dir=run_dir, skip=gs.skip, ref_data_dir=gs.data_dir)
+                      run_dir=run_dir, skip=gs.skip, ref_data_dir=ref_data_dir)
             job.efield = efield
             queue.append(job)
         return queue
@@ -215,16 +222,17 @@ class PolTensor(AbstractWorkflow):
             # Compute the second order tensor elements
             # for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))
             for i, (job1, job2) in enumerate(zip(*[iter(self.queue)]*2)):
+                # Get the delta of dipoles
+                d1 = np.array(job1.logfile.dipole)
+                d2 = np.array(job2.logfile.dipole)
+                delta_dipoles = d1 - d2
                 # Get the delta of electric field amplitude
                 amp1 = job1.efield.amplitude
                 amp2 = job2.efield.amplitude
                 assert amp1 == - amp2
                 delta_ef = amp1 - amp2
-                # Get the delta of dipoles
-                d1 = np.array(job1.logfile.dipole)
-                d2 = np.array(job2.logfile.dipole)
                 # Update the polarizability tensor
-                pol_tensor[:, i] = (d1 - d2) / delta_ef
+                pol_tensor[:, i] = delta_dipoles / delta_ef
         # Set some attributes
         self._pol_tensor = pol_tensor  # atomic units
         self._mean_polarizability = pol_tensor.trace()/3  # atomic units

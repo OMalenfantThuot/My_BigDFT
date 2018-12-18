@@ -5,7 +5,7 @@ infrared spectrum.
 """
 
 import numpy as np
-from mybigdft.globals import ATOMS_MASS, ANG_TO_B, B_TO_ANG, AU_TO_DEBYE
+from mybigdft.globals import ANG_TO_B, B_TO_ANG, AU_TO_DEBYE
 from .workflow import AbstractWorkflow
 
 
@@ -100,7 +100,7 @@ class InfraredSpectrum(AbstractWorkflow):
         """
         return self._Zbvs
 
-    def _run(self, nmpi, nomp, force_run, dry_run):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to plot the
@@ -118,10 +118,16 @@ class InfraredSpectrum(AbstractWorkflow):
         dry_run : bool
             If `True`, the input files are written on disk, but the
             bigdft-tool command is run instead of the bigdft one.
+        restart_if_incomplete : bool
+            If `True`, the job is restarted if the existing logfile is
+            incomplete.
         """
         self.phonons.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run)
-        super(InfraredSpectrum, self)._run(nmpi, nomp, force_run, dry_run)
+            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete)
+        super(InfraredSpectrum, self)._run(
+            nmpi, nomp, force_run, dry_run,
+            restart_if_incomplete=restart_if_incomplete)
 
     def post_proc(self):
         r"""
@@ -134,7 +140,7 @@ class InfraredSpectrum(AbstractWorkflow):
         nms = self.phonons.normal_modes.T
         self._Zbvs = [self.Z*nm for nm in nms]
         self._intensities = np.array([np.sum(np.sum(Zbv, axis=1)**2)
-                                     for Zbv in self.Zbvs])
+                                      for Zbv in self.Zbvs])
 
     def _compute_Z_matrix(self):
         r"""
@@ -150,16 +156,19 @@ class InfraredSpectrum(AbstractWorkflow):
         # displacement
         ZT = np.zeros((3*n_at, 3))  # transpose of the wanted Z matrix
         for i, (job1, job2) in enumerate(zip(*[iter(self.phonons.queue)]*2)):
+            # Compute the delta dipole (in atomic units)
+            d1 = np.array(job1.logfile.dipole)
+            d2 = np.array(job2.logfile.dipole)
+            delta_dipoles = d1 - d2
+            # Compute the delta displacement (in atomic units or bohr)
             amp1 = job1.displacement.amplitude
             amp2 = job2.displacement.amplitude
             delta_u = amp1-amp2
             if job1.posinp.units == "angstroem":
                 delta_u *= ANG_TO_B
-            d1 = np.array(job1.logfile.dipole)
-            d2 = np.array(job2.logfile.dipole)
-            ZT[i] = ((d1-d2)*AU_TO_DEBYE) / (delta_u*B_TO_ANG)
+            # Set the new line of the transpose of the Z matrix
+            ZT[i] = (delta_dipoles*AU_TO_DEBYE) / (delta_u*B_TO_ANG)
         # Normalize by the square root of the masses of the displaced atom
-        masses = [ATOMS_MASS[atom.type] for atom in posinp]
-        mass_norm = np.array([[mass]*9 for mass in masses])
+        mass_norm = np.array([[mass]*9 for mass in posinp.masses])
         mass_norm = mass_norm.reshape((3*n_at, 3))
         return (ZT / np.sqrt(mass_norm)).T

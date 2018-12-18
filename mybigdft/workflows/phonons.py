@@ -8,8 +8,8 @@ import os
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 from mybigdft import Job
-from mybigdft.globals import (COORDS, SIGNS, ATOMS_MASS, AMU_TO_EMU,
-                              B_TO_ANG, ANG_TO_B, HA_TO_CMM1)
+from mybigdft.globals import (COORDS, SIGNS, AMU_TO_EMU, HA_TO_CMM1,
+                              B_TO_ANG, ANG_TO_B, DEFAULT_PARAMETERS)
 from .workflow import AbstractWorkflow
 
 
@@ -89,7 +89,7 @@ class Phonons(AbstractWorkflow):
         translation_amplitudes = [amp if amp is not None else 0.0
                                   for amp in translation_amplitudes]
         if 0.0 in translation_amplitudes:
-            raise NotImplementedError()  # pragma: no cover
+            raise NotImplementedError()
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._translation_amplitudes = translation_amplitudes
@@ -198,9 +198,17 @@ class Phonons(AbstractWorkflow):
                 run_dir = os.path.join(
                     gs.run_dir, "atom{:04d}".format(i_at), key)
                 new_posinp = gs.posinp.translate_atom(i_at, disp.vector)
+                # Set the correct reference data directory
+                default = DEFAULT_PARAMETERS["output"]["orbitals"]
+                write_orbitals = ("output" in gs.inputparams and
+                                  gs.inputparams["output"] != default)
+                if self.order == 1 and write_orbitals:
+                    ref_data_dir = gs.data_dir  # pragma: no cover
+                else:
+                    ref_data_dir = gs.ref_data_dir
                 job = Job(inputparams=gs.inputparams, posinp=new_posinp,
                           name=gs.name, run_dir=run_dir, skip=gs.skip,
-                          ref_data_dir=gs.data_dir)
+                          ref_data_dir=ref_data_dir)
                 # Add attributes to the job to facilitate post-processing
                 job.moved_atom = i_at
                 job.displacement = disp
@@ -275,19 +283,12 @@ class Phonons(AbstractWorkflow):
         Returns
         -------
         2D square numpy array of dimension :math:`3 n_{at}`
-            Masses matrix.
+            Masses matrix converted to electronic mass units.
         """
-        # Get the atoms of the system from the reference posinp
         posinp = self.ground_state.posinp
-        atom_types = [atom.type for atom in posinp]
-        # Build the masses matrix (the loops over range(3) are here
-        # to ensure that masses has the same dimension as the Hessian)
-        masses = [[ATOMS_MASS[atom1] * ATOMS_MASS[atom2]
-                   for atom2 in atom_types for _ in range(3)]
-                  for atom1 in atom_types for _ in range(3)]
-        # Return the masses as a numpy array, converted in electronic
-        # mass units
-        return np.sqrt(masses) * AMU_TO_EMU
+        to_mesh = [atom.mass for atom in posinp for _ in range(3)]
+        m_i, m_j = np.meshgrid(to_mesh, to_mesh)
+        return np.sqrt(m_i*m_j) * AMU_TO_EMU
 
     def _compute_hessian(self):
         r"""
