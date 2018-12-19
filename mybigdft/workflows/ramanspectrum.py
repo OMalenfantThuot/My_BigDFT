@@ -124,7 +124,8 @@ class RamanSpectrum(AbstractWorkflow):
         """
         return self._poltensor_workflows
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
+             timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related Raman intensities in order to be able to plot the
@@ -145,17 +146,18 @@ class RamanSpectrum(AbstractWorkflow):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which each job must be stopped.
         """
         self.phonons.run(
             nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
         for pt in self.poltensor_workflows:
             pt.run(
                 nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-                restart_if_incomplete=restart_if_incomplete)
+                timeout=timeout, restart_if_incomplete=restart_if_incomplete)
         super(RamanSpectrum, self)._run(
-            nmpi, nomp, force_run, dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
 
     def post_proc(self):
         r"""

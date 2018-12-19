@@ -6,6 +6,7 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
+from threading import Timer
 from copy import deepcopy
 from mybigdft.iofiles import InputParams, Logfile
 from mybigdft.iofiles.logfiles import GeoptLogfile
@@ -415,7 +416,7 @@ class Job(object):
         os.chdir(self.init_dir)
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False,
-            restart_if_incomplete=False):
+            restart_if_incomplete=False, timeout=None):
         r"""
         Run the BigDFT calculation if it was not already performed.
         The number of MPI and OpenMP tasks may be specified.
@@ -445,6 +446,8 @@ class Job(object):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which the job must be stopped.
         """
         # Copy the data directory of a reference calculation
         if self.ref_data_dir is not None:
@@ -462,7 +465,7 @@ class Job(object):
             self._set_environment(nomp)
             self.write_input_files()
             command = self._get_command(nmpi, dry_run)
-            output_msg = self._launch_calculation(command)
+            output_msg = self._launch_calculation(command, timeout)
             if dry_run:
                 self._write_bigdft_tool_output(output_msg)
             else:
@@ -486,7 +489,8 @@ class Job(object):
                     print("The logfile was incomplete, restart calculation")
                     os.remove(self.logfile_name)
                     self.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                             dry_run=dry_run, restart_if_incomplete=False)
+                             dry_run=dry_run, restart_if_incomplete=False,
+                             timeout=timeout)
                 else:
                     raise e
             else:
@@ -684,7 +688,7 @@ class Job(object):
             self.posinp.write(self.posinp_name)
 
     @staticmethod
-    def _launch_calculation(command):
+    def _launch_calculation(command, timeout):
         r"""
         Launch the command to run the bigdft or bigdft-tool command.
 
@@ -702,13 +706,21 @@ class Job(object):
         to_str = "{} "*len(command)
         command_msg = to_str.format(*command)+"..."
         print(command_msg)
-        # Run the calculation
+        # Run the calculation for at most timeout minutes
         run = subprocess.Popen(
             command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if timeout is None:
+            # 60 years timeout should be enough...
+            timeout = 60*365*24*60
+        timer = Timer(timeout*60, run.kill)
+        try:
+            timer.start()
+            out, err = run.communicate()
+            error_msg = err.decode('unicode_escape')
+        finally:
+            timer.cancel()
         # Raise an error if the calculation ended badly, else return the
         # decoded output message
-        out, err = run.communicate()
-        error_msg = err.decode('unicode_escape')
         if error_msg != '':
             raise RuntimeError(
                 "The calculation ended with the following error message:{}"

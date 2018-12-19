@@ -108,7 +108,8 @@ class VibPolTensor(AbstractWorkflow):
         """
         return self._mean_polarizability
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
+             timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to compute
@@ -130,13 +131,14 @@ class VibPolTensor(AbstractWorkflow):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which each job must be stopped.
         """
         self.infrared.run(
             nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
         super(VibPolTensor, self)._run(
-            nmpi, nomp, force_run, dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
 
     def post_proc(self):
         r"""
