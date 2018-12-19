@@ -471,7 +471,12 @@ class Job(object):
             else:
                 output_msg = output_msg.decode('unicode_escape')
                 print(output_msg)
-            self._logfile = Logfile.from_file(self.logfile_name)
+            try:
+                self._logfile = Logfile.from_file(self.logfile_name)
+            except ValueError as e:
+                if str(e) == "The logfile is incomplete!":
+                    raise RuntimeError(
+                        "Timeout exceded ({} minutes)".format(timeout))
             if os.path.exists(self.data_dir):
                 self._clean_data_dir()
         else:
@@ -482,8 +487,7 @@ class Job(object):
             try:
                 self._logfile = Logfile.from_file(self.logfile_name)
             except ValueError as e:
-                incomplete_log = str(e).endswith(
-                    "The logfile is incomplete!")
+                incomplete_log = str(e) == "The logfile is incomplete!"
                 if incomplete_log and restart_if_incomplete:
                     # Remove the logfile and restart the calculation
                     print("The logfile was incomplete, restart calculation")
@@ -539,101 +543,6 @@ class Job(object):
                     del self.inputparams['dft']['inputpsiid']
             except KeyError:
                 pass
-
-    def _clean_data_dir(self):
-        r"""
-        Clean the data directory, namely delete the wavefunctions in
-        the data folder if it was not requested to output them, and
-        delete the output files of a geopt calculation if a geopt
-        was not performed.
-        """
-        # Delete the wavefunction files in the data directory and
-        # replace them by empty files if needed.
-        inp = self.inputparams
-        default = DEFAULT_PARAMETERS["output"]["orbitals"]
-        write_orbitals = ("output" in inp and "orbitals" in inp["output"]
-                          and inp["output"]["orbitals"] != default)
-        if "output" not in inp or not write_orbitals:
-            wf_files = [os.path.join(self.data_dir, filename)
-                        for filename in os.listdir(self.data_dir)
-                        if filename.startswith("wavefunction")]
-            for wf_file in wf_files:
-                os.remove(wf_file)
-                # Equivalent to touch wf_file in bash
-                with open(wf_file, 'a'):
-                    os.utime(wf_file, None)
-        # Delete geopt data if no geopt was required
-        if "geopt" not in inp:
-            # Delete the posout files
-            posout_files = [os.path.join(self.data_dir, filename)
-                            for filename in os.listdir(self.data_dir)
-                            if filename.startswith("posout")]
-            for posout_file in posout_files:
-                os.remove(posout_file)
-            # Delete the geopt.mon file
-            try:
-                os.remove(os.path.join(self.data_dir, "geopt.mon"))
-            except OSError:
-                pass
-
-    def _check_logfile_posinp(self):
-        r"""
-        Check that the posinp used in the logfile corresponds to the one
-        used to initialize the job.
-
-        Raises
-        ------
-        UserWarning
-            If the initial geometry of the job does not correspond to
-            the one of the Logfile previously read from the disk.
-        """
-        if isinstance(self.logfile, GeoptLogfile):
-            log_pos = self.logfile.posinps[0]
-        else:
-            log_pos = self.logfile.posinp
-        if log_pos != self.posinp:
-            raise UserWarning(
-                "The initial geometry of this job do not correspond to the "
-                "one used in the Logfile:\n"
-                "Logfile posinp:\n{}Actual posinp:\n{}"
-                .format(log_pos, self.posinp))
-
-    def _check_logfile_inputparams(self):
-        r"""
-        Check that the input parameters used in the logfile correspond
-        to the ones used to initialize the job.
-
-        Raises
-        ------
-        UserWarning
-            If the input parameters of the job does not correspond to
-            the one used in the Logfile previously read from the disk.
-        """
-        log_inp = self.logfile.inputparams
-        base_inp = self.inputparams
-        # Clean the disablesym key:
-        disablesym_in_log_inp = ('dft' in log_inp and
-                                 'disablesym' in log_inp['dft'])
-        disablesym_not_in_log_inp = ('dft' in log_inp and
-                                     'disablesym' not in log_inp['dft'])
-        disablesym_in_base_inp = ('dft' in base_inp and
-                                  'disablesym' in base_inp['dft'])
-        disablesym_not_in_base_inp = ('dft' in base_inp and
-                                      'disablesym' not in base_inp['dft'])
-        # - if present only in the log_inp
-        if disablesym_in_log_inp and disablesym_not_in_base_inp:
-            del log_inp['dft']['disablesym']
-            log_inp._params = clean(log_inp.params)
-        # - if present only in the base_inp
-        if disablesym_not_in_log_inp and disablesym_in_base_inp:
-            del base_inp['dft']['disablesym']
-            base_inp._params = clean(log_inp.params)
-        if base_inp != log_inp:
-            raise UserWarning(
-                "The input parameters of this job do not correspond to the "
-                "ones used in the Logfile:\n"
-                "Logfile input parameters:\n{}\nActual input parameters:\n{}"
-                .format(log_inp, base_inp))
 
     @staticmethod
     def _set_environment(nomp):
@@ -738,6 +647,101 @@ class Job(object):
         """
         log = Logfile.from_stream(output_msg)
         log.write(self.logfile_name)
+
+    def _clean_data_dir(self):
+        r"""
+        Clean the data directory, namely delete the wavefunctions in
+        the data folder if it was not requested to output them, and
+        delete the output files of a geopt calculation if a geopt
+        was not performed.
+        """
+        # Delete the wavefunction files in the data directory and
+        # replace them by empty files if needed.
+        inp = self.inputparams
+        default = DEFAULT_PARAMETERS["output"]["orbitals"]
+        write_orbitals = ("output" in inp and "orbitals" in inp["output"]
+                          and inp["output"]["orbitals"] != default)
+        if "output" not in inp or not write_orbitals:
+            wf_files = [os.path.join(self.data_dir, filename)
+                        for filename in os.listdir(self.data_dir)
+                        if filename.startswith("wavefunction")]
+            for wf_file in wf_files:
+                os.remove(wf_file)
+                # Equivalent to touch wf_file in bash
+                with open(wf_file, 'a'):
+                    os.utime(wf_file, None)
+        # Delete geopt data if no geopt was required
+        if "geopt" not in inp:
+            # Delete the posout files
+            posout_files = [os.path.join(self.data_dir, filename)
+                            for filename in os.listdir(self.data_dir)
+                            if filename.startswith("posout")]
+            for posout_file in posout_files:
+                os.remove(posout_file)
+            # Delete the geopt.mon file
+            try:
+                os.remove(os.path.join(self.data_dir, "geopt.mon"))
+            except OSError:
+                pass
+
+    def _check_logfile_posinp(self):
+        r"""
+        Check that the posinp used in the logfile corresponds to the one
+        used to initialize the job.
+
+        Raises
+        ------
+        UserWarning
+            If the initial geometry of the job does not correspond to
+            the one of the Logfile previously read from the disk.
+        """
+        if isinstance(self.logfile, GeoptLogfile):
+            log_pos = self.logfile.posinps[0]
+        else:
+            log_pos = self.logfile.posinp
+        if log_pos != self.posinp:
+            raise UserWarning(
+                "The initial geometry of this job do not correspond to the "
+                "one used in the Logfile:\n"
+                "Logfile posinp:\n{}Actual posinp:\n{}"
+                .format(log_pos, self.posinp))
+
+    def _check_logfile_inputparams(self):
+        r"""
+        Check that the input parameters used in the logfile correspond
+        to the ones used to initialize the job.
+
+        Raises
+        ------
+        UserWarning
+            If the input parameters of the job does not correspond to
+            the one used in the Logfile previously read from the disk.
+        """
+        log_inp = self.logfile.inputparams
+        base_inp = self.inputparams
+        # Clean the disablesym key:
+        disablesym_in_log_inp = ('dft' in log_inp and
+                                 'disablesym' in log_inp['dft'])
+        disablesym_not_in_log_inp = ('dft' in log_inp and
+                                     'disablesym' not in log_inp['dft'])
+        disablesym_in_base_inp = ('dft' in base_inp and
+                                  'disablesym' in base_inp['dft'])
+        disablesym_not_in_base_inp = ('dft' in base_inp and
+                                      'disablesym' not in base_inp['dft'])
+        # - if present only in the log_inp
+        if disablesym_in_log_inp and disablesym_not_in_base_inp:
+            del log_inp['dft']['disablesym']
+            log_inp._params = clean(log_inp.params)
+        # - if present only in the base_inp
+        if disablesym_not_in_log_inp and disablesym_in_base_inp:
+            del base_inp['dft']['disablesym']
+            base_inp._params = clean(log_inp.params)
+        if base_inp != log_inp:
+            raise UserWarning(
+                "The input parameters of this job do not correspond to the "
+                "ones used in the Logfile:\n"
+                "Logfile input parameters:\n{}\nActual input parameters:\n{}"
+                .format(log_inp, base_inp))
 
     def clean(self, data_dir=False, logfiles_dir=False):
         r"""

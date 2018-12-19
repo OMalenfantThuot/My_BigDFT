@@ -159,14 +159,14 @@ class TestJob:
             job.clean()
         assert np.isclose(job.logfile.energy, -191.74377352940274)
 
-    def test_run_exceeds_timeout_raises_ValueError(self):
+    def test_run_exceeds_timeout_raises_RuntimeError(self):
         inp = InputParams({"dft": {"rmult": [9, 12], "hgrids": 0.25}})
         with Job(inputparams=inp, posinp=self.pos, run_dir="tests",
                  name="long-run") as job:
             job.clean()
             assert not job.is_completed
-            with pytest.raises(ValueError):
-                job.run(timeout=1.5/60)
+            with pytest.raises(RuntimeError):
+                job.run(timeout=1.5/60, force_run=True)
 
     def test_clean(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
