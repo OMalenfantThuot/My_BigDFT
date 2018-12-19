@@ -138,7 +138,7 @@ class TestJob:
             assert job.is_completed
         assert np.isclose(job.logfile.energy, -191.74377352940274)
 
-    def test_run_raises_ValueErro_when_incomplete_logfile(self):
+    def test_run_raises_ValueError_when_incomplete_logfile(self):
         with Job(inputparams=self.inp, posinp=self.pos,
                  run_dir="tests",
                  name="incomplete") as job:
@@ -158,6 +158,15 @@ class TestJob:
             assert job.is_completed
             job.clean()
         assert np.isclose(job.logfile.energy, -191.74377352940274)
+
+    def test_run_exceeds_timeout_raises_ValueError(self):
+        inp = InputParams({"dft": {"rmult": [9, 12], "hgrids": 0.25}})
+        with Job(inputparams=inp, posinp=self.pos, run_dir="tests",
+                 name="long-run") as job:
+            job.clean()
+            assert not job.is_completed
+            with pytest.raises(ValueError):
+                job.run(timeout=1.5/60)
 
     def test_clean(self):
         with Job(inputparams=self.inp, name="dry_run", run_dir="tests") as job:
