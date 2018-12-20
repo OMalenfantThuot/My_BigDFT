@@ -239,6 +239,14 @@ class TestLogfile:
         assert all([pos != log_HCN[0].posinp for pos in log_HCN.posinps[1:]])
         assert all([log_HCN.inputparams == doc.inputparams for doc in log_HCN])
 
+    @pytest.mark.filterwarnings("ignore::UserWarning")
+    def test_test_GeoptLogfile_acceptable_though_incomplete(self):
+        fname = os.path.join(tests_fol,
+                             "log-geopt-acceptable-though-incomplete.yaml")
+        log_H3CCN = Logfile.from_file(fname)
+        assert isinstance(log_H3CCN, GeoptLogfile)
+        assert len(log_H3CCN) == 15
+
 
 class TestMultipleLogfile:
 
