@@ -65,7 +65,7 @@ class InfraredSpectrum(AbstractWorkflow):
         Returns
         -------
         numpy.array or None
-            Phonon energies of the system.
+            Phonon energies of the system (units: cm^-1).
         """
         return self.phonons.energies
 
@@ -75,7 +75,8 @@ class InfraredSpectrum(AbstractWorkflow):
         Returns
         -------
         list or None
-            Intensities of the phonons.
+            Infrared intensities of the phonons (units:
+            (D/Ang)^2.amu^-1).
         """
         return self._intensities
 

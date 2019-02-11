@@ -146,7 +146,7 @@ class VibPolTensor(AbstractWorkflow):
         considered system (units: atomic).
         """
         # Filter energies and normal modes according to e_cut
-        e = self.infrared.phonons.energies["cm^-1"]
+        e = self.infrared.phonons.energies
         e_f = e[np.where(e > self.e_cut)]
         # Convert intensities to km.mol^-1 and filter them
         intensities = self.infrared.intensities * 42.255

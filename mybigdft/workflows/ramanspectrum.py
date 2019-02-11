@@ -89,7 +89,7 @@ class RamanSpectrum(AbstractWorkflow):
         Returns
         -------
         numpy.array or None
-            Phonon energies of the system.
+            Phonon energies of the system (units: cm^-1).
         """
         return self.phonons.energies
 
@@ -99,7 +99,7 @@ class RamanSpectrum(AbstractWorkflow):
         Returns
         -------
         list or None
-            Intensities of the phonons.
+            Raman intensities of the phonons (units: Ang^4.amu^-1).
         """
         return self._intensities
 

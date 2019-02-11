@@ -131,7 +131,7 @@ N   3.571946174   3.571946174   4.71401439"""
         assert ph.is_completed
         # Test the only physically relevant phonon energy
         np.testing.assert_almost_equal(
-            max(ph.energies['cm^-1']), 2386.9850607523636, decimal=6)
+            max(ph.energies), 2386.9850607523636, decimal=6)
 
 
 class TestRamanSpectrum:
@@ -156,12 +156,12 @@ N   3.571946174   3.571946174   4.71401439"""
         assert raman.is_completed
         # Test the only physically relevant phonon energy
         np.testing.assert_almost_equal(
-            max(raman.energies['cm^-1']), 2386.9850607466974, decimal=6)
+            max(raman.energies), 2386.9850607466974, decimal=6)
         # Test the only physically relevant intensity
         np.testing.assert_almost_equal(
             max(raman.intensities), 22.561427637014187)
         # Test the only physically relevant depolarization ratio
-        i = np.argmax(raman.energies['cm^-1'])
+        i = np.argmax(raman.energies)
         np.testing.assert_almost_equal(
             raman.depolarization_ratios[i], 0.09412532271275614)
         # Test that running the workflow again warns a UserWarning
@@ -187,12 +187,12 @@ N   3.571946174   3.571946174   4.71401439"""
         assert raman.is_completed
         # Test the only physically relevant phonon energy
         np.testing.assert_almost_equal(
-            max(raman.energies['cm^-1']), 2386.9463343478246, decimal=6)
+            max(raman.energies), 2386.9463343478246, decimal=6)
         # Test the only physically relevant intensity
         np.testing.assert_almost_equal(
             max(raman.intensities), 22.564457304830206)
         # Test the only physically relevant depolarization ratio
-        i = np.argmax(raman.energies['cm^-1'])
+        i = np.argmax(raman.energies)
         np.testing.assert_almost_equal(
             raman.depolarization_ratios[i], 0.09412173797731693)
         # Test that running the workflow again warns a UserWarning
@@ -225,7 +225,7 @@ class TestInfraredSpectrum:
         ir.run()
         assert ir.is_completed
         # Test the only physically relevant infrared intensity
-        i = np.argmax(ir.energies['cm^-1'])
+        i = np.argmax(ir.energies)
         np.testing.assert_almost_equal(ir.intensities[i], 1.100446469749e-06)
         # Test that running the workflow again warns a UserWarning
         with pytest.warns(UserWarning):
