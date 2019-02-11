@@ -41,7 +41,7 @@ LAST_SUBSPACE_OPTIMIZATION = LAST_GROUND_STATE_OPTIMIZATION + [
 ]
 
 
-def _get_value_from_last_optimizations(key):
+def _get_value_from_last_optimization(key):
     r"""
     """
     l_1 = deepcopy(LAST_GROUND_STATE_OPTIMIZATION)
@@ -83,15 +83,15 @@ ATTRIBUTES = {
     },
     "evals": {
         PATHS: [["Complete list of energy eigenvalues"]] +
-               _get_value_from_last_optimizations("Orbitals"),  # noqa
+        _get_value_from_last_optimization("Orbitals"),
         DOC: "Orbital energies and occupations"
     },
     "fermi_level": {
-        PATHS: _get_value_from_last_optimizations("Fermi Energy"),
+        PATHS: _get_value_from_last_optimization("Fermi Energy"),
         DOC: "Fermi level"
     },
     "magnetization": {
-        PATHS: _get_value_from_last_optimizations("Total magnetization"),
+        PATHS: _get_value_from_last_optimization("Total magnetization"),
         DOC: "Total magnetization of the system"
     },
     "kpt_mesh": {
@@ -173,8 +173,25 @@ class Logfile(Mapping):
         self._log = log
         self._set_builtin_attributes()
         self._clean_attributes()
-        if self.log != {} and (self.energy is None and self.forces is None and
-                               self.walltime is None):
+        # It might happen that a geopt calculation has a step whose log
+        # looks like it is incomplete, but they are actually acceptable.
+        # To that end, we look for a specific warning message in one of
+        # the logs (except the initial one). To make sure the current
+        # log is not the initial one, we look for the "geopt" key, which
+        # is not repreated in the subsequent logs. It's a workaround
+        # which might prove edgy in the future.
+        if "geopt" not in self.log:
+            avoidable_warning = ("The norm of the residue is too large, need "
+                                 "to recalculate input wavefunctions")
+            warnings = log.get("WARNINGS")
+            acceptable_though_incomplete = (warnings is not None and
+                                            avoidable_warning in warnings)
+        else:
+            acceptable_though_incomplete = False
+        # Check if the logfile is incomplete
+        if self.log != {} and not acceptable_though_incomplete and (
+                self.energy is None and self.forces is None and
+                self.walltime is None):
             raise ValueError("The logfile is incomplete!")
         params = {key: log.get(key) for key in INPUT_PARAMETERS_DEFINITIONS}
         params = clean(params)

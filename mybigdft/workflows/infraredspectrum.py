@@ -65,7 +65,7 @@ class InfraredSpectrum(AbstractWorkflow):
         Returns
         -------
         numpy.array or None
-            Phonon energies of the system.
+            Phonon energies of the system (units: cm^-1).
         """
         return self.phonons.energies
 
@@ -75,7 +75,8 @@ class InfraredSpectrum(AbstractWorkflow):
         Returns
         -------
         list or None
-            Intensities of the phonons.
+            Infrared intensities of the phonons (units:
+            (D/Ang)^2.amu^-1).
         """
         return self._intensities
 
@@ -100,7 +101,8 @@ class InfraredSpectrum(AbstractWorkflow):
         """
         return self._Zbvs
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
+             timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to plot the
@@ -121,13 +123,14 @@ class InfraredSpectrum(AbstractWorkflow):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which each job must be stopped.
         """
         self.phonons.run(
             nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
         super(InfraredSpectrum, self)._run(
-            nmpi, nomp, force_run, dry_run,
-            restart_if_incomplete=restart_if_incomplete)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
 
     def post_proc(self):
         r"""

@@ -273,7 +273,8 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         """
         raise NotImplementedError
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
+             timeout):
         r"""
         This method runs the jobs until the hgrids are too high to
         stop giving results in the desired precision range.
@@ -293,6 +294,8 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which each job must be stopped.
 
         Warns
         ------
@@ -303,7 +306,7 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         # Run the first job of the queue and get the reference energy
         with self.queue[0] as ref_job:
             ref_job.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                        dry_run=dry_run,
+                        dry_run=dry_run, timeout=timeout,
                         restart_if_incomplete=restart_if_incomplete)
         ref_job.is_converged = True
         ref_job.precision_per_atom = 0.0
@@ -320,7 +323,7 @@ class AbstractConvergence(AbstractWorkflow, ABC):
             else:
                 with job as j:
                     j.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                          dry_run=dry_run,
+                          dry_run=dry_run, timeout=timeout,
                           restart_if_incomplete=restart_if_incomplete)
                 # Warn a UserWarning if the current job gives a lower
                 # energy than the reference one

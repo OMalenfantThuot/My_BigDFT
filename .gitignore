@@ -20,8 +20,8 @@ tests/*_N2/
 tests/data-*
 tests/forces*.xyz
 tests/time*.yaml
-tests/with_*dir.xyz
-tests/with_*dir.yaml
+tests/with_*dir.*y*
+tests/long-run.*y*
 
 # Doc files
 doc/build/

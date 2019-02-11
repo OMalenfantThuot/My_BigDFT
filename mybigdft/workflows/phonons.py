@@ -140,7 +140,7 @@ class Phonons(AbstractWorkflow):
         Returns
         -------
         numpy.array or None
-            Phonon energies of the system.
+            Phonon energies of the system (units: cm^-1).
         """
         return self._energies
 
@@ -244,9 +244,8 @@ class Phonons(AbstractWorkflow):
         # - Set the dynamical matrix
         self._dyn_mat = self._compute_dyn_mat()
         # - Find the energies as eigenvalues of the dynamical matrix
-        self._energies = {}
-        self._energies['Ha'], self._normal_modes = self._solve_dyn_mat()
-        self._energies['cm^-1'] = self.energies['Ha'] * HA_TO_CMM1
+        self._energies, self._normal_modes = self._solve_dyn_mat()
+        self._energies *= HA_TO_CMM1  # Convert from Hartree to cm^-1
 
     def _compute_dyn_mat(self):
         r"""

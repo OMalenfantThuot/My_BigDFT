@@ -6,6 +6,7 @@ from __future__ import print_function, absolute_import
 import os
 import shutil
 import subprocess
+from threading import Timer
 from copy import deepcopy
 from mybigdft.iofiles import InputParams, Logfile
 from mybigdft.iofiles.logfiles import GeoptLogfile
@@ -415,7 +416,7 @@ class Job(object):
         os.chdir(self.init_dir)
 
     def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False,
-            restart_if_incomplete=False):
+            restart_if_incomplete=False, timeout=None):
         r"""
         Run the BigDFT calculation if it was not already performed.
         The number of MPI and OpenMP tasks may be specified.
@@ -445,6 +446,8 @@ class Job(object):
         restart_if_incomplete : bool
             If `True`, the job is restarted if the existing logfile is
             incomplete.
+        timeout : float or int or None
+            Number of minutes after which the job must be stopped.
         """
         # Copy the data directory of a reference calculation
         if self.ref_data_dir is not None:
@@ -462,13 +465,18 @@ class Job(object):
             self._set_environment(nomp)
             self.write_input_files()
             command = self._get_command(nmpi, dry_run)
-            output_msg = self._launch_calculation(command)
+            output_msg = self._launch_calculation(command, timeout)
             if dry_run:
                 self._write_bigdft_tool_output(output_msg)
             else:
                 output_msg = output_msg.decode('unicode_escape')
                 print(output_msg)
-            self._logfile = Logfile.from_file(self.logfile_name)
+            try:
+                self._logfile = Logfile.from_file(self.logfile_name)
+            except ValueError as e:
+                if str(e) == "The logfile is incomplete!":
+                    raise RuntimeError(
+                        "Timeout exceded ({} minutes)".format(timeout))
             if os.path.exists(self.data_dir):
                 self._clean_data_dir()
         else:
@@ -479,14 +487,14 @@ class Job(object):
             try:
                 self._logfile = Logfile.from_file(self.logfile_name)
             except ValueError as e:
-                incomplete_log = str(e).endswith(
-                    "The logfile is incomplete!")
+                incomplete_log = str(e) == "The logfile is incomplete!"
                 if incomplete_log and restart_if_incomplete:
                     # Remove the logfile and restart the calculation
                     print("The logfile was incomplete, restart calculation")
                     os.remove(self.logfile_name)
                     self.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                             dry_run=dry_run, restart_if_incomplete=False)
+                             dry_run=dry_run, restart_if_incomplete=False,
+                             timeout=timeout)
                 else:
                     raise e
             else:
@@ -535,6 +543,110 @@ class Job(object):
                     del self.inputparams['dft']['inputpsiid']
             except KeyError:
                 pass
+
+    @staticmethod
+    def _set_environment(nomp):
+        r"""
+        Set the number of OpenMP threads.
+
+        Parameters
+        ----------
+        nomp : int
+            Number of OpenMP tasks.
+        """
+        nomp = int(nomp)  # Make sure you get an integer
+        if nomp > 1:
+            os.environ["OMP_NUM_THREADS"] = str(nomp)
+
+    def _get_command(self, nmpi, dry_run):
+        r"""
+        Returns
+        -------
+        command : list
+            The command to run bigdft if `dry_run` is set to `False`,
+            else the command to run bigdft-tool.
+
+        Parameters
+        ----------
+        nmpi : int
+            Number of MPI tasks.
+        dry_run : bool
+            If `True`, the input files are written on disk, but the
+            bigdft-tool command is run instead of the bigdft one.
+        """
+        nmpi = int(nmpi)  # Make sure you get an integer
+        mpi_option = []
+        if dry_run:
+            if nmpi > 1:
+                mpi_option = ['-n', str(nmpi)]
+            command = self.bigdft_tool_cmd + mpi_option
+        else:
+            if nmpi > 1:
+                mpi_option = ['mpirun', '-np', str(nmpi)]
+            command = mpi_option + self.bigdft_cmd
+        return command
+
+    def write_input_files(self):
+        r"""
+        Write the input files on disk (there might be no posinp to write,
+        since the initial positions can be defined in the input
+        parameters).
+        """
+        self.inputparams.write(self.input_name)
+        if self.posinp is not None:
+            self.posinp.write(self.posinp_name)
+
+    @staticmethod
+    def _launch_calculation(command, timeout):
+        r"""
+        Launch the command to run the bigdft or bigdft-tool command.
+
+        Parameters
+        ----------
+        command : list
+            The command to run bigdft or bigdft-tool.
+
+        Raises
+        ------
+        RuntimeError
+            If the calculation ended with an error message.
+        """
+        # Print the command in a human readable way
+        to_str = "{} "*len(command)
+        command_msg = to_str.format(*command)+"..."
+        print(command_msg)
+        # Run the calculation for at most timeout minutes
+        run = subprocess.Popen(
+            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        if timeout is None:
+            # 60 years timeout should be enough...
+            timeout = 60*365*24*60
+        timer = Timer(timeout*60, run.kill)
+        try:
+            timer.start()
+            out, err = run.communicate()
+            error_msg = err.decode('unicode_escape')
+        finally:
+            timer.cancel()
+        # Raise an error if the calculation ended badly, else return the
+        # decoded output message
+        if error_msg != '':
+            raise RuntimeError(
+                "The calculation ended with the following error message:{}"
+                .format(error_msg))
+        return out
+
+    def _write_bigdft_tool_output(self, output_msg):
+        r"""
+        Write the output of the bigdft-tool command on disk.
+
+        Parameters
+        ----------
+        output_msg : str
+            Output of the bigdft-tool command as a Logfile.
+        """
+        log = Logfile.from_stream(output_msg)
+        log.write(self.logfile_name)
 
     def _clean_data_dir(self):
         r"""
@@ -630,102 +742,6 @@ class Job(object):
                 "ones used in the Logfile:\n"
                 "Logfile input parameters:\n{}\nActual input parameters:\n{}"
                 .format(log_inp, base_inp))
-
-    @staticmethod
-    def _set_environment(nomp):
-        r"""
-        Set the number of OpenMP threads.
-
-        Parameters
-        ----------
-        nomp : int
-            Number of OpenMP tasks.
-        """
-        nomp = int(nomp)  # Make sure you get an integer
-        if nomp > 1:
-            os.environ["OMP_NUM_THREADS"] = str(nomp)
-
-    def _get_command(self, nmpi, dry_run):
-        r"""
-        Returns
-        -------
-        command : list
-            The command to run bigdft if `dry_run` is set to `False`,
-            else the command to run bigdft-tool.
-
-        Parameters
-        ----------
-        nmpi : int
-            Number of MPI tasks.
-        dry_run : bool
-            If `True`, the input files are written on disk, but the
-            bigdft-tool command is run instead of the bigdft one.
-        """
-        nmpi = int(nmpi)  # Make sure you get an integer
-        mpi_option = []
-        if dry_run:
-            if nmpi > 1:
-                mpi_option = ['-n', str(nmpi)]
-            command = self.bigdft_tool_cmd + mpi_option
-        else:
-            if nmpi > 1:
-                mpi_option = ['mpirun', '-np', str(nmpi)]
-            command = mpi_option + self.bigdft_cmd
-        return command
-
-    def write_input_files(self):
-        r"""
-        Write the input files on disk (there might be no posinp to write,
-        since the initial positions can be defined in the input
-        parameters).
-        """
-        self.inputparams.write(self.input_name)
-        if self.posinp is not None:
-            self.posinp.write(self.posinp_name)
-
-    @staticmethod
-    def _launch_calculation(command):
-        r"""
-        Launch the command to run the bigdft or bigdft-tool command.
-
-        Parameters
-        ----------
-        command : list
-            The command to run bigdft or bigdft-tool.
-
-        Raises
-        ------
-        RuntimeError
-            If the calculation ended with an error message.
-        """
-        # Print the command in a human readable way
-        to_str = "{} "*len(command)
-        command_msg = to_str.format(*command)+"..."
-        print(command_msg)
-        # Run the calculation
-        run = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        # Raise an error if the calculation ended badly, else return the
-        # decoded output message
-        out, err = run.communicate()
-        error_msg = err.decode('unicode_escape')
-        if error_msg != '':
-            raise RuntimeError(
-                "The calculation ended with the following error message:{}"
-                .format(error_msg))
-        return out
-
-    def _write_bigdft_tool_output(self, output_msg):
-        r"""
-        Write the output of the bigdft-tool command on disk.
-
-        Parameters
-        ----------
-        output_msg : str
-            Output of the bigdft-tool command as a Logfile.
-        """
-        log = Logfile.from_stream(output_msg)
-        log.write(self.logfile_name)
 
     def clean(self, data_dir=False, logfiles_dir=False):
         r"""
