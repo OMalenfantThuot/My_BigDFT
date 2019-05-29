@@ -7,6 +7,7 @@ even though both packages do not provide the same API and functionalities.
 
 It is currently supported for the following python versions: 2.7, 3.6, 3.7.
 
+Credit to [mmoriniere](https://gitlab.com/mmoriniere) for the original [code](https://gitlab.com/mmoriniere/MyBigDFT).
 
 ## Installation
 

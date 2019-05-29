@@ -3,6 +3,8 @@
 *pyc
 *__pycache__*
 *egg-info*
+build/
+dist/
 
 # Testing/coverage files
 *assets
