@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*
 """setup for MyBigDFT."""
 
-from setuptools import setup  # , find_packages
+from setuptools import setup, find_packages
 from codecs import open
 from os import path
 
@@ -17,4 +17,7 @@ def readme():
     return long_description
 
 
-setup()
+setup(
+    name="mybigdft",
+    packages=find_packages(),
+    )
