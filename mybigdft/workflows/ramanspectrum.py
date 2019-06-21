@@ -211,11 +211,11 @@ class RamanSpectrum(AbstractWorkflow):
         modes.
 
         Note that each element is also weighted by the inverse of the
-        square root of the atom that is moved.
+        square root of the mass of the atom that is moved.
 
         Returns
         -------
-        2D np.array of shape :math:`(3 n_{at}, 9)`
+        2D np.array of shape :math:`(3, 3, 3 n_{at})`
             Derivatives of the polarizability tensor.
         """
         n_at = len(self.phonons.ground_state.posinp)
