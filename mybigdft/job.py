@@ -154,6 +154,8 @@ class Job(object):
         self._set_filename_attributes()
         self._set_cmd_attributes()
 
+        self._pseudos = pseudos
+
     @property
     def name(self):
         r"""
@@ -430,7 +432,6 @@ class Job(object):
         dry_run=False,
         restart_if_incomplete=False,
         timeout=None,
-        pseudos=pseudos,
     ):
         r"""
         Run the BigDFT calculation if it was not already performed.
@@ -478,7 +479,7 @@ class Job(object):
             # Run bigdft (if dry_run is False) or bigdft-tool (if
             # dry_run is True)
             self._set_environment(nomp)
-            self.write_input_files(pseudos=pseudos)
+            self.write_input_files()
             command = self._get_command(nmpi, dry_run)
             output_msg = self._launch_calculation(command, timeout)
             if dry_run:
@@ -513,7 +514,6 @@ class Job(object):
                         dry_run=dry_run,
                         restart_if_incomplete=False,
                         timeout=timeout,
-                        pseudos=pseudos
                     )
                 else:
                     raise e
@@ -605,7 +605,7 @@ class Job(object):
             command = mpi_option + self.bigdft_cmd
         return command
 
-    def write_input_files(self, pseudos=pseudos):
+    def write_input_files(self):
         r"""
         Write the input files on disk (there might be no posinp to write,
         since the initial positions can be defined in the input
@@ -614,10 +614,10 @@ class Job(object):
         self.inputparams.write(self.input_name)
         if self.posinp is not None:
             self.posinp.write(self.posinp_name)
-        if pseudos:
-            elements = set([atom.type for atom in pos])
+        if self._pseudos:
+            elements = set([atom.type for atom in self.posinp])
             for element in elements:
-                shutil.copyfile("$PSEUDODIR" + "psppar." + element, "psppar." + element)
+                shutil.copyfile(os.environ['PSEUDODIR'] + "psppar." + element, "psppar." + element)
 
     @staticmethod
     def _launch_calculation(command, timeout):
