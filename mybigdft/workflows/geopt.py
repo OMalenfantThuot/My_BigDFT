@@ -19,7 +19,7 @@ class Geopt(AbstractWorkflow):
 
     POST_PROCESSING_ATTRIBUTES = ["final_posinp"]
 
-    def __init__(self, base_job, method="SQNM", forcemax=1e-6, frac_fluct=2.0,
+    def __init__(self, base_job, method="SQNM", forcemax=1e-6, frac_fluct=0.0,
                  betax=1, ncount_cluster_x=200, **kwargs):
         r"""
         The base job has a given set of input parameters, and default
