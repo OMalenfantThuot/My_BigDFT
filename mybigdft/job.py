@@ -21,8 +21,16 @@ class Job(object):
     that the calculation is run the desired directory.
     """
 
-    def __init__(self, name="", inputparams=None, posinp=None, run_dir=None,
-                 ref_data_dir=None, skip=False):
+    def __init__(
+        self,
+        name="",
+        inputparams=None,
+        posinp=None,
+        run_dir=None,
+        ref_data_dir=None,
+        skip=False,
+        pseudos=False,
+    ):
         r"""
         You may pass input parameters and/or initial geometry (posinp).
         Make sure to at least provide initial positions, either via the
@@ -129,8 +137,7 @@ class Job(object):
         if inputparams.posinp is None and posinp is None:
             raise ValueError("Please provide initial positions.")
         elif inputparams.posinp is not None and posinp != inputparams.posinp:
-            raise ValueError(
-                "inputparams and posinp do not define the same posinp.")
+            raise ValueError("inputparams and posinp do not define the same posinp.")
 
         # Set the base attributes
         inputparams._params = clean(inputparams.params)
@@ -146,6 +153,8 @@ class Job(object):
         self._set_directory_attributes(run_dir)
         self._set_filename_attributes()
         self._set_cmd_attributes()
+
+        self._pseudos = pseudos
 
     @property
     def name(self):
@@ -199,6 +208,17 @@ class Job(object):
             wavefunctions) is stored.
         """
         return self._ref_data_dir
+
+    @property
+    def pseudos(self):
+        r"""
+        Returns
+        _______
+        bool
+            if `True`, the calculation uses the pseudopotential files
+            in $PSEUDODIR (environment variable).
+        """
+        return self._pseudos
 
     @property
     def skip(self):
@@ -336,7 +356,7 @@ class Job(object):
             # A run directory was given, find the common prefix with the
             # current working directory
             basename = os.path.commonprefix([self.init_dir, run_dir])
-            if basename == '':
+            if basename == "":
                 # If there is no common prefix, then the run directory
                 # is already well defined, and the absolute directory is
                 # the concatenation of the current working directory and
@@ -360,7 +380,7 @@ class Job(object):
         # Set the data directory
         data_dir = "data"  # base name for the BigDFT data directory
         if self.name != "":
-            data_dir += '-'+self.name
+            data_dir += "-" + self.name
         self._data_dir = os.path.join(self.run_dir, data_dir)
 
     def _set_cmd_attributes(self):
@@ -386,9 +406,9 @@ class Job(object):
         files.
         """
         if self.name != "":
-            self._input_name = self.name+".yaml"  # input file name
-            self._posinp_name = self.name+".xyz"  # posinp file name
-            self._logfile_name = "log-"+self.input_name  # output file name
+            self._input_name = self.name + ".yaml"  # input file name
+            self._posinp_name = self.name + ".xyz"  # posinp file name
+            self._logfile_name = "log-" + self.input_name  # output file name
         else:
             self._input_name = "input.yaml"  # input file name
             self._posinp_name = "posinp.xyz"  # posinp file name
@@ -415,8 +435,15 @@ class Job(object):
         """
         os.chdir(self.init_dir)
 
-    def run(self, nmpi=1, nomp=1, force_run=False, dry_run=False,
-            restart_if_incomplete=False, timeout=None):
+    def run(
+        self,
+        nmpi=1,
+        nomp=1,
+        force_run=False,
+        dry_run=False,
+        restart_if_incomplete=False,
+        timeout=None,
+    ):
         r"""
         Run the BigDFT calculation if it was not already performed.
         The number of MPI and OpenMP tasks may be specified.
@@ -469,14 +496,13 @@ class Job(object):
             if dry_run:
                 self._write_bigdft_tool_output(output_msg)
             else:
-                output_msg = output_msg.decode('unicode_escape')
+                output_msg = output_msg.decode("unicode_escape")
                 print(output_msg)
             try:
                 self._logfile = Logfile.from_file(self.logfile_name)
             except ValueError as e:
                 if str(e) == "The logfile is incomplete!":
-                    raise RuntimeError(
-                        "Timeout exceded ({} minutes)".format(timeout))
+                    raise RuntimeError("Timeout exceded ({} minutes)".format(timeout))
             if os.path.exists(self.data_dir):
                 self._clean_data_dir()
         else:
@@ -492,9 +518,14 @@ class Job(object):
                     # Remove the logfile and restart the calculation
                     print("The logfile was incomplete, restart calculation")
                     os.remove(self.logfile_name)
-                    self.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                             dry_run=dry_run, restart_if_incomplete=False,
-                             timeout=timeout)
+                    self.run(
+                        nmpi=nmpi,
+                        nomp=nomp,
+                        force_run=force_run,
+                        dry_run=dry_run,
+                        restart_if_incomplete=False,
+                        timeout=timeout,
+                    )
                 else:
                     raise e
             else:
@@ -525,22 +556,21 @@ class Job(object):
         directory if they exist.
         """
         # Check that there are wavefunction files
-        wf_files = [f for f in os.listdir(self.data_dir)
-                    if 'wavefunction' in f]
+        wf_files = [f for f in os.listdir(self.data_dir) if "wavefunction" in f]
         if wf_files:
             # If there are wavefunction files, add the
             # option to read them from files.
             try:
-                self.inputparams['dft']['inputpsiid'] = 2
+                self.inputparams["dft"]["inputpsiid"] = 2
             except KeyError:
-                self.inputparams['dft'] = {'inputpsiid': 2}
+                self.inputparams["dft"] = {"inputpsiid": 2}
         else:
             # Else, delete the option from the input file, if
             # it is equal to 2 (might be better than completely
             # removing inputpsiid ?).
             try:
-                if self.inputparams['dft']['inputpsiid'] == 2:
-                    del self.inputparams['dft']['inputpsiid']
+                if self.inputparams["dft"]["inputpsiid"] == 2:
+                    del self.inputparams["dft"]["inputpsiid"]
             except KeyError:
                 pass
 
@@ -578,11 +608,11 @@ class Job(object):
         mpi_option = []
         if dry_run:
             if nmpi > 1:
-                mpi_option = ['-n', str(nmpi)]
+                mpi_option = ["-n", str(nmpi)]
             command = self.bigdft_tool_cmd + mpi_option
         else:
             if nmpi > 1:
-                mpi_option = ['mpirun', '-np', str(nmpi)]
+                mpi_option = ["mpirun", "-np", str(nmpi)]
             command = mpi_option + self.bigdft_cmd
         return command
 
@@ -595,6 +625,12 @@ class Job(object):
         self.inputparams.write(self.input_name)
         if self.posinp is not None:
             self.posinp.write(self.posinp_name)
+        if self._pseudos:
+            elements = set([atom.type for atom in self.posinp])
+            for element in elements:
+                shutil.copyfile(
+                    os.environ["PSEUDODIR"] + "psppar." + element, "psppar." + element
+                )
 
     @staticmethod
     def _launch_calculation(command, timeout):
@@ -612,28 +648,29 @@ class Job(object):
             If the calculation ended with an error message.
         """
         # Print the command in a human readable way
-        to_str = "{} "*len(command)
-        command_msg = to_str.format(*command)+"..."
+        to_str = "{} " * len(command)
+        command_msg = to_str.format(*command) + "..."
         print(command_msg)
         # Run the calculation for at most timeout minutes
-        run = subprocess.Popen(
-            command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        run = subprocess.Popen(command, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         if timeout is None:
             # 60 years timeout should be enough...
-            timeout = 60*365*24*60
-        timer = Timer(timeout*60, run.kill)
+            timeout = 60 * 365 * 24 * 60
+        timer = Timer(timeout * 60, run.kill)
         try:
             timer.start()
             out, err = run.communicate()
-            error_msg = err.decode('unicode_escape')
+            error_msg = err.decode("unicode_escape")
         finally:
             timer.cancel()
         # Raise an error if the calculation ended badly, else return the
         # decoded output message
-        if error_msg != '':
+        if error_msg != "":
             raise RuntimeError(
-                "The calculation ended with the following error message:{}"
-                .format(error_msg))
+                "The calculation ended with the following error message:{}".format(
+                    error_msg
+                )
+            )
         return out
 
     def _write_bigdft_tool_output(self, output_msg):
@@ -659,23 +696,30 @@ class Job(object):
         # replace them by empty files if needed.
         inp = self.inputparams
         default = DEFAULT_PARAMETERS["output"]["orbitals"]
-        write_orbitals = ("output" in inp and "orbitals" in inp["output"]
-                          and inp["output"]["orbitals"] != default)
+        write_orbitals = (
+            "output" in inp
+            and "orbitals" in inp["output"]
+            and inp["output"]["orbitals"] != default
+        )
         if "output" not in inp or not write_orbitals:
-            wf_files = [os.path.join(self.data_dir, filename)
-                        for filename in os.listdir(self.data_dir)
-                        if filename.startswith("wavefunction")]
+            wf_files = [
+                os.path.join(self.data_dir, filename)
+                for filename in os.listdir(self.data_dir)
+                if filename.startswith("wavefunction")
+            ]
             for wf_file in wf_files:
                 os.remove(wf_file)
                 # Equivalent to touch wf_file in bash
-                with open(wf_file, 'a'):
+                with open(wf_file, "a"):
                     os.utime(wf_file, None)
         # Delete geopt data if no geopt was required
         if "geopt" not in inp:
             # Delete the posout files
-            posout_files = [os.path.join(self.data_dir, filename)
-                            for filename in os.listdir(self.data_dir)
-                            if filename.startswith("posout")]
+            posout_files = [
+                os.path.join(self.data_dir, filename)
+                for filename in os.listdir(self.data_dir)
+                if filename.startswith("posout")
+            ]
             for posout_file in posout_files:
                 os.remove(posout_file)
             # Delete the geopt.mon file
@@ -703,8 +747,8 @@ class Job(object):
             raise UserWarning(
                 "The initial geometry of this job do not correspond to the "
                 "one used in the Logfile:\n"
-                "Logfile posinp:\n{}Actual posinp:\n{}"
-                .format(log_pos, self.posinp))
+                "Logfile posinp:\n{}Actual posinp:\n{}".format(log_pos, self.posinp)
+            )
 
     def _check_logfile_inputparams(self):
         r"""
@@ -720,28 +764,30 @@ class Job(object):
         log_inp = self.logfile.inputparams
         base_inp = self.inputparams
         # Clean the disablesym key:
-        disablesym_in_log_inp = ('dft' in log_inp and
-                                 'disablesym' in log_inp['dft'])
-        disablesym_not_in_log_inp = ('dft' in log_inp and
-                                     'disablesym' not in log_inp['dft'])
-        disablesym_in_base_inp = ('dft' in base_inp and
-                                  'disablesym' in base_inp['dft'])
-        disablesym_not_in_base_inp = ('dft' in base_inp and
-                                      'disablesym' not in base_inp['dft'])
+        disablesym_in_log_inp = "dft" in log_inp and "disablesym" in log_inp["dft"]
+        disablesym_not_in_log_inp = (
+            "dft" in log_inp and "disablesym" not in log_inp["dft"]
+        )
+        disablesym_in_base_inp = "dft" in base_inp and "disablesym" in base_inp["dft"]
+        disablesym_not_in_base_inp = (
+            "dft" in base_inp and "disablesym" not in base_inp["dft"]
+        )
         # - if present only in the log_inp
         if disablesym_in_log_inp and disablesym_not_in_base_inp:
-            del log_inp['dft']['disablesym']
+            del log_inp["dft"]["disablesym"]
             log_inp._params = clean(log_inp.params)
         # - if present only in the base_inp
         if disablesym_not_in_log_inp and disablesym_in_base_inp:
-            del base_inp['dft']['disablesym']
+            del base_inp["dft"]["disablesym"]
             base_inp._params = clean(log_inp.params)
         if base_inp != log_inp:
             raise UserWarning(
                 "The input parameters of this job do not correspond to the "
                 "ones used in the Logfile:\n"
-                "Logfile input parameters:\n{}\nActual input parameters:\n{}"
-                .format(log_inp, base_inp))
+                "Logfile input parameters:\n{}\nActual input parameters:\n{}".format(
+                    log_inp, base_inp
+                )
+            )
 
     def clean(self, data_dir=False, logfiles_dir=False):
         r"""
@@ -762,9 +808,16 @@ class Job(object):
             mentioned options are set to `True`: use with caution.
         """
         # Delete the input and output files
-        filenames = [self.logfile_name, self.input_name, self.posinp_name,
-                     "forces_"+self.posinp_name, "forces.xyz", "time.yaml",
-                     "input_minimal.yaml", self.name+"_minimal.yaml"]
+        filenames = [
+            self.logfile_name,
+            self.input_name,
+            self.posinp_name,
+            "forces_" + self.posinp_name,
+            "forces.xyz",
+            "time.yaml",
+            "input_minimal.yaml",
+            self.name + "_minimal.yaml",
+        ]
         for filename in filenames:
             try:
                 os.remove(filename)
@@ -773,7 +826,7 @@ class Job(object):
         # Delete the required directories
         directories = []
         if data_dir:
-            directories += ["data", "data-"+self.name]
+            directories += ["data", "data-" + self.name]
         if logfiles_dir:
             directories += ["logfiles"]
         for directory in directories:
