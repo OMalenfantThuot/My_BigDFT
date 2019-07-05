@@ -8,8 +8,15 @@ import os
 from collections import Sequence, namedtuple, OrderedDict
 import numpy as np
 from mybigdft import Job
-from mybigdft.globals import (COORDS, SIGNS, AMU_TO_EMU, HA_TO_CMM1,
-                              B_TO_ANG, ANG_TO_B, DEFAULT_PARAMETERS)
+from mybigdft.globals import (
+    COORDS,
+    SIGNS,
+    AMU_TO_EMU,
+    HA_TO_CMM1,
+    B_TO_ANG,
+    ANG_TO_B,
+    DEFAULT_PARAMETERS,
+)
 from .workflow import AbstractWorkflow
 
 
@@ -76,18 +83,23 @@ class Phonons(AbstractWorkflow):
         """
         # Set default translation amplitudes
         if translation_amplitudes is None:
-            translation_amplitudes = [0.45/64]*3
+            translation_amplitudes = [0.45 / 64] * 3
         # Check the desired order
         order = int(order)
         if order not in [1, 2]:
             raise NotImplementedError("Only first and second order available")
         # Check the translation amplitudes
-        if not isinstance(translation_amplitudes, Sequence) or \
-                len(translation_amplitudes) != 3:
-            raise ValueError("You must provide three electric field "
-                             "amplitudes, one for each space coordinate.")
-        translation_amplitudes = [amp if amp is not None else 0.0
-                                  for amp in translation_amplitudes]
+        if (
+            not isinstance(translation_amplitudes, Sequence)
+            or len(translation_amplitudes) != 3
+        ):
+            raise ValueError(
+                "You must provide three electric field "
+                "amplitudes, one for each space coordinate."
+            )
+        translation_amplitudes = [
+            amp if amp is not None else 0.0 for amp in translation_amplitudes
+        ]
         if 0.0 in translation_amplitudes:
             raise NotImplementedError()
         # Initialize the attributes that are specific to this workflow
@@ -195,20 +207,26 @@ class Phonons(AbstractWorkflow):
         for i_at in range(len(gs.posinp)):
             for key, disp in self.displacements.items():
                 # Prepare the new job by translating an atom
-                run_dir = os.path.join(
-                    gs.run_dir, "atom{:04d}".format(i_at), key)
+                run_dir = os.path.join(gs.run_dir, "atom{:04d}".format(i_at), key)
                 new_posinp = gs.posinp.translate_atom(i_at, disp.vector)
                 # Set the correct reference data directory
                 default = DEFAULT_PARAMETERS["output"]["orbitals"]
-                write_orbitals = ("output" in gs.inputparams and
-                                  gs.inputparams["output"] != default)
+                write_orbitals = (
+                    "output" in gs.inputparams and gs.inputparams["output"] != default
+                )
                 if self.order == 1 and write_orbitals:
                     ref_data_dir = gs.data_dir  # pragma: no cover
                 else:
                     ref_data_dir = gs.ref_data_dir
-                job = Job(inputparams=gs.inputparams, posinp=new_posinp,
-                          name=gs.name, run_dir=run_dir, skip=gs.skip,
-                          ref_data_dir=ref_data_dir, pseudos=gs.pseudos)
+                job = Job(
+                    inputparams=gs.inputparams,
+                    posinp=new_posinp,
+                    name=gs.name,
+                    run_dir=run_dir,
+                    skip=gs.skip,
+                    ref_data_dir=ref_data_dir,
+                    pseudos=gs.pseudos,
+                )
                 # Add attributes to the job to facilitate post-processing
                 job.moved_atom = i_at
                 job.displacement = disp
@@ -222,14 +240,14 @@ class Phonons(AbstractWorkflow):
         """
         displacements = OrderedDict()
         if self.order == 1:
-            signs = {"+": 1.}  # One displacement per coordinate
+            signs = {"+": 1.0}  # One displacement per coordinate
         elif self.order == 2:
             signs = SIGNS  # Two displacements per coordinate
         for i, coord in enumerate(COORDS):
             for sign in signs:
                 key = coord + sign
                 amplitude = signs[sign] * self.translation_amplitudes[i]
-                if self.ground_state.posinp.units == 'angstroem':
+                if self.ground_state.posinp.units == "angstroem":
                     amplitude *= B_TO_ANG
                 displacements[key] = Displacement(i, amplitude)
         return displacements
@@ -287,7 +305,7 @@ class Phonons(AbstractWorkflow):
         posinp = self.ground_state.posinp
         to_mesh = [atom.mass for atom in posinp for _ in range(3)]
         m_i, m_j = np.meshgrid(to_mesh, to_mesh)
-        return np.sqrt(m_i*m_j) * AMU_TO_EMU
+        return np.sqrt(m_i * m_j) * AMU_TO_EMU
 
     def _compute_hessian(self):
         r"""
@@ -303,7 +321,7 @@ class Phonons(AbstractWorkflow):
         gs = self.ground_state
         pos = gs.posinp
         n_at = len(pos)
-        hessian = np.zeros((3*n_at, 3*n_at))
+        hessian = np.zeros((3 * n_at, 3 * n_at))
         if self.order == 1:
             # Compute the first order matrix elements
             gs_forces = gs.logfile.forces.flatten()
@@ -317,11 +335,11 @@ class Phonons(AbstractWorkflow):
         elif self.order == 2:
             # Compute the second order matrix elements
             # for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))
-            for i, (job1, job2) in enumerate(zip(*[iter(self.queue)]*2)):
+            for i, (job1, job2) in enumerate(zip(*[iter(self.queue)] * 2)):
                 # Get the value of the delta of move amplitudes
                 amp1 = job1.displacement.amplitude
                 amp2 = job2.displacement.amplitude
-                assert amp1 == - amp2
+                assert amp1 == -amp2
                 delta_x = amp1 - amp2
                 # Get the value of the delta of forces
                 forces1 = job1.logfile.forces.flatten()
@@ -329,10 +347,10 @@ class Phonons(AbstractWorkflow):
                 # Set a new line of the Hessian matrix
                 hessian[i] = (forces1 - forces2) / delta_x
         # Convert to atomic units if needed
-        if pos.units == 'angstroem':
+        if pos.units == "angstroem":
             hessian /= ANG_TO_B
         # Return the Hessian matrix as a symmetric numpy array
-        return -(hessian + hessian.T) / 2.
+        return -(hessian + hessian.T) / 2.0
 
     def _solve_dyn_mat(self):
         r"""
@@ -353,7 +371,7 @@ class Phonons(AbstractWorkflow):
         return eigs, vecs
 
 
-class Displacement(namedtuple('Displacement', ['i_coord', 'amplitude'])):
+class Displacement(namedtuple("Displacement", ["i_coord", "amplitude"])):
     r"""
     This class defines an atomic displacement from the coordinate index
     and the amplitude of the displacement in that direction.

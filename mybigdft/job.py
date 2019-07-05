@@ -29,7 +29,7 @@ class Job(object):
         run_dir=None,
         ref_data_dir=None,
         skip=False,
-        pseudos=False
+        pseudos=False,
     ):
         r"""
         You may pass input parameters and/or initial geometry (posinp).
@@ -628,7 +628,9 @@ class Job(object):
         if self._pseudos:
             elements = set([atom.type for atom in self.posinp])
             for element in elements:
-                shutil.copyfile(os.environ['PSEUDODIR'] + "psppar." + element, "psppar." + element)
+                shutil.copyfile(
+                    os.environ["PSEUDODIR"] + "psppar." + element, "psppar." + element
+                )
 
     @staticmethod
     def _launch_calculation(command, timeout):
