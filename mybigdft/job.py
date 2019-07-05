@@ -210,6 +210,17 @@ class Job(object):
         return self._ref_data_dir
 
     @property
+    def pseudos(self):
+        r"""
+        Returns
+        _______
+        bool
+            if `True`, the calculation uses the pseudopotential files
+            in $PSEUDODIR (environment variable).
+        """
+        return self._pseudos
+
+    @property
     def skip(self):
         r"""
         Returns

@@ -208,7 +208,7 @@ class Phonons(AbstractWorkflow):
                     ref_data_dir = gs.ref_data_dir
                 job = Job(inputparams=gs.inputparams, posinp=new_posinp,
                           name=gs.name, run_dir=run_dir, skip=gs.skip,
-                          ref_data_dir=ref_data_dir)
+                          ref_data_dir=ref_data_dir, pseudos=gs.pseudos)
                 # Add attributes to the job to facilitate post-processing
                 job.moved_atom = i_at
                 job.displacement = disp
