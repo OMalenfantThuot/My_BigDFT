@@ -25,6 +25,16 @@ directory):
 This will copy the MyBigDFT sources, then set the environment variables
 needed by MyBigDFT before installing it.
 
+### To use pseudopotential files (optional)
+
+To be able to use pseudopotential files in the calculations, the following line
+must be added to the `~/.bashrc` file:
+
+`export PSEUDODIR="/path/to/the/directory/for/pseudos/files/"`
+
+The desired files must be named `psppar.` with the extension being the corresponding
+element atomic symbol.
+
 
 ### Extra steps you might need to follow
 
