@@ -35,6 +35,13 @@ must be added to the `~/.bashrc` file:
 The desired files must be named `psppar.` with the extension being the corresponding
 element atomic symbol.
 
+### To use SchnetPack models (optional)
+
+To be able to use [SchnetPack](https://github.com/OMalenfantThuot/schnetpack) models in calculations,
+the following line msut be added to the `~/.bashrc` file:
+
+`export MODELDIR="/path/to/the/directory/for/trained/models/"`
+
 
 ### Extra steps you might need to follow
 
