@@ -1,5 +1,9 @@
 # MyBigDFT
 
+<p align="center">
+<a href="https://github.com/ambv/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+</p>
+
 MyBigDFT provides a python wrapper over the BigDFT code.
 It can be considered as a sandbox for the PyBigDFT package.
 It might be used instead of the PyBigDFT package,
