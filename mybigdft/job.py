@@ -141,6 +141,7 @@ class Job(object):
 
         # Set the base attributes
         inputparams._params = clean(inputparams.params)
+        self._inputparams = deepcopy(inputparams)
         self._posinp = posinp
         self._logfile = Logfile()
         self._ref_data_dir = ref_data_dir
@@ -153,7 +154,6 @@ class Job(object):
                 self.inputparams["dft"]["ixc"] = -101130
             except KeyError:
                 self.inputparams["dft"] = {"ixc": -101130}
-        self._inputparams = deepcopy(inputparams)
 
         # Derive the rest of the attributes from the other arguments
         self._set_directory_attributes(run_dir)
