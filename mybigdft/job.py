@@ -65,6 +65,9 @@ class Job(object):
             be useful now, since we check for the existence of the
             logfile before running, which might be the actual check of
             the skip option of BigDFT.)
+        pseudos : bool
+            If `True`, the pseudopotential files stored in $PSEUDODIR
+            will be used to complete the job.
 
         Raises
         ------
