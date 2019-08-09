@@ -6,7 +6,7 @@ from __future__ import print_function, absolute_import
 import os
 
 
-class JobSchnet(object):
+class Jobschnet(object):
     r"""
     This class defines a SchnetPack calculation similarly
     to the Job class for BigDFT.
@@ -31,8 +31,7 @@ class JobSchnet(object):
         self._skip = bool(skip)
 
         self._set_directories(run_dir)
-        self._set_filename_attributes()
-        self._set_cmd_attributes
+        self._set_filenames()
 
     @property
     def name(self):
@@ -85,8 +84,38 @@ class JobSchnet(object):
         """
         return self._init_dir
 
+    @property
+    def run_dir(self):
+        r"""
+        Returns
+        -------
+        str
+            Absolute path to the directory where the calculation is run.
+        """
+        return self._run_dir
+
+    @property
+    def posinp_name(self):
+        r"""
+        Returns
+        -------
+        str
+            Name of base posinp file
+        """
+        return self._posinp_name
+
+    @property
+    def outfile_name(self):
+        r"""
+        Returns
+        -------
+        str
+            Name of the output file
+        """
+        return self._outfile_name
+
     def _set_directories(self, run_dir):
-        self.init_dir = os.getcwd()
+        self._init_dir = os.getcwd()
         if run_dir is None:
             self._run_dir = self.init_dir
         else:
@@ -97,3 +126,45 @@ class JobSchnet(object):
                 self._init_dir = basename
                 new_run_dir = os.path.relpath(run_dir, start=basename)
                 self._run_dir = os.path.join(self.init_dir, new_run_dir)
+
+    def _set_filenames(self):
+        if self.name != "":
+            self._posinp_name = self.name + ".xyz"
+            self._outfile_name = self.name + ".out"
+        else:
+            self._posinp_name = "posinp.xyz"
+            self._outfile_name = "outfile.out"
+
+    def __enter__(self):
+        r"""
+        When entering the context manager:
+
+        * create the directory where the calculations must be run,
+        * go to that directory.
+        """
+        if self.run_dir not in [".", ""]:
+            if not os.path.exists(self.run_dir):
+                os.makedirs(self.run_dir)
+            os.chdir(self.run_dir)
+        print(os.getcwd())
+        return self
+
+    def __exit__(self, *args):
+        r"""
+        When leaving the context manager, go back to the initial
+        directory.
+        """
+        os.chdir(self.init_dir)
+
+    def run(self, device="cpu", write_to_disk=False, timeout=None):
+        r"""
+        Parameters
+        ----------
+        device : str
+            Either 'cpu' or 'cuda' to run on cpu or gpu
+        write_to_disk : bool
+            If `True`, an outfile will be written after the calculation.
+        timeout : float or int or None
+            Number of minutes after which the job must be stopped.
+        """
+        pass
