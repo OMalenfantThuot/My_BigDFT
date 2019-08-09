@@ -4,6 +4,8 @@ The :class: `JobSchnet` class is the base class defining a SchnetPack calculatio
 
 from __future__ import print_function, absolute_import
 import os
+import torch
+from schnetpack.utils.script_utils.predict import predict
 
 
 class Jobschnet(object):
@@ -23,6 +25,13 @@ class Jobschnet(object):
         # Verify there are initial positions
         if posinp is None:
             raise ValueError("A JobSchnet instance has no initial positions.")
+        elif not isinstance(posinp, list):
+            posinp = [posinp]
+        for pos in posinp:
+            if not isinstance(pos, mybigdft.Posinp):
+                raise TypeError(
+                    "Atomic Positions should be given in a list of mybigdft.Posinp instances."
+                )
 
         # Set the base attributes
         self._posinp = posinp
@@ -156,15 +165,56 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
-    def run(self, device="cpu", write_to_disk=False, timeout=None):
+    def run(
+        self,
+        model_dir=None,
+        device="cpu",
+        write_to_disk=False,
+        batch_size=128,
+        overwrite=False,
+    ):
         r"""
         Parameters
         ----------
+        model_dir: str
+            Absolute path to the SchnetPack model to use in calculation
         device : str
             Either 'cpu' or 'cuda' to run on cpu or gpu
         write_to_disk : bool
             If `True`, an outfile will be written after the calculation.
-        timeout : float or int or None
-            Number of minutes after which the job must be stopped.
+        batch_size : int
+            Size of the mini-batches used in predictions
+        overwrite : bool
+            If `True`, all .db files are removed from the run_dir before 
+            the calculation is done.
         """
-        pass
+        # Verify model_dir
+        if model_dir is None:
+            raise ValueError("This job needs a path to a stored model.")
+        if not isinstance(model_dir, str):
+            raise TypeError("The path to the stored model must be a string.")
+
+        # Verify device
+        device = str(device)
+        if device.startswith("cuda"):
+            if not torch.cuda.is_available():
+                raise Warning("CUDA was asked for, but is not available.")
+
+        # Verify batch_size
+        if not isinstance(batch_size, int):
+            try:
+                batch_size == int(batch_size)
+            except:
+                raise TypeError("The mini-batches sizes are not defined correctly.")
+
+        # Run the actual calculation
+
+        predictions = predict(
+            modelpath=model_dir,
+            posinp=self._posinp,
+            device=device,
+            disk_out=write_to_disk,
+            batch_size=batch_size,
+            overwrite=overwrite,
+            return_values=True,
+        )
