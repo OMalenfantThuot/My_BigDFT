@@ -5,6 +5,7 @@ The :class: `JobSchnet` class is the base class defining a SchnetPack calculatio
 from __future__ import print_function, absolute_import
 import os
 import torch
+import numpy as np
 from mybigdft import Posinp
 from schnetpack.utils.script_utils.predict import predict
 
@@ -51,6 +52,9 @@ class Jobschnet(object):
 
         self._set_directories(run_dir)
         self._set_filenames()
+
+        if self._require_forces:
+            self.create_additional_structures()
 
     @property
     def name(self):
@@ -175,6 +179,23 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
+    def create_additional_structures(self, deriv_length=0.02):
+        r"""
+        Creates the additional structures needed to do a numeric
+        derivation of the energy to calculate the forces.
+        """
+        all_structs = []
+        for str_idx, struct in enumerate(self._posinp):
+            all_structs.append(struct)
+            for dim in [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])]:
+                all_structs.extend(
+                    [
+                        struct.translate_atom(atom_idx, deriv_length * dim)
+                        for atom_idx in range(len(struct))
+                    ]
+                )
+        self._posinp = all_structs
+
     def run(
         self,
         model_dir=None,
@@ -218,7 +239,6 @@ class Jobschnet(object):
                 raise TypeError("The mini-batches sizes are not defined correctly.")
 
         # Run the actual calculation
-
         predictions = predict(
             modelpath=model_dir,
             posinp=self._posinp,
@@ -228,4 +248,8 @@ class Jobschnet(object):
             batch_size=batch_size,
             overwrite=overwrite,
             return_values=True,
-        )
+        )["energy_U0"]
+
+        # calculate the forces
+        if self._require_forces:
+            pass
