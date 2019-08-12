@@ -5,6 +5,7 @@ The :class: `JobSchnet` class is the base class defining a SchnetPack calculatio
 from __future__ import print_function, absolute_import
 import os
 import torch
+from mybigdft import Posinp
 from schnetpack.utils.script_utils.predict import predict
 
 
@@ -28,7 +29,7 @@ class Jobschnet(object):
         elif not isinstance(posinp, list):
             posinp = [posinp]
         for pos in posinp:
-            if not isinstance(pos, mybigdft.Posinp):
+            if not isinstance(pos, Posinp):
                 raise TypeError(
                     "Atomic Positions should be given in a list of mybigdft.Posinp instances."
                 )
@@ -212,6 +213,7 @@ class Jobschnet(object):
         predictions = predict(
             modelpath=model_dir,
             posinp=self._posinp,
+            name=self._name,
             device=device,
             disk_out=write_to_disk,
             batch_size=batch_size,
