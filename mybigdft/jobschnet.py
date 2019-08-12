@@ -46,6 +46,7 @@ class Jobschnet(object):
 
         # Set the base attributes
         self._posinp = posinp
+        self._number_of_structures = len(self._posinp)
         self._require_forces = require_forces
         self._name = str(name)
         self._skip = bool(skip)
@@ -76,6 +77,16 @@ class Jobschnet(object):
             Initial positions of the calculation
         """
         return self._posinp
+
+    @property
+    def number_of_structures(self):
+        r"""
+        Returns
+        -------
+        int
+            Number of different structures when the job is declared
+        """
+        return self._number_of_structures
 
     @property
     def require_forces(self):
@@ -179,7 +190,7 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
-    def create_additional_structures(self, deriv_length=0.02):
+    def create_additional_structures(self, deriv_length=0.001):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
@@ -187,7 +198,14 @@ class Jobschnet(object):
         all_structs = []
         for str_idx, struct in enumerate(self._posinp):
             all_structs.append(struct)
-            for dim in [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])]:
+            for dim in [
+                np.array([1, 0, 0]),
+                np.array([-1, 0, 0]),
+                np.array([0, 1, 0]),
+                np.array([0, -1, 0]),
+                np.array([0, 0, 1]),
+                np.array([0, 0, -1]),
+            ]:
                 all_structs.extend(
                     [
                         struct.translate_atom(atom_idx, deriv_length * dim)
@@ -252,4 +270,5 @@ class Jobschnet(object):
 
         # calculate the forces
         if self._require_forces:
+            idx = 0
             pass
