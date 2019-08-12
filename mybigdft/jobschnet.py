@@ -22,6 +22,15 @@ class Jobschnet(object):
         Parameters
         ----------
         name : str
+            Name of the job. Will be used to name the created files.
+        posinp : Posinp
+            Base atomic positions for the job
+        require_forces : bool
+            If `True`, the forces need to be evaluated also.
+        run_dir : str or None
+            Folder where to run calculations (default to current directory)
+        skip : bool
+            If `True`, the calculation will be skipped (not used presently).
         """
         # Verify there are initial positions
         if posinp is None:
