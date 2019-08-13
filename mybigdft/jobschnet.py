@@ -50,6 +50,7 @@ class Jobschnet(object):
         self._require_forces = require_forces
         self._name = str(name)
         self._skip = bool(skip)
+        self._logfile = Logfileschnet(self._posinp)
 
         self._set_directories(run_dir)
         self._set_filenames()
@@ -107,6 +108,16 @@ class Jobschnet(object):
             If `True`, the calculation will be skipped.
         """
         return self._skip
+
+    @property
+    def logfile(self):
+        r"""
+        Returns
+        -------
+        Logfileschnet
+            Object empty or containing the results of the calculation.
+        """
+        return self._logfile
 
     @property
     def init_dir(self):
@@ -266,9 +277,48 @@ class Jobschnet(object):
             batch_size=batch_size,
             overwrite=overwrite,
             return_values=True,
-        )["energy_U0"]
+        )
 
         # calculate the forces
         if self._require_forces:
             idx = 0
             pass
+
+class Logfileschnet(object):
+    # Container class to emulate the Logfile object used in BigDFT calculations
+    def __init__(self, posinp):
+
+        self._posinp=posinp
+        self._n_at = []
+        self._atom_types = []
+        self._boundary_conditions = []
+        self._cell = []
+        
+        for struct in posinp:
+            self._n_at.append(len(struct))
+            self._atom_types.append(set([atom.type for atom in struct]))
+            self._boundary_conditions.append(struct.boundary_conditions)
+            self._cell.append(struct.cell)
+        
+        self._energies=None
+        self._forces=None
+        self._dipole=None
+
+    def update_results(self, predictions):
+        r"""
+        Method to store Jobschnet results in the Logfileschnet container
+
+        Parameters
+        ----------
+        predictions : dict
+            Dictionary containing the predictions returned by the
+            Schnetpack calculations
+        """
+
+        available_properties = list(predictions.keys())
+
+        if any(x in available_properties for x in ["energy", "energy_U0"]):
+            try:
+                self._energies = predictions["energy_U0"]
+            except KeyError:
+                self._energies = predictions["energy"]
