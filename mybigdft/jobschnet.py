@@ -6,6 +6,7 @@ from __future__ import print_function, absolute_import
 import os
 import torch
 import numpy as np
+from copy import deepcopy
 from mybigdft import Posinp
 from schnetpack.utils.script_utils.predict import predict
 
@@ -56,7 +57,7 @@ class Jobschnet(object):
         self._set_filenames()
 
         if self._require_forces:
-            self.create_additional_structures()
+            self._create_additional_structures()
 
     @property
     def name(self):
@@ -201,11 +202,13 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
-    def create_additional_structures(self, deriv_length=0.001):
+    def _create_additional_structures(self, deriv_length=0.001):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
         """
+        self._init_posinp = deepcopy(self._posinp)
+        self._deriv_length = deriv_length
         all_structs = []
         for str_idx, struct in enumerate(self._posinp):
             all_structs.append(struct)
@@ -268,7 +271,7 @@ class Jobschnet(object):
                 raise TypeError("The mini-batches sizes are not defined correctly.")
 
         # Run the actual calculation
-        predictions = predict(
+        raw_predictions = predict(
             modelpath=model_dir,
             posinp=self._posinp,
             name=self._name,
@@ -279,34 +282,116 @@ class Jobschnet(object):
             return_values=True,
         )
 
-        # calculate the forces
-        if self._require_forces:
-            idx = 0
-            pass
+        # Determine available properties
+        if "energy_U0" in list(raw_predictions.keys()):
+            raw_predictions["energy"] = raw_predictions.pop("energy_U0")
+        available_properties = list(raw_predictions.keys()).remove("idx")
+
+        # Format the predictions
+        predictions = {}
+        if not self._require_forces:
+            for prop in available_properties:
+                predictions[prop] = list(raw_predictions[prop])
+        else:
+            # Calculate the forces
+            pred_idx = 0
+            predictions["energy"], predictions["forces"] = [], []
+            for struct_idx in range(self.number_of_structures):
+                predictions["energy"].append(raw_predictions["energy"][pred_idx])
+                pred_idx += 1
+                predictions["forces"].append(
+                    self._calculate_forces(
+                        raw_predictions["energy"][
+                            pred_idx : pred_idx + 6 * len(self._init_posinp[struct_idx])
+                        ]
+                    )
+                )
+                pred_idx += 6 * len(self._init_posinp[struct_idx])
+            print(predictions["energy"])
+            print(predictions["forces"])
+
+    def _calculate_forces(self, predictions):
+        r"""
+        Method to calculate forces from the displaced atomic positions
+
+        Parameters
+        ----------
+        predictions : 1D numpy array (size 6*n_at)
+             Contains the predictions obtained from the neural network
+
+        Returns
+        -------
+        forces : 2D numpy array (size (n_at, 3))
+            Forces for each structure
+        """
+        nat = len(predictions) / 6
+        print(nat)
+        nat = int(nat)
+        forces = np.zeros((nat, 3))
+        for i in range(nat):
+            for j in range(3):
+                forces[i, j] = -(
+                    predictions[2 * j + i] - predictions[2 * j + nat + i]
+                ) / (2 * self._deriv_length)
+        return forces
+
 
 class Logfileschnet(object):
     # Container class to emulate the Logfile object used in BigDFT calculations
     def __init__(self, posinp):
 
-        self._posinp=posinp
+        self._posinp = posinp
         self._n_at = []
         self._atom_types = []
         self._boundary_conditions = []
         self._cell = []
-        
+
         for struct in posinp:
             self._n_at.append(len(struct))
             self._atom_types.append(set([atom.type for atom in struct]))
             self._boundary_conditions.append(struct.boundary_conditions)
             self._cell.append(struct.cell)
-        
-        self._energies=None
-        self._forces=None
-        self._dipole=None
+
+        self._energy = None
+        self._forces = None
+        self._dipole = None
+
+    @property
+    def posinp(self):
+        return self._posinp
+
+    @property
+    def n_at(self):
+        return self._n_at
+
+    @property
+    def atom_types(self):
+        return self._atom_types
+
+    @property
+    def boundary_conditions(self):
+        return self._boundary_conditions
+
+    @property
+    def cell(self):
+        return self._cell
+
+    @property
+    def energy(self):
+        return self._energy
+
+    @property
+    def forces(self):
+        return self._forces
+
+    @property
+    def dipole(self):
+        return self._dipole
 
     def update_results(self, predictions):
         r"""
-        Method to store Jobschnet results in the Logfileschnet container
+        Method to store Jobschnet results in the Logfileschnet container.
+        Useful for the workflows.
 
         Parameters
         ----------
@@ -317,8 +402,15 @@ class Logfileschnet(object):
 
         available_properties = list(predictions.keys())
 
-        if any(x in available_properties for x in ["energy", "energy_U0"]):
-            try:
-                self._energies = predictions["energy_U0"]
-            except KeyError:
-                self._energies = predictions["energy"]
+        if "energy" in available_properties:
+            self._energy = []
+            for struct in posinp:
+                self._energy.append(predictions["energy"])
+        if "forces" in available_properties:
+            self._forces = []
+            for struct in posinp:
+                self._forces.append(predictions["forces"])
+        if "dipole" in available_properties:
+            self._dipole = []
+            for struct in posinp:
+                self._dipole.append(predictions["dipole"])
