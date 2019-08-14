@@ -285,7 +285,8 @@ class Jobschnet(object):
         # Determine available properties
         if "energy_U0" in list(raw_predictions.keys()):
             raw_predictions["energy"] = raw_predictions.pop("energy_U0")
-        available_properties = list(raw_predictions.keys()).remove("idx")
+        available_properties = list(raw_predictions.keys())
+        available_properties.remove("idx")
 
         # Format the predictions
         predictions = {}
@@ -324,15 +325,14 @@ class Jobschnet(object):
         forces : 2D numpy array (size (n_at, 3))
             Forces for each structure
         """
-        nat = len(predictions) / 6
-        print(nat)
-        nat = int(nat)
+        nat = int(len(predictions) / 6)
         forces = np.zeros((nat, 3))
-        for i in range(nat):
-            for j in range(3):
-                forces[i, j] = -(
-                    predictions[2 * j + i] - predictions[2 * j + nat + i]
-                ) / (2 * self._deriv_length)
+        for i in range(3):
+            ener1, ener2 = (
+                predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
+                predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
+            )
+            forces[:, i] = -(ener1 - ener2).reshape(nat) / (2 * self._deriv_length)
         return forces
 
 
