@@ -17,9 +17,7 @@ class Jobschnet(object):
     to the Job class for BigDFT.
     """
 
-    def __init__(
-        self, name="", posinp=None, require_forces=False, run_dir=None, skip=False
-    ):
+    def __init__(self, name="", posinp=None, run_dir=None, skip=False):
         r"""
         Parameters
         ----------
@@ -27,8 +25,6 @@ class Jobschnet(object):
             Name of the job. Will be used to name the created files.
         posinp : Posinp
             Base atomic positions for the job
-        require_forces : bool
-            If `True`, the forces need to be evaluated also.
         run_dir : str or None
             Folder where to run calculations (default to current directory)
         skip : bool
@@ -48,16 +44,12 @@ class Jobschnet(object):
         # Set the base attributes
         self._posinp = posinp
         self._number_of_structures = len(self._posinp)
-        self._require_forces = require_forces
         self._name = str(name)
         self._skip = bool(skip)
         self._logfile = Logfileschnet(self._posinp)
 
         self._set_directories(run_dir)
         self._set_filenames()
-
-        if self._require_forces:
-            self._create_additional_structures()
 
     @property
     def name(self):
@@ -89,16 +81,6 @@ class Jobschnet(object):
             Number of different structures when the job is declared
         """
         return self._number_of_structures
-
-    @property
-    def require_forces(self):
-        r"""
-        Returns
-        -------
-        bool
-            If `True`, the forces of the structure must be evaluated.
-        """
-        return self._require_forces
 
     @property
     def skip(self):
@@ -202,35 +184,10 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
-    def _create_additional_structures(self, deriv_length=0.01):
-        r"""
-        Creates the additional structures needed to do a numeric
-        derivation of the energy to calculate the forces.
-        """
-        self._init_posinp = deepcopy(self._posinp)
-        self._deriv_length = deriv_length
-        all_structs = []
-        for str_idx, struct in enumerate(self._posinp):
-            all_structs.append(struct)
-            for dim in [
-                np.array([1, 0, 0]),
-                np.array([-1, 0, 0]),
-                np.array([0, 1, 0]),
-                np.array([0, -1, 0]),
-                np.array([0, 0, 1]),
-                np.array([0, 0, -1]),
-            ]:
-                all_structs.extend(
-                    [
-                        struct.translate_atom(atom_idx, deriv_length * dim)
-                        for atom_idx in range(len(struct))
-                    ]
-                )
-        self._posinp = all_structs
-
     def run(
         self,
         model_dir=None,
+        forces=False,
         device="cpu",
         write_to_disk=False,
         batch_size=128,
@@ -241,6 +198,11 @@ class Jobschnet(object):
         ----------
         model_dir: str
             Absolute path to the SchnetPack model to use in calculation
+        forces : int or bool
+            Order of the force calculations (0, 1 or 2)                                   
+            If 0 (or `False`), forces are not evaluated.
+            If 1, forces are evaluated on first-order (6N calculations)
+            If 2 (or `True`), forces are evaluated on second-order (12N calculations)
         device : str
             Either 'cpu' or 'cuda' to run on cpu or gpu
         write_to_disk : bool
@@ -256,6 +218,19 @@ class Jobschnet(object):
             raise ValueError("This job needs a path to a stored model.")
         if not isinstance(model_dir, str):
             raise TypeError("The path to the stored model must be a string.")
+
+        # Forces verification and preparation
+        if isinstance(forces, bool):
+            forces = 2 if forces else 0
+        if forces in [0, 1, 2]:
+            if forces == 1:
+                self._create_additional_structures(order=1)
+            if forces == 2:
+                self._create_additional_Structures(order=2)
+        else:
+            raise ValueError(
+                "Parameter `forces` should be a bool or a int between 0 and 2."
+            )
 
         # Verify device
         device = str(device)
@@ -290,7 +265,7 @@ class Jobschnet(object):
 
         # Format the predictions
         predictions = {}
-        if not self._require_forces:
+        if not forces:
             for prop in available_properties:
                 predictions[prop] = list(raw_predictions[prop])
         else:
@@ -300,18 +275,81 @@ class Jobschnet(object):
             for struct_idx in range(self.number_of_structures):
                 predictions["energy"].append(raw_predictions["energy"][pred_idx])
                 pred_idx += 1
-                predictions["forces"].append(
-                    self._calculate_forces(
-                        raw_predictions["energy"][
-                            pred_idx : pred_idx + 6 * len(self._init_posinp[struct_idx])
-                        ]
+                if forces == 1:
+                    predictions["forces"].append(
+                        self._calculate_forces(
+                            raw_predictions["energy"][
+                                pred_idx : pred_idx
+                                + 6 * len(self._init_posinp[struct_idx])
+                            ],
+                            order=forces,
+                        )
                     )
-                )
-                pred_idx += 6 * len(self._init_posinp[struct_idx])
+                    pred_idx += 6 * len(self._init_posinp[struct_idx])
+                elif forces == 2:
+                    predictions["forces"].append(
+                        self._calculate_forces(
+                            raw_predictions["energy"][
+                                pred_idx : pred_idx
+                                + 12 * len(self._init_posinp[struct_idx])
+                            ],
+                            order=forces,
+                        )
+                    )
+                    pred_idx += 12 * len(self._init_posinp[struct_idx])
             print(predictions["energy"])
             print(predictions["forces"])
 
-    def _calculate_forces(self, predictions):
+    def _create_additional_structures(self, order, deriv_length=0.01):
+        r"""
+        Creates the additional structures needed to do a numeric
+        derivation of the energy to calculate the forces.
+        """
+        if order not in [1, 2]:
+            raise ValueError("Order of the forces calculation should be 1 or 2.")
+        self._init_posinp = deepcopy(self._posinp)
+        self._deriv_length = deriv_length
+        all_structs = []
+        # First order forces calculation
+        if order == 1:
+            for str_idx, struct in enumerate(self._posinp):
+                all_structs.append(struct)
+                for factor in [1, -1]:
+                    for dim in [
+                        np.array([1, 0, 0]),
+                        np.array([0, 1, 0]),
+                        np.array([0, 0, 1]),
+                    ]:
+                        all_structs.extend(
+                            [
+                                struct.translate_atom(
+                                    atom_idx, deriv_length * factor * dim
+                                )
+                                for atom_idx in range(len(struct))
+                            ]
+                        )
+            self._posinp = all_structs
+        # Second order forces calculations
+        elif order == 2:
+            for str_idx, struct in enumerate(self._posinp):
+                all_structs.append(struct)
+                for factor in [2, 1, -1, -2]:
+                    for dim in [
+                        np.array([1, 0, 0]),
+                        np.array([0, 1, 0]),
+                        np.array([0, 0, 1]),
+                    ]:
+                        all_structs.extend(
+                            [
+                                struct.translate_atom(
+                                    atom_idx, deriv_length * factor * dim
+                                )
+                                for atom_idx in range(len(struct))
+                            ]
+                        )
+            self._posinp = all_structs
+
+    def _calculate_forces(self, predictions, order):
         r"""
         Method to calculate forces from the displaced atomic positions
 
@@ -325,14 +363,30 @@ class Jobschnet(object):
         forces : 2D numpy array (size (n_at, 3))
             Forces for each structure
         """
-        nat = int(len(predictions) / 6)
         forces = np.zeros((nat, 3))
-        for i in range(3):
-            ener1, ener2 = (
-                predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
-                predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
-            )
-            forces[:, i] = -(ener1 - ener2).reshape(nat) / (2 * self._deriv_length)
+        if order == 1:
+            nat = int(len(predictions) / 6)
+            for i in range(3):
+                ener1, ener2 = (
+                    predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
+                    predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
+                )
+                forces[:, i] = -(ener1 - ener2).reshape(nat) / (2 * self._deriv_length)
+        elif order == 2:
+            nat = int(len(predictions) / 12)
+            for i in range(3):
+                ener1, ener2, ener3, ener4 = (
+                    predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
+                    predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
+                    predictions[np.arange((2 * i + 2) * nat, (2 * i + 3) * nat, 1)],
+                    predictions[np.arange((2 * i + 3) * nat, (2 * i + 4) * nat, 1)],
+                )
+                forces[:, i] = -(
+                    (-ener1 + 8 * ener2 - 8 * ener3 + ener4).reshape(nat)
+                    / (12 * self._deriv_length)
+                )
+        else:
+            raise ValueError("Order of the forces calculation should be 1 or 2.")
         return forces
 
 
