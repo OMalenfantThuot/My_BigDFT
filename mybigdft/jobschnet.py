@@ -202,7 +202,7 @@ class Jobschnet(object):
         """
         os.chdir(self.init_dir)
 
-    def _create_additional_structures(self, deriv_length=0.001):
+    def _create_additional_structures(self, deriv_length=0.01):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
