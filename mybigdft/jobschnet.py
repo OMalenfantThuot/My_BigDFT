@@ -226,7 +226,7 @@ class Jobschnet(object):
             if forces == 1:
                 self._create_additional_structures(order=1)
             if forces == 2:
-                self._create_additional_Structures(order=2)
+                self._create_additional_structures(order=2)
         else:
             raise ValueError(
                 "Parameter `forces` should be a bool or a int between 0 and 2."
@@ -363,9 +363,9 @@ class Jobschnet(object):
         forces : 2D numpy array (size (n_at, 3))
             Forces for each structure
         """
-        forces = np.zeros((nat, 3))
         if order == 1:
             nat = int(len(predictions) / 6)
+            forces = np.zeros((nat, 3))
             for i in range(3):
                 ener1, ener2 = (
                     predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
@@ -374,6 +374,7 @@ class Jobschnet(object):
                 forces[:, i] = -(ener1 - ener2).reshape(nat) / (2 * self._deriv_length)
         elif order == 2:
             nat = int(len(predictions) / 12)
+            forces = np.zeros((nat, 3))
             for i in range(3):
                 ener1, ener2, ener3, ener4 = (
                     predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
