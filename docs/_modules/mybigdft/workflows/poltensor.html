@@ -1,0 +1,451 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.poltensor &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.poltensor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.poltensor</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">This module defines the :class:`PolTensor` workflow.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">COORDS</span><span class="p">,</span> <span class="n">SIGNS</span><span class="p">,</span> <span class="n">DEFAULT_PARAMETERS</span>
+<span class="kn">from</span> <span class="nn">.workflow</span> <span class="k">import</span> <span class="n">AbstractWorkflow</span>
+
+
+<div class="viewcode-block" id="PolTensor"><a class="viewcode-back" href="../../../elecpoltensor.html#mybigdft.workflows.poltensor.PolTensor">[docs]</a><span class="k">class</span> <span class="nc">PolTensor</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This workflow allows to compute the (electronic) polarizability</span>
+<span class="sd">    tensor of a given system.</span>
+
+<span class="sd">    The polarizability tensor represents the response of the charges of</span>
+<span class="sd">    a system (its dipole) to the application of an external electric</span>
+<span class="sd">    field.</span>
+
+<span class="sd">    To compute this polarizability tensor, some BigDFT calculations are</span>
+<span class="sd">    performed, where the system is subject to an external electric</span>
+<span class="sd">    field along each direction of space (:math:`x`, :math:`y` and</span>
+<span class="sd">    :math:`z`). The elements of the polarizability tensor are then</span>
+<span class="sd">    defined by the ratio of the delta of the dipole in one direction and</span>
+<span class="sd">    the delta of the electric field amplitudes:</span>
+
+<span class="sd">    .. math::</span>
+
+<span class="sd">        \alpha_{ij} = \frac{\Delta D_i}{\Delta E_j}</span>
+
+<span class="sd">    where :math:`i, j \in \{x, y, z\}`, :math:`\Delta D_i` is the</span>
+<span class="sd">    variation of the dipole along the :math:`i` direction and</span>
+<span class="sd">    :math:`\Delta E_j` is the variation of the electric field amplitude</span>
+<span class="sd">    along the :math:`j` direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;pol_tensor&quot;</span><span class="p">,</span> <span class="s2">&quot;mean_polarizability&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_state</span><span class="p">,</span> <span class="n">ef_amplitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        A PolTensor workflow is initialized by the job of the ground-</span>
+<span class="sd">        state of the system and three electric field amplitudes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ground_state : Job</span>
+<span class="sd">            Job used to compute the ground state of the system under</span>
+<span class="sd">            consideration.</span>
+<span class="sd">        ef_amplitudes : list or numpy array of length 3</span>
+<span class="sd">            Amplitude of the electric field to be applied in the three</span>
+<span class="sd">            directions of space (:math:`x`, :math:`y`, :math:`z`).</span>
+<span class="sd">        order : int</span>
+<span class="sd">            Order of the numerical differentiation used to compute the</span>
+<span class="sd">            polarizability tensor. If second order (resp. first), then</span>
+<span class="sd">            six (resp. three) calculations per atom are to be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set a default value to ef_amplitudes</span>
+        <span class="k">if</span> <span class="n">ef_amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">ef_amplitudes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-4</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span>
+        <span class="c1"># Check the value of the order</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only first and second order available&quot;</span><span class="p">)</span>
+        <span class="c1"># Check the ground state has no electric field</span>
+        <span class="k">if</span> <span class="s1">&#39;dft&#39;</span> <span class="ow">in</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">:</span>
+            <span class="n">efield</span> <span class="o">=</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;elecfield&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">efield</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The ground state input parameters define an &quot;</span>
+                              <span class="s2">&quot;electric field&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># Check the electric field amplitudes</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ef_amplitudes</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ef_amplitudes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide three electric field &quot;</span>
+                             <span class="s2">&quot;amplitudes, one for each space coordinate.&quot;</span><span class="p">)</span>
+        <span class="c1"># Initialize the attributes that are specific to this workflow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ground_state</span> <span class="o">=</span> <span class="n">ground_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ef_amplitudes</span> <span class="o">=</span> <span class="n">ef_amplitudes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="c1"># Depending on the desired order, there are 3 or 6 electric</span>
+        <span class="c1"># fields to be applied on the system</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_efields</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_efields</span><span class="p">()</span>
+        <span class="c1"># Initialize the queue of jobs for this workflow</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_queue</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">PolTensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ground_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Job</span>
+<span class="sd">            Job of the ground state of the system under consideration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ground_state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ef_amplitudes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list or numpy array of length 3</span>
+<span class="sd">            Amplitude of the electric field to be applied in the three</span>
+<span class="sd">            directions of space (:math:`x`, :math:`y`, :math:`z`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ef_amplitudes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        order : int</span>
+<span class="sd">            Order of the numerical differentiation used to compute the</span>
+<span class="sd">            polarizability tensor. If second order (resp. first), then</span>
+<span class="sd">            six (resp. three) calculations per atom are to be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_order</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pol_tensor</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array</span>
+<span class="sd">            Polarizability tensor of the system (units: atomic).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pol_tensor</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">mean_polarizability</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Mean (electronic) polarizability of the system (units:</span>
+<span class="sd">            atomic).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">efields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        OrderedDict of length 3 or 6</span>
+<span class="sd">            Electric fields the system must undergo before computing the</span>
+<span class="sd">            polarizability tensor as post-processing. There are three or</span>
+<span class="sd">            six of them (one or two per space coordinate, depending on</span>
+<span class="sd">            the order of the numerical derivative procedure) if the</span>
+<span class="sd">            forward or central difference scheme is used, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_efields</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the queue of calculations to be performed in order to</span>
+<span class="sd">        compute the polarizability tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span>
+        <span class="c1"># Add the ground state job to the queue after updating the run</span>
+        <span class="c1"># directory if needed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gs</span><span class="p">)</span>
+        <span class="c1"># Add a job for each electric field calculation (one along each</span>
+        <span class="c1"># space coordinate)</span>
+        <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">efield</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">efields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">inp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">)</span>
+            <span class="k">if</span> <span class="s1">&#39;dft&#39;</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">:</span>
+                <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;elecfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elecfield&#39;</span><span class="p">:</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span><span class="p">}</span>
+            <span class="c1"># Set the correct reference data directory</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="n">DEFAULT_PARAMETERS</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span>
+            <span class="n">write_orbitals</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span> <span class="ow">and</span>
+                              <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">default</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">write_orbitals</span><span class="p">:</span>
+                <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">data_dir</span>  <span class="c1"># pragma: no cover</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">ref_data_dir</span>
+            <span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="s2">&quot;EF_along_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="n">inp</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">posinp</span><span class="p">,</span>
+                      <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">skip</span><span class="p">,</span> <span class="n">ref_data_dir</span><span class="o">=</span><span class="n">ref_data_dir</span><span class="p">)</span>
+            <span class="n">job</span><span class="o">.</span><span class="n">efield</span> <span class="o">=</span> <span class="n">efield</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queue</span>
+
+    <span class="k">def</span> <span class="nf">_init_efields</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the electric fields each atom must undergo from the</span>
+<span class="sd">        electric field amplitudes in each direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">efields</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">signs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">}</span>  <span class="c1"># One electric field per coordinate</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">signs</span> <span class="o">=</span> <span class="n">SIGNS</span>  <span class="c1"># Two electric fields per coordinate</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">COORDS</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">sign</span> <span class="ow">in</span> <span class="n">signs</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">coord</span> <span class="o">+</span> <span class="n">sign</span>
+                <span class="n">amplitude</span> <span class="o">=</span> <span class="n">signs</span><span class="p">[</span><span class="n">sign</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ef_amplitudes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">efields</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">ElectricField</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">efields</span>
+
+<div class="viewcode-block" id="PolTensor.post_proc"><a class="viewcode-back" href="../../../elecpoltensor.html#mybigdft.workflows.poltensor.PolTensor.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the polarisability tensor and set its value (you can</span>
+<span class="sd">        access its value via the attribute :attr:`pol_tensor`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">pol_tensor</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">d0</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="n">delta_ef</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">efield</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+                <span class="c1"># Update the polarizability tensor</span>
+                <span class="n">pol_tensor</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">d1</span> <span class="o">-</span> <span class="n">d0</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta_ef</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># Compute the second order tensor elements</span>
+            <span class="c1"># for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">job1</span><span class="p">,</span> <span class="n">job2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)]</span><span class="o">*</span><span class="mi">2</span><span class="p">)):</span>
+                <span class="c1"># Get the delta of dipoles</span>
+                <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job1</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+                <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job2</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+                <span class="n">delta_dipoles</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">-</span> <span class="n">d2</span>
+                <span class="c1"># Get the delta of electric field amplitude</span>
+                <span class="n">amp1</span> <span class="o">=</span> <span class="n">job1</span><span class="o">.</span><span class="n">efield</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="n">amp2</span> <span class="o">=</span> <span class="n">job2</span><span class="o">.</span><span class="n">efield</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="k">assert</span> <span class="n">amp1</span> <span class="o">==</span> <span class="o">-</span> <span class="n">amp2</span>
+                <span class="n">delta_ef</span> <span class="o">=</span> <span class="n">amp1</span> <span class="o">-</span> <span class="n">amp2</span>
+                <span class="c1"># Update the polarizability tensor</span>
+                <span class="n">pol_tensor</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_dipoles</span> <span class="o">/</span> <span class="n">delta_ef</span>
+        <span class="c1"># Set some attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pol_tensor</span> <span class="o">=</span> <span class="n">pol_tensor</span>  <span class="c1"># atomic units</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span> <span class="o">=</span> <span class="n">pol_tensor</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span><span class="o">/</span><span class="mi">3</span>  <span class="c1"># atomic units</span></div></div>
+
+
+<div class="viewcode-block" id="ElectricField"><a class="viewcode-back" href="../../../elecpoltensor.html#mybigdft.workflows.poltensor.ElectricField">[docs]</a><span class="k">class</span> <span class="nc">ElectricField</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ElectricField&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;i_coord&#39;</span><span class="p">,</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">])):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class defines an electric field from the coordinate index and</span>
+<span class="sd">    the amplitude of the electric field in that direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            ElectricField vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">vector</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i_coord</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span>
+        <span class="k">return</span> <span class="n">vector</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

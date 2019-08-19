@@ -1,0 +1,931 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Convergence classes &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compute the electronic polarizability tensor" href="PolTensor.html" />
+    <link rel="prev" title="Run BigDFT and manipulate its output files" href="Job_and_Logfile.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">MyBigDFT tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Input_files.html">Manipulate BigDFT input files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Job_and_Logfile.html">Run BigDFT and manipulate its output files</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Convergence classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rmult-convergence">rmult convergence</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Plotting-the-convergence">Plotting the convergence</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#hgrids-convergence">hgrids convergence</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Plotting-the-convergence">Plotting the convergence</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#frmult-convergence">frmult convergence</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Conclusion">Conclusion</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="PolTensor.html">Compute the electronic polarizability tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Phonons_and_RamanSpectrum.html">Compute the phonons and the Raman spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Phonons_and_InfraredSpectrum.html">Compute the phonons and the infrared spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VibPolTensor.html">Compute the vibrational polarizability tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Dissociation_curve.html">Dissociation curve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Geopt.html">Geometry optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorials.html">MyBigDFT tutorials</a> &raquo;</li>
+        
+      <li>Convergence classes</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/Convergences.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 5ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Convergence-classes">
+<h1>Convergence classes<a class="headerlink" href="#Convergence-classes" title="Permalink to this headline">¶</a></h1>
+<p>BigDFT uses wavelets on a discretization grid to represent the wavefunction and density of the electronic system. The key parameters of a BigDFT calculation therefore are the grid spacing (noted <code class="docutils literal notranslate"><span class="pre">hgrids</span></code>) and the grid extension (noted <code class="docutils literal notranslate"><span class="pre">rmult</span></code>). The convergence of a given BigDFT calculation with respect to those two parameters can easily be studied via two classes: <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/hgrids_convergence.html">HgridsConvergence</a> and
+<a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/rmult_convergence.html">RmultConvergence</a>. Both will be used here in the case of the N<span class="math notranslate nohighlight">\(_2\)</span> molecule with the LDA exchange-correlation potential.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># Import the relevant modules, classes and constant.</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">import</span> <span class="nn">matplotlib.pyplot</span> <span class="k">as</span> <span class="nn">plt</span>
+<span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Posinp</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">InputParams</span><span class="p">,</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">EV_TO_HA</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="rmult-convergence">
+<h2>rmult convergence<a class="headerlink" href="#rmult-convergence" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">RmultConvergence</span></code> class allows to run all the necessary calculations to determine the smallest grid extensions which must be used so that the energy error compared to the reference calculation (<em>i.e.</em>, with the largest <code class="docutils literal notranslate"><span class="pre">rmult</span></code> considered) lie within the required precision per atom. Using the smallest <code class="docutils literal notranslate"><span class="pre">rmult</span></code> as possible allows to save computational time because there are less grid points (or degrees of freedom).</p>
+<p>Note that there actually are two grids centered on the atoms of the system: a fine one with a shorter extension and a coarse one with a longer extension. They respectively correspond to the two numbers in the <code class="docutils literal notranslate"><span class="pre">reference</span></code> list given when initializing the <code class="docutils literal notranslate"><span class="pre">RmultConvergence</span></code> instance. These numbers will be decreased by 1 until the resulting energy lies outside the given <code class="docutils literal notranslate"><span class="pre">precision_per_atom</span></code> (here, 10 meV). The maximal number of jobs to be run is fixed to 6.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mybigdft.workflows.convergences</span> <span class="k">import</span> <span class="n">RmultConvergence</span>
+
+<span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+<span class="n">base</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="s2">&quot;N2/rmult_convergence&quot;</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;N2&quot;</span><span class="p">)</span>
+<span class="n">rmc</span> <span class="o">=</span> <span class="n">RmultConvergence</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="p">[</span><span class="mi">9</span><span class="p">,</span> <span class="mi">11</span><span class="p">],</span> <span class="n">delta</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">],</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span>
+                       <span class="n">precision_per_atom</span><span class="o">=</span><span class="mf">0.01</span><span class="o">*</span><span class="n">EV_TO_HA</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The jobs in the queue have an extra attribute <code class="docutils literal notranslate"><span class="pre">param</span></code> which returns the value of rmult:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">rmc</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[9.0, 11.0]
+[8.0, 10.0]
+[7.0, 9.0]
+[6.0, 8.0]
+[5.0, 7.0]
+[4.0, 6.0]
+</pre></div></div>
+</div>
+<p>You can run the calculations as usual:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rmc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/9.0_11.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/8.0_10.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/7.0_9.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/6.0_8.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/5.0_7.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/rmult_convergence/4.0_6.0
+Logfile log-N2.yaml already exists!
+
+</pre></div></div>
+</div>
+<p>Once the calculations are performed, a converged job is determined. It corresponds to the one with the smallest <code class="docutils literal notranslate"><span class="pre">rmult</span></code> so that the total energy of the system is below the convergence threshold, defined by the sum of the energy found for the largest <code class="docutils literal notranslate"><span class="pre">rmult</span></code> and the user defined precision per atom. It can be accessed via the <code class="docutils literal notranslate"><span class="pre">converged</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rmc</span><span class="o">.</span><span class="n">converged</span><span class="o">.</span><span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>[5.0, 7.0]
+</pre></div>
+</div>
+</div>
+<p>The result of the previous cell shows that <code class="docutils literal notranslate"><span class="pre">rmult</span> <span class="pre">=</span> <span class="pre">[5.0,</span> <span class="pre">7.0]</span></code> gives converged results for the given precision per atom. To make sure that everything ran as expected, all the relevant data can be accessed via the <code class="docutils literal notranslate"><span class="pre">summary</span></code> method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">rmc</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requested precision per atom: 3.67e-04 (Ha)
+----------------------------------------------------
+    rmult     precision_per_atom (Ha)  is_converged
+----------------------------------------------------
+ [9.0, 11.0]          0.00e+00             True
+ [8.0, 10.0]          1.09e-06             True
+  [7.0, 9.0]          3.71e-06             True
+  [6.0, 8.0]          4.96e-06             True
+  [5.0, 7.0]          2.75e-04             True
+  [4.0, 6.0]          2.31e-03            False
+</pre></div></div>
+</div>
+<div class="section" id="Plotting-the-convergence">
+<h3>Plotting the convergence<a class="headerlink" href="#Plotting-the-convergence" title="Permalink to this headline">¶</a></h3>
+<p>The figure below shows the convergence of the total energy of the N<span class="math notranslate nohighlight">\(_2\)</span> system with respect to the rmult. The threshold is also shown for comparison.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">rmc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">rmults</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">param</span>
+          <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">rmc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">frmult</span> <span class="o">=</span> <span class="p">[</span><span class="n">rmult</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rmult</span> <span class="ow">in</span> <span class="n">rmults</span><span class="p">]</span>
+<span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmc</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_at</span><span class="o">*</span><span class="n">rmc</span><span class="o">.</span><span class="n">precision_per_atom</span>
+
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>  <span class="c1"># When dark background</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frmult</span><span class="p">,</span> <span class="n">energies</span><span class="p">,</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;BigDFT results&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frmult</span><span class="p">,</span> <span class="p">[</span><span class="n">threshold</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">),</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Convergence threshold&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;frmult&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Energy (Ha)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Convergences_13_0.png" src="../_images/notebooks_Convergences_13_0.png" />
+</div>
+</div>
+<p>Remember that there are actually two grids: one known as the fine grid, the other being the coarse one. The former is more expensive (from a computational point of view) than the latter, and should therefore have a smaller extension. One can perform a more refined rmult convergence by testing the convergence with respect to that fine grid extensions: this will be done after the convergence with respect to <code class="docutils literal notranslate"><span class="pre">hgrids</span></code>.</p>
+</div>
+</div>
+<div class="section" id="hgrids-convergence">
+<h2>hgrids convergence<a class="headerlink" href="#hgrids-convergence" title="Permalink to this headline">¶</a></h2>
+<p>The <code class="docutils literal notranslate"><span class="pre">HgridsConvergence</span></code> class allows to run all the necessary calculations to determine the largest <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> which must be used so that the energy error compared to the reference calculation (with the lowest <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> considered) lie within the required precision per atom. Using the largest <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> as possible allows to save computational time because there are less grid points (or degrees of freedom).</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mybigdft.workflows.convergences</span> <span class="k">import</span> <span class="n">HgridsConvergence</span>
+
+<span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">]),</span> <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+<span class="n">inp</span> <span class="o">=</span> <span class="n">InputParams</span><span class="p">({</span><span class="s2">&quot;dft&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rmult&quot;</span><span class="p">:</span> <span class="n">rmc</span><span class="o">.</span><span class="n">converged</span><span class="o">.</span><span class="n">param</span><span class="p">}})</span>
+<span class="n">run_dir</span> <span class="o">=</span> <span class="s2">&quot;N2/hgrids_convergence/rm_</span><span class="si">{:.1f}</span><span class="s2">_</span><span class="si">{:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">rmc</span><span class="o">.</span><span class="n">converged</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+<span class="n">base</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">inputparams</span><span class="o">=</span><span class="n">inp</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;N2&quot;</span><span class="p">)</span>
+<span class="n">hgc</span> <span class="o">=</span> <span class="n">HgridsConvergence</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="mf">0.24</span><span class="p">,</span> <span class="n">delta</span><span class="o">=</span><span class="mf">0.02</span><span class="p">,</span>
+                        <span class="n">precision_per_atom</span><span class="o">=</span><span class="mf">0.01</span><span class="o">*</span><span class="n">EV_TO_HA</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The jobs in the queue have an extra attribute <code class="docutils literal notranslate"><span class="pre">hgrids</span></code>:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">hgc</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[0.24, 0.24, 0.24]
+[0.26, 0.26, 0.26]
+[0.28, 0.28, 0.28]
+[0.3, 0.3, 0.3]
+[0.32, 0.32, 0.32]
+[0.34, 0.34, 0.34]
+[0.36, 0.36, 0.36]
+[0.38, 0.38, 0.38]
+[0.4, 0.4, 0.4]
+[0.42, 0.42, 0.42]
+</pre></div></div>
+</div>
+<p>You can run the calculations as usual:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">hgc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.24_0.24_0.24
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.26_0.26_0.26
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.28_0.28_0.28
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.30_0.30_0.30
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.32_0.32_0.32
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.34_0.34_0.34
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.36_0.36_0.36
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/0.38_0.38_0.38
+Logfile log-N2.yaml already exists!
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/mybigdft/workflows/workflow.py:114: UserWarning: Some jobs of the workflow were not run.
+  UserWarning)
+</pre></div></div>
+</div>
+<p>Note that not all calculations were run: this is because the job with <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> = 0.38 gave an energy that was above the requested precision per atom.</p>
+<p>Once the calculations are performed, a converged job is determined. It corresponds to the one with the largest <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> so that the total energy of the system is below the convergence threshold. It can be accessed via the <code class="docutils literal notranslate"><span class="pre">converged</span></code> attribute. Its <code class="docutils literal notranslate"><span class="pre">param</span></code> attribute can in turns be accessed:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">hgc</span><span class="o">.</span><span class="n">converged</span><span class="o">.</span><span class="n">param</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>[0.36, 0.36, 0.36]
+</pre></div>
+</div>
+</div>
+<p>The result of the previous cell shows that <code class="docutils literal notranslate"><span class="pre">hgrids</span> <span class="pre">=</span> <span class="pre">0.36</span></code> gives converged results for the given precision per atom. To make sure that everything ran as expected, all the relevant data can be accessed as follows:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">hgc</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requested precision per atom: 3.67e-04 (Ha)
+-----------------------------------------------------------
+       hgrids        precision_per_atom (Ha)  is_converged
+-----------------------------------------------------------
+ [0.24, 0.24, 0.24]          0.00e+00             True
+ [0.26, 0.26, 0.26]          3.89e-07             True
+ [0.28, 0.28, 0.28]          2.63e-05             True
+ [0.30, 0.30, 0.30]          4.53e-05             True
+ [0.32, 0.32, 0.32]          1.23e-04             True
+ [0.34, 0.34, 0.34]          1.88e-04             True
+ [0.36, 0.36, 0.36]          3.46e-04             True
+ [0.38, 0.38, 0.38]          5.86e-04            False
+</pre></div></div>
+</div>
+<p>It shows that everything ran as expected: the calculation with <code class="docutils literal notranslate"><span class="pre">hgrids</span> <span class="pre">=</span> <span class="pre">0.36</span></code> has the largest <code class="docutils literal notranslate"><span class="pre">hgrids</span></code> while still having an energy below the requested threshold.</p>
+<div class="section" id="Plotting-the-convergence">
+<h3>Plotting the convergence<a class="headerlink" href="#Plotting-the-convergence" title="Permalink to this headline">¶</a></h3>
+<p>The figure below shows the convergence of the total energy of the N<span class="math notranslate nohighlight">\(_2\)</span> system with respect to <code class="docutils literal notranslate"><span class="pre">hgrids</span></code>. The threshold value is also shown for comparison.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">hgc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">hgrids</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">param</span>
+          <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">hgc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">simple_hgrids</span> <span class="o">=</span> <span class="p">[</span><span class="n">hgrid</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">hgrid</span> <span class="ow">in</span> <span class="n">hgrids</span><span class="p">]</span>
+<span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">hgc</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_at</span><span class="o">*</span><span class="n">hgc</span><span class="o">.</span><span class="n">precision_per_atom</span>
+
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>  <span class="c1"># When dark background</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">simple_hgrids</span><span class="p">,</span> <span class="n">energies</span><span class="p">,</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;BigDFT results&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">simple_hgrids</span><span class="p">,</span> <span class="p">[</span><span class="n">threshold</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">),</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Convergence threshold&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;hgrid along $x$&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Energy (Ha)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Convergences_27_0.png" src="../_images/notebooks_Convergences_27_0.png" />
+</div>
+</div>
+</div>
+</div>
+<div class="section" id="frmult-convergence">
+<h2>frmult convergence<a class="headerlink" href="#frmult-convergence" title="Permalink to this headline">¶</a></h2>
+<p>We started the convergence study with a coarse grid having a larger extension than the fine grid. This means that the coarse grid extension is converged, but there might still be some room to use a smaller fine grid. This is the reason why the convergence study ends by looking only at the fine grid extension multiplying factor <code class="docutils literal notranslate"><span class="pre">frmult</span></code> (note that the delta value for <code class="docutils literal notranslate"><span class="pre">crmult</span></code> is 0):</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="p">[</span><span class="n">frm</span><span class="p">,</span> <span class="n">crm</span><span class="p">]</span> <span class="o">=</span> <span class="n">rmc</span><span class="o">.</span><span class="n">converged</span><span class="o">.</span><span class="n">param</span>
+<span class="n">frmc</span> <span class="o">=</span> <span class="n">RmultConvergence</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">reference</span><span class="o">=</span><span class="p">[</span><span class="n">frm</span><span class="o">+</span><span class="mi">2</span><span class="p">,</span> <span class="n">crm</span><span class="p">],</span> <span class="n">delta</span><span class="o">=</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">],</span>
+                        <span class="n">n_jobs</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span> <span class="n">precision_per_atom</span><span class="o">=</span><span class="mf">0.01</span><span class="o">*</span><span class="n">EV_TO_HA</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">frmc</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="mi">6</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/7.0_7.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/6.0_7.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/5.0_7.0
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/doc/source/notebooks/N2/hgrids_convergence/rm_5.0_7.0/4.0_7.0
+Logfile log-N2.yaml already exists!
+
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/mybigdft/workflows/workflow.py:114: UserWarning: Some jobs of the workflow were not run.
+  UserWarning)
+</pre></div></div>
+</div>
+<p>Nothing changed: <code class="docutils literal notranslate"><span class="pre">frmult</span> <span class="pre">=</span> <span class="pre">5.0</span></code> gives converged results for the given precision:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">frmc</span><span class="o">.</span><span class="n">summary</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Requested precision per atom: 3.67e-04 (Ha)
+---------------------------------------------------
+   rmult     precision_per_atom (Ha)  is_converged
+---------------------------------------------------
+ [7.0, 7.0]          0.00e+00             True
+ [6.0, 7.0]          1.17e-05             True
+ [5.0, 7.0]          1.55e-04             True
+ [4.0, 7.0]          1.93e-03            False
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">energies</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">frmc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">rmults</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">param</span>
+          <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="n">frmc</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+<span class="n">frmult</span> <span class="o">=</span> <span class="p">[</span><span class="n">rmult</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">rmult</span> <span class="ow">in</span> <span class="n">rmults</span><span class="p">]</span>
+<span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">frmc</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+<span class="n">threshold</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">energies</span><span class="p">)</span> <span class="o">+</span> <span class="n">n_at</span><span class="o">*</span><span class="n">frmc</span><span class="o">.</span><span class="n">precision_per_atom</span>
+<span class="n">fig</span><span class="o">=</span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">()</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">patch</span><span class="o">.</span><span class="n">set_facecolor</span><span class="p">(</span><span class="s1">&#39;white&#39;</span><span class="p">)</span>  <span class="c1"># When dark background</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frmult</span><span class="p">,</span> <span class="n">energies</span><span class="p">,</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;BigDFT results&quot;</span><span class="p">,</span> <span class="n">marker</span><span class="o">=</span><span class="s2">&quot;o&quot;</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">&#39;&#39;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">plot</span><span class="p">(</span><span class="n">frmult</span><span class="p">,</span> <span class="p">[</span><span class="n">threshold</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">energies</span><span class="p">),</span>
+         <span class="n">label</span><span class="o">=</span><span class="s2">&quot;Convergence threshold&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s2">&quot;frmult&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s2">&quot;Energy (Ha)&quot;</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">legend</span><span class="p">()</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/notebooks_Convergences_33_0.png" src="../_images/notebooks_Convergences_33_0.png" />
+</div>
+</div>
+</div>
+<div class="section" id="Conclusion">
+<h2>Conclusion<a class="headerlink" href="#Conclusion" title="Permalink to this headline">¶</a></h2>
+<p>The convergence with a precision per atom of 10 meV for the N<span class="math notranslate nohighlight">\(_2\)</span> molecule is found using <code class="docutils literal notranslate"><span class="pre">hgrids</span> <span class="pre">=</span> <span class="pre">0.36</span></code> and <code class="docutils literal notranslate"><span class="pre">rmult</span> <span class="pre">=</span> <span class="pre">[5.0,</span> <span class="pre">7.0]</span></code> as input parameters for a BigDFT calculation.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="PolTensor.html" class="btn btn-neutral float-right" title="Compute the electronic polarizability tensor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="Job_and_Logfile.html" class="btn btn-neutral float-left" title="Run BigDFT and manipulate its output files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

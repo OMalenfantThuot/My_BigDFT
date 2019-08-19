@@ -1,0 +1,426 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>InputParams &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Posinp and Atom" href="posinp.html" />
+    <link rel="prev" title="Input and Output files" href="iofiles.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iofiles.html">Input and Output files</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">InputParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="posinp.html">Posinp and Atom</a></li>
+<li class="toctree-l3"><a class="reference internal" href="logfile.html">Logfile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="iofiles.html">Input and Output files</a> &raquo;</li>
+        
+      <li>InputParams</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/inputparams.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.iofiles.inputparams">
+<span id="inputparams"></span><h1>InputParams<a class="headerlink" href="#module-mybigdft.iofiles.inputparams" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams"><code class="xref py py-class docutils literal notranslate"><span class="pre">InputParams</span></code></a> class is meant to represent the input
+parameters of a BigDFT calculation in a yaml format.</p>
+<p>It also comes with two functions:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#mybigdft.iofiles.inputparams.check" title="mybigdft.iofiles.inputparams.check"><code class="xref py py-func docutils literal notranslate"><span class="pre">check()</span></code></a> to check that a dictionary is only made of valid BigDFT
+input parameters.</p></li>
+<li><p><a class="reference internal" href="#mybigdft.iofiles.inputparams.clean" title="mybigdft.iofiles.inputparams.clean"><code class="xref py py-func docutils literal notranslate"><span class="pre">clean()</span></code></a> to clean a dictionary of input parameters so that only
+non-default values are kept in memory.</p></li>
+</ul>
+<dl class="class">
+<dt id="mybigdft.iofiles.inputparams.InputParams">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.iofiles.inputparams.</code><code class="sig-name descname">InputParams</code><span class="sig-paren">(</span><em class="sig-param">params=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#InputParams"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.MutableMapping</span></code></p>
+<p>Class allowing to initialize, read, write and interact with the
+input parameters of a BigDFT calculation.</p>
+<p>Input parameters are initialized from a yaml dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> (<em>dict</em>) – yaml dictionary of the input parameters.</p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dft&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="go">{&#39;dft&#39;: {&#39;hgrids&#39;: [0.35, 0.35, 0.35]}}</span>
+</pre></div>
+</div>
+<p>Default values are cleaned from the input parameters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dft&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.45</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<p>The input parameters can be empty:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="p">()</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<p>Initializing with unknown parameters raises a <code class="docutils literal notranslate"><span class="pre">KeyError</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dfpt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&quot;Unknown key &#39;dfpt&#39;&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dft&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="gt">Traceback (most recent call last):</span>
+<span class="c">...</span>
+<span class="gr">KeyError</span>: <span class="n">&quot;Unknown key &#39;hgrid&#39; in &#39;dft&#39;&quot;</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.from_file">
+<em class="property">classmethod </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#InputParams.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize an InputParams instance from a BigDFT input file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the file to read.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>InputParams instance initialized from the file.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams">InputParams</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.from_string">
+<em class="property">classmethod </em><code class="sig-name descname">from_string</code><span class="sig-paren">(</span><em class="sig-param">string</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#InputParams.from_string"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.from_string" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize an InputParams instance from a string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>string</strong> (<em>str</em>) – Input parameters dictionary as a string.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>InputParams instance initialized from the string.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams">InputParams</a></p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">InputParams</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="s2">&quot;{&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}&quot;</span><span class="p">)</span>
+<span class="go">{&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.params">
+<em class="property">property </em><code class="sig-name descname">params</code><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.params" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Input parameters.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Initial positions contained in the input parameters</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.__setitem__">
+<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param">key</em>, <em class="sig-param">value</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#InputParams.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the input parameters after making sure that they are valid.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>key</strong> (<em>str</em>) – Input parameters key.</p></li>
+<li><p><strong>value</strong> (<em>dict</em>) – Value of the given key of input parameters.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Warns</dt>
+<dd class="field-even"><p><strong>UserWarning</strong> – If the proposed update does not modify the input parameters.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.inputparams.InputParams.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#InputParams.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.InputParams.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the input parameters on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the input file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="function">
+<dt id="mybigdft.iofiles.inputparams.clean">
+<code class="sig-prename descclassname">mybigdft.iofiles.inputparams.</code><code class="sig-name descname">clean</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">keyword=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.clean" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>dict</em>) – Trial BigDFT input parameters.</p></li>
+<li><p><strong>keyword</strong> (<em>NoneType</em><em> or </em><em>str</em>) – Main key of input parameters key to be checked (used to check
+CheSS input parameters).</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Input parameters whose values are not their default, after
+checking that all the keys in <cite>params</cite> correspond to actual
+BigDFT parameters.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="function">
+<dt id="mybigdft.iofiles.inputparams.check">
+<code class="sig-prename descclassname">mybigdft.iofiles.inputparams.</code><code class="sig-name descname">check</code><span class="sig-paren">(</span><em class="sig-param">params</em>, <em class="sig-param">keyword=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/inputparams.html#check"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.inputparams.check" title="Permalink to this definition">¶</a></dt>
+<dd><p>Check that the keys of <cite>params</cite> correspond to BigDFT parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>params</strong> (<em>dict</em>) – Trial input parameters.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>KeyError</strong> – If a key or a sub-key is not a BigDFT parameter.</p></li>
+<li><p><strong>ValueError</strong> – If a value is invalid (not in the correct range, not in the
+    possible values, the value of the master key does not allow for
+    the key to be defined)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="posinp.html" class="btn btn-neutral float-right" title="Posinp and Atom" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="iofiles.html" class="btn btn-neutral float-left" title="Input and Output files" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

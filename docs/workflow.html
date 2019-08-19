@@ -1,0 +1,480 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>AbstractWorkflow and Workflow &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Convergence classes" href="convergences.html" />
+    <link rel="prev" title="Workflows" href="workflows.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="workflows.html">Workflows</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">AbstractWorkflow and Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="workflows.html">Workflows</a> &raquo;</li>
+        
+      <li>AbstractWorkflow and Workflow</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/workflow.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.workflows.workflow">
+<span id="abstractworkflow-and-workflow"></span><h1>AbstractWorkflow and Workflow<a class="headerlink" href="#module-mybigdft.workflows.workflow" title="Permalink to this headline">¶</a></h1>
+<p>The workflows of the MyBigDFT package are meant to ease the calculation
+of some interesting quantities requiring to launch multiple BigDFT
+calculations by providing an API that focuses on the main parameters of
+such nested calculations.</p>
+<p>Here are defined an <a class="reference internal" href="#mybigdft.workflows.workflow.AbstractWorkflow" title="mybigdft.workflows.workflow.AbstractWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWorkflow</span></code></a> class (meant to be the
+base class of all the other workflow classes implemented in the
+workflows module) and a <a class="reference internal" href="#mybigdft.workflows.workflow.Workflow" title="mybigdft.workflows.workflow.Workflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">Workflow</span></code></a> class, which represents the
+simplest way of implementing such a child class (intended to be used
+when one wants to create a toy implementation of a new workflow).</p>
+<dl class="class">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.workflow.</code><code class="sig-name descname">AbstractWorkflow</code><span class="sig-paren">(</span><em class="sig-param">queue</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/workflow.html#AbstractWorkflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">abc.ABC</span></code></p>
+<p>This abstract class is the base class of all the workflows of this
+module. It defines the queue of jobs as a list of
+<a class="reference internal" href="job.html#mybigdft.job.Job" title="mybigdft.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a> instances, that are run sequentially when
+the <a class="reference internal" href="#mybigdft.workflows.workflow.AbstractWorkflow.run" title="mybigdft.workflows.workflow.AbstractWorkflow.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> method is used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>queue</strong> (<em>list</em>) – List of all the jobs to run.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow.queue">
+<em class="property">property </em><code class="sig-name descname">queue</code><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow.queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All the jobs of the workflow.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow.logfiles">
+<em class="property">property </em><code class="sig-name descname">logfiles</code><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow.logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of all the logfiles of the workflow, with the
+name of the associated job as key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">nmpi=1</em>, <em class="sig-param">nomp=1</em>, <em class="sig-param">force_run=False</em>, <em class="sig-param">dry_run=False</em>, <em class="sig-param">restart_if_incomplete=False</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/workflow.html#AbstractWorkflow.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the calculations if the post-processing was not already
+performed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <cite>force_run</cite> or <cite>dry_run</cite> is set to <cite>True</cite>, then any
+previous value of the post-processing attributes is deleted
+and set back to their default value, so that the
+post-processing is not considered as being performed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmpi</strong> (<em>int</em>) – Number of MPI tasks.</p></li>
+<li><p><strong>nomp</strong> (<em>int</em>) – Number of OpenMP tasks.</p></li>
+<li><p><strong>force_run</strong> (<em>bool</em>) – If <cite>True</cite>, the calculations are run even though a logfile
+already exists.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – If <cite>True</cite>, the input files are written on disk, but the
+bigdft-tool command is run instead of the bigdft one.</p></li>
+<li><p><strong>restart_if_incomplete</strong> (<em>bool</em>) – If <cite>True</cite>, the job is restarted if the existing logfile is
+incomplete.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>int</em><em> or </em><em>None</em>) – Number of minutes after which each job must be stopped.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Warns</dt>
+<dd class="field-even"><p><strong>UserWarning</strong> – If the post-processing was already completed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow.is_completed">
+<em class="property">property </em><code class="sig-name descname">is_completed</code><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow.is_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if all the post-processing attributes are no longer
+set to their default value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.AbstractWorkflow.post_proc">
+<em class="property">abstract </em><code class="sig-name descname">post_proc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/workflow.html#AbstractWorkflow.post_proc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.workflow.AbstractWorkflow.post_proc" title="Permalink to this definition">¶</a></dt>
+<dd><p>This should be an abstract method used to post-process the
+output of the calculations and get some meaningful results out of
+them.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mybigdft.workflows.workflow.Workflow">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.workflow.</code><code class="sig-name descname">Workflow</code><span class="sig-paren">(</span><em class="sig-param">queue=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/workflow.html#Workflow"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mybigdft.workflows.workflow.AbstractWorkflow" title="mybigdft.workflows.workflow.AbstractWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.workflows.workflow.AbstractWorkflow</span></code></a></p>
+<p>This is a usable workflow that one can play with, but without
+post-processing. This means you can add jobs to the queue and run
+them as usual, but you must then code the post-processing yourself,
+in a separate function taking the workflow as parameter.</p>
+<p>This latter scheme can even be part of the development cycle of a
+new workflow that could be later added to the MyBigDFT project: you
+first define roughly the jobs to be added to the queue for your
+workflow, and then develop a post-processing function taking your
+workflow as argument. When you are happy with the result, it is
+then easy to re-use most of the code to create a workflow class
+deriving from the <a class="reference internal" href="#mybigdft.workflows.workflow.AbstractWorkflow" title="mybigdft.workflows.workflow.AbstractWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">AbstractWorkflow</span></code></a> class.</p>
+<p>To do that, you only have to make sure that you override the
+<cite>__init__</cite> method to create the queue of jobs, then define which are
+the post-processing arguments and create properties to access them,
+and finally override the <cite>post_proc</cite> method to make sure these
+attributes are properly initialized.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>queue</strong> (<em>list</em>) – List of all the jobs to run.</p>
+</dd>
+</dl>
+<p>The queue can be empty:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span> <span class="o">=</span> <span class="n">Workflow</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">queue</span>
+<span class="go">[]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">wf</span><span class="o">.</span><span class="n">logfiles</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.completed">
+<em class="property">property </em><code class="sig-name descname">completed</code><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if the post_proc method was run successfully.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.is_completed">
+<em class="property">property </em><code class="sig-name descname">is_completed</code><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.is_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if all the post-processing attributes are no longer
+set to their default value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.logfiles">
+<em class="property">property </em><code class="sig-name descname">logfiles</code><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of all the logfiles of the workflow, with the
+name of the associated job as key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.post_proc">
+<code class="sig-name descname">post_proc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/workflow.html#Workflow.post_proc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.post_proc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Set the post-processing attribute <code class="docutils literal notranslate"><span class="pre">completed</span></code> to <cite>True</cite></p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.queue">
+<em class="property">property </em><code class="sig-name descname">queue</code><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All the jobs of the workflow.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.workflow.Workflow.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">nmpi=1</em>, <em class="sig-param">nomp=1</em>, <em class="sig-param">force_run=False</em>, <em class="sig-param">dry_run=False</em>, <em class="sig-param">restart_if_incomplete=False</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mybigdft.workflows.workflow.Workflow.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the calculations if the post-processing was not already
+performed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <cite>force_run</cite> or <cite>dry_run</cite> is set to <cite>True</cite>, then any
+previous value of the post-processing attributes is deleted
+and set back to their default value, so that the
+post-processing is not considered as being performed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmpi</strong> (<em>int</em>) – Number of MPI tasks.</p></li>
+<li><p><strong>nomp</strong> (<em>int</em>) – Number of OpenMP tasks.</p></li>
+<li><p><strong>force_run</strong> (<em>bool</em>) – If <cite>True</cite>, the calculations are run even though a logfile
+already exists.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – If <cite>True</cite>, the input files are written on disk, but the
+bigdft-tool command is run instead of the bigdft one.</p></li>
+<li><p><strong>restart_if_incomplete</strong> (<em>bool</em>) – If <cite>True</cite>, the job is restarted if the existing logfile is
+incomplete.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>int</em><em> or </em><em>None</em>) – Number of minutes after which each job must be stopped.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Warns</dt>
+<dd class="field-even"><p><strong>UserWarning</strong> – If the post-processing was already completed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="convergences.html" class="btn btn-neutral float-right" title="Convergence classes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="workflows.html" class="btn btn-neutral float-left" title="Workflows" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

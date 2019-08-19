@@ -1,0 +1,806 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Compute the phonons and the Raman spectrum &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Compute the phonons and the infrared spectrum" href="Phonons_and_InfraredSpectrum.html" />
+    <link rel="prev" title="Compute the electronic polarizability tensor" href="PolTensor.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">MyBigDFT tutorials</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="Input_files.html">Manipulate BigDFT input files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Job_and_Logfile.html">Run BigDFT and manipulate its output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Convergences.html">Convergence classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PolTensor.html">Compute the electronic polarizability tensor</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Compute the phonons and the Raman spectrum</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Initialization">Initialization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-Phonons-class">The Phonons class</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#The-RamanSpectrum-class">The RamanSpectrum class</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Phonons_and_InfraredSpectrum.html">Compute the phonons and the infrared spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VibPolTensor.html">Compute the vibrational polarizability tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Dissociation_curve.html">Dissociation curve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Geopt.html">Geometry optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorials.html">MyBigDFT tutorials</a> &raquo;</li>
+        
+      <li>Compute the phonons and the Raman spectrum</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/Phonons_and_RamanSpectrum.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 5ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Compute-the-phonons-and-the-Raman-spectrum">
+<h1>Compute the phonons and the Raman spectrum<a class="headerlink" href="#Compute-the-phonons-and-the-Raman-spectrum" title="Permalink to this headline">¶</a></h1>
+<p>MyBigDFT comes with some classes implementing particular workflows of calculations. These workflows define a queue of jobs, that can easily be run sequentially, without having to worry about the <code class="docutils literal notranslate"><span class="pre">Job</span></code> context manager. They also generally define a particular post-processing procedure, run after all the BigDFT calculations in order to extract some meaningful imformation.</p>
+<p>The example provided here shows how to obtain the phonons and the Raman spectrum of the N<span class="math notranslate nohighlight">\(_2\)</span> molecule using the <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/phonons.html#mybigdft.workflows.phonons.Phonons">Phonons</a> and <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/raman.html#mybigdft.workflows.ramanspectrum.RamanSpectrum">RamanSpectrum</a> class.</p>
+<p>The goal of these calculations is to find the normal modes of vibration (or phonons) of the system under consideration as well as their respective Raman intensities. A good reference for the underlying theory of molecular vibrations is the book <em>Molecular Vibrations</em> by Wilson <em>et al.</em> (1955) or the <em>Advances in Chemical Physics, vol. 67</em> by K.P. Lawley or <em>Spectra of Atoms and Molecules</em> by Peter F. Bernath (where the conversion between atomic units, SI units and the units used in the
+litterature is well explained in pages 316-317).</p>
+<p>For more details on how all these quantities are computed, you may read <a class="reference external" href="http://dx.doi.org/10.1063/1.470783">A. Stirling, *J. Chem. Phys.* **104**, 1254 (1996)</a> and <a class="reference external" href="https://link.aps.org/doi/10.1103/PhysRevB.54.7830">D. Porezag and M. R.Pederson, *PRB* **54**, 7830-7836 (1996)</a>. To check for the polarizability tensor and, more importantly, its derivative, we used <a class="reference external" href="https://doi.org/10.1139/v96-128">K. M. Gough *et al.*, *Can. J. Chem.* **74**, 1139-1144 (1996)</a> as a comparison.</p>
+<div class="section" id="Initialization">
+<h2>Initialization<a class="headerlink" href="#Initialization" title="Permalink to this headline">¶</a></h2>
+<p>You first need to import some useful classes to define a ground state calculation as well as the <code class="docutils literal notranslate"><span class="pre">Phonons</span></code> and <code class="docutils literal notranslate"><span class="pre">RamanSpectrum</span></code> classes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Job</span><span class="p">,</span> <span class="n">Posinp</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">InputParams</span>
+<span class="kn">from</span> <span class="nn">mybigdft.workflows</span> <span class="k">import</span> <span class="n">Phonons</span><span class="p">,</span> <span class="n">RamanSpectrum</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="The-Phonons-class">
+<h2>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/phonons.html#mybigdft.workflows.phonons.Phonons">Phonons</a> class<a class="headerlink" href="#The-Phonons-class" title="Permalink to this headline">¶</a></h2>
+<p>Let us first obtain the the normal modes of the N2 molecule.</p>
+<p>To get the <strong>energies</strong> of the Raman spectrum, one needs to find the <strong>eigenvalues of the dynamical matrix</strong>, that is closely related to the Hessian matrix. To build these matrices, one must find the derivatives of the forces when the position of each atom is translated (along each coordinate) by a small amount around their equilibrium position. To get a better precision on the derivative, each coodinate is translated positively and negatively. The number of BigDFT calculations therefore amounts
+to <span class="math notranslate nohighlight">\(2 * 3 n_{at} = 6 n_{at}\)</span>, where <span class="math notranslate nohighlight">\(n_{at}\)</span> is the number of atoms (3 for the coordinates (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span> and <span class="math notranslate nohighlight">\(z\)</span>), 2 for the number of calculations per coordinates).</p>
+<p><strong>Be careful:</strong> you must compute a geometry optimization of your system before actually computing the phonons, as you may get unphysical results. This part is not reproduced here. Similarly to the polarizability tensor calculation, you only need to provide a ground state job while default values are used to define the amplitude of the moves along each direction (you might want to set them via the <code class="docutils literal notranslate"><span class="pre">translation_amplitudes</span></code> argument).</p>
+<p><strong>Note</strong>: you can select <code class="docutils literal notranslate"><span class="pre">order=1</span></code> when initializing the Phonons instance, so as to run only one calculation per coordinates (meaning <span class="math notranslate nohighlight">\(3 n_{at}\)</span> calculations will be performed, instead of <span class="math notranslate nohighlight">\(6 n_{at}\)</span>)</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">N2_ref</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;2   angstroem</span>
+<span class="s2">free</span>
+<span class="s2">N   3.571946174   3.571946174   3.620526682</span>
+<span class="s2">N   3.571946174   3.571946174   4.71401439&quot;&quot;&quot;</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">N2_ref</span><span class="p">)</span>
+<span class="n">gs</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s1">&#39;N2&#39;</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="s1">&#39;../../../tests/phonons_N2&#39;</span><span class="p">)</span>
+<span class="n">phonons</span> <span class="o">=</span> <span class="n">Phonons</span><span class="p">(</span><span class="n">gs</span><span class="p">)</span>
+<span class="c1"># The line above actually amounts to:</span>
+<span class="c1"># phonons = Phonons(gs, translation_amplitudes=[0.45/64]*3, order=2)</span>
+</pre></div>
+</div>
+</div>
+<p>To run the calculation, simply use the run method:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">phonons</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z-
+Logfile log-N2.yaml already exists!
+
+</pre></div></div>
+</div>
+<p>In the end, you can get the phonon energies via the <code class="docutils literal notranslate"><span class="pre">energies</span></code> attribute. They are stored in a dictionary whose keys are the units.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">phonons</span><span class="o">.</span><span class="n">energies</span>  <span class="c1"># values in cm^-1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([ 2.38694633e+03,  6.64733640e+00,  6.64737304e+00, -1.86019702e-02,
+        1.18120290e-05, -4.75490601e-06])
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="The-RamanSpectrum-class">
+<h2>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/raman.html#mybigdft.workflows.ramanspectrum.RamanSpectrum">RamanSpectrum</a> class<a class="headerlink" href="#The-RamanSpectrum-class" title="Permalink to this headline">¶</a></h2>
+<p>To get the <strong>intensities</strong> (or <strong>activities</strong>) of the Raman spectrum, one must compute the <strong>derivative of the polarizability tensor along the normal modes</strong>. To that end, one must compute the polarizability tensor at each of the positons used to get the vibrational energies, and this means applying an external electric field along each coordinate. This leads to 3 extra calculations per atom, meaning that <span class="math notranslate nohighlight">\(18 n_{at}\)</span> additional BigDFT standard calculations are required to obtain the
+intensities of the Raman spectrum intensities, leading to 24 <span class="math notranslate nohighlight">\(n_{at}\)</span> calculations in total.</p>
+<p>A RamanSpectrum instance is initialized by a Phonons instance (you may also provide electric field amplitudes (via the <code class="docutils literal notranslate"><span class="pre">ef_amplitudes</span></code> argument) to set the amplitude of the electric field applied when computing the polarizability tensor).</p>
+<p>Here, the phonons instance defined above is re-used, hence the UserWarning below: the calculations for the phonons were already performed before, so we are said to set <code class="docutils literal notranslate"><span class="pre">force_run</span></code> to <code class="docutils literal notranslate"><span class="pre">True</span></code> if we wish to run them again (but this is not our case).</p>
+<p><strong>Note</strong>: You can set <code class="docutils literal notranslate"><span class="pre">order=2</span></code> upon initializing the RamanSpectrum class to run two calculations per electric field coordinates per atom, leading to <span class="math notranslate nohighlight">\(36 n_{at}\)</span> extra calculations, instead of <span class="math notranslate nohighlight">\(18 n_{at}\)</span>.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">raman</span> <span class="o">=</span> <span class="n">RamanSpectrum</span><span class="p">(</span><span class="n">phonons</span><span class="p">)</span>
+<span class="n">raman</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/mybigdft/workflows/workflow.py:118: UserWarning: Calculations already performed; set the argument &#39;force_run&#39; to True to re-run them.
+  warnings.warn(warning_msg, UserWarning)
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/x-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/y-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0000/z-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/x-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/y-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z+/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z+/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z+/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z-
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z-/EF_along_x+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z-/EF_along_y+
+Logfile log-N2.yaml already exists!
+
+/Users/maximemoriniere/Documents/Python/MyBigDFT/tests/phonons_N2/atom0001/z-/EF_along_z+
+Logfile log-N2.yaml already exists!
+
+</pre></div></div>
+</div>
+<p>In the end, we can check the phonon energies:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">raman</span><span class="o">.</span><span class="n">energies</span>  <span class="c1"># in cm^-1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([ 2.38694633e+03,  6.64733640e+00,  6.64737304e+00, -1.86019702e-02,
+        1.18120290e-05, -4.75490601e-06])
+</pre></div>
+</div>
+</div>
+<p>The intensities associated to each normal mode are obtained via the <code class="docutils literal notranslate"><span class="pre">intensities</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">raman</span><span class="o">.</span><span class="n">intensities</span>  <span class="c1"># in Ang^4.amu^-1</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([2.25644573e+01, 1.07011259e+00, 1.06300226e+00, 1.46246429e-09,
+       2.58350510e-21, 1.44359058e-22])
+</pre></div>
+</div>
+</div>
+<p>Another quantity is the depolarization ratio:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">raman</span><span class="o">.</span><span class="n">depolarization_ratios</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>array([0.09412174, 0.75      , 0.75      , 0.12054558, 0.1427555 ,
+       0.29955284])
+</pre></div>
+</div>
+</div>
+<p>The nitrogen molecule being linear, it has <span class="math notranslate nohighlight">\(3 n_{at} - 5 = 1\)</span> normal mode. Its energy, found using the LDA exchange-correlation is around 2387 cm<span class="math notranslate nohighlight">\(^{-1}\)</span>. Following the statement of <a class="reference external" href="http://aip.scitation.org/doi/10.1063/1.464906">B. G. Johnson *et al.*, *J. Chem. Phys.* **98**, 5612 (1993)</a>, our result should be compared with the harmonic experimental value, which is reported to be 2360 cm<span class="math notranslate nohighlight">\(^{-1}\)</span> in this same reference. There is a rather good agreement! Note that the
+actual experimental value (without neglecting anharmocity) is 2331 cm<span class="math notranslate nohighlight">\(^{-1}\)</span>.</p>
+<p>A value of 0.11 for the depolarization ratio was also reported in <a class="reference external" href="http://pubs.acs.org/doi/abs/10.1021/j100384a024">P. L. Polavarapu, *J. Chem. Phys.* **94**, 8106-8112 (1990)</a>, which compares rather well to our 0.094. An energy of 2725 cm<span class="math notranslate nohighlight">\(^{-1}\)</span> was also reported, along with an intensity of 26.0 <span class="math notranslate nohighlight">\(\unicode[serif]{xC5}^4\)</span> amu<span class="math notranslate nohighlight">\(^{-1}\)</span> (close to our 22.6 <span class="math notranslate nohighlight">\(\unicode[serif]{xC5}^4\)</span> amu<span class="math notranslate nohighlight">\(^{-1}\)</span>).</p>
+<p>Keep in mind that default input parameters were used, so that the present calculations cannot be considered as converged (the grid extension should be increased and the grid spacing decreased).</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Phonons_and_InfraredSpectrum.html" class="btn btn-neutral float-right" title="Compute the phonons and the infrared spectrum" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="PolTensor.html" class="btn btn-neutral float-left" title="Compute the electronic polarizability tensor" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

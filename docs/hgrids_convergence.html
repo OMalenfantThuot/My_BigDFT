@@ -1,0 +1,296 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>HgridsConvergence &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="RmultConvergence" href="rmult_convergence.html" />
+    <link rel="prev" title="Convergence classes" href="convergences.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="workflows.html">Workflows</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="convergences.html">Convergence classes</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">HgridsConvergence</a></li>
+<li class="toctree-l4"><a class="reference internal" href="rmult_convergence.html">RmultConvergence</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
+<li class="toctree-l3"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="workflows.html">Workflows</a> &raquo;</li>
+        
+          <li><a href="convergences.html">Convergence classes</a> &raquo;</li>
+        
+      <li>HgridsConvergence</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/hgrids_convergence.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="hgridsconvergence">
+<h1>HgridsConvergence<a class="headerlink" href="#hgridsconvergence" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mybigdft.workflows.convergences.HgridsConvergence">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.convergences.</code><code class="sig-name descname">HgridsConvergence</code><span class="sig-paren">(</span><em class="sig-param">base_job</em>, <em class="sig-param">reference</em>, <em class="sig-param">delta</em>, <em class="sig-param">n_jobs=10</em>, <em class="sig-param">precision_per_atom=0.00036749322480854655</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/convergences.html#HgridsConvergence"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.convergences.HgridsConvergence" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.workflows.convergences.AbstractConvergence</span></code></p>
+<p>BigDFT uses wavelets on a grid to represent the wavefunctions and
+density of the system. One key parameter of a BigDFT calculation
+therefore is the grid spacing (noted hgrids) between two grid points
+(which must be defined in the three directions of space).</p>
+<p>This class allows to run all the necessary calculations to determine
+the largest hgrids which must be used so that the energy error
+compared to the reference calculation (with the lowest hgrid
+considered) lie within the required precision per atom.</p>
+<p>One must provide a base <cite>Job</cite> instance defining the system
+considered and possibly non-default input parameters. Then, one
+must give the reference value of the input
+parameter for which the convergence is considered. A delta value
+of this input parameter is then used to initialize a given
+number of jobs (<cite>n_jobs</cite>) of decreasing quality. Finally, a
+precision per atom (in Ha) is required (default to 0.3675 mHa
+(= 10 meV) par atom).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_job</strong> (<a class="reference internal" href="job.html#mybigdft.job.Job" title="mybigdft.job.Job"><em>Job</em></a>) – Template for all the other jobs of this workflow.</p></li>
+<li><p><strong>reference</strong> – Reference input parameter, giving high quality results.</p></li>
+<li><p><strong>delta</strong> – Variation of of the input parameter between two runs.</p></li>
+<li><p><strong>n_jobs</strong> (<em>int</em>) – Maximal number of jobs to be run.</p></li>
+<li><p><strong>precision_per_atom</strong> (<em>float</em>) – Precision per atom for a job to be considered as converged,
+the reference energy being that of the job using the
+reference input parameter (units: Ha).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.workflows.convergences.HgridsConvergence.summary">
+<code class="sig-name descname">summary</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/convergences.html#HgridsConvergence.summary"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.convergences.HgridsConvergence.summary" title="Permalink to this definition">¶</a></dt>
+<dd><p>Print a summary of the results of the hgrids convergence
+workflow.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="rmult_convergence.html" class="btn btn-neutral float-right" title="RmultConvergence" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="convergences.html" class="btn btn-neutral float-left" title="Convergence classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

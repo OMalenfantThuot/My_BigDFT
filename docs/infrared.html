@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Infrared spectrum &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Raman spectrum" href="raman.html" />
+    <link rel="prev" title="Phonon energies" href="phonons.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="workflows.html">Workflows</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="phonons.html">Phonon energies</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Infrared spectrum</a></li>
+<li class="toctree-l4"><a class="reference internal" href="raman.html">Raman spectrum</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="workflows.html">Workflows</a> &raquo;</li>
+        
+          <li><a href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a> &raquo;</li>
+        
+      <li>Infrared spectrum</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/infrared.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.workflows.infraredspectrum">
+<span id="infrared-spectrum"></span><h1>Infrared spectrum<a class="headerlink" href="#module-mybigdft.workflows.infraredspectrum" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum" title="mybigdft.workflows.infraredspectrum.InfraredSpectrum"><code class="xref py py-class docutils literal notranslate"><span class="pre">InfraredSpectrum</span></code></a> class allows to compute the normal modes
+and their respective infrared intensities, allowing one to study the
+infrared spectrum.</p>
+<dl class="class">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.infraredspectrum.</code><code class="sig-name descname">InfraredSpectrum</code><span class="sig-paren">(</span><em class="sig-param">phonons</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/infraredspectrum.html#InfraredSpectrum"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="workflow.html#mybigdft.workflows.workflow.AbstractWorkflow" title="mybigdft.workflows.workflow.AbstractWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.workflows.workflow.AbstractWorkflow</span></code></a></p>
+<p>This class allows to run all the calculations enabling the
+computation of the infrared spectrum of a given system, that is its
+normal modes of vibration (or phonons) associated to a given energy
+and an infrared intensity.</p>
+<p>One therefore needs to compute the phonons first. This is done by
+solving the dynamical matrix (the eigenvalues giving the phonon
+energies and the eigenvectors the normal modes). This matrix is
+computed at the expense of <span class="math notranslate nohighlight">\(6 n_{at}\)</span> BigDFT calculations,
+where each atom is in turns translated by a small amount around its
+equilibrium positions. You may want to refer to the
+<a class="reference internal" href="phonons.html#mybigdft.workflows.phonons.Phonons" title="mybigdft.workflows.phonons.Phonons"><code class="xref py py-class docutils literal notranslate"><span class="pre">Phonons</span></code></a> class for more details.</p>
+<p>To get the intensities of the infrared spectrum, one must compute
+the derivative of the dipole moment along the normal modes. All the
+necessary dipole moments to use are readily found in the logfiles of
+the BigDFT calculations performed to compute the phonons: no extra
+calculation is required.</p>
+<p>From a phonon calculation, one is able to compute the infrared
+spectrum of a given system by only measuring the dipole moment
+at each out-of-equilibrium positions used to compute the
+phonons.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>phonons</strong> (<a class="reference internal" href="phonons.html#mybigdft.workflows.phonons.Phonons" title="mybigdft.workflows.phonons.Phonons"><em>Phonons</em></a>) – Phonon energies workflow.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.phonons">
+<em class="property">property </em><code class="sig-name descname">phonons</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.phonons" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Workflow allowing to compute the phonon energies of the
+system under consideration.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="phonons.html#mybigdft.workflows.phonons.Phonons" title="mybigdft.workflows.phonons.Phonons">Phonons</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.energies">
+<em class="property">property </em><code class="sig-name descname">energies</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.energies" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Phonon energies of the system (units: cm^-1).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.intensities">
+<em class="property">property </em><code class="sig-name descname">intensities</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.intensities" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Infrared intensities of the phonons (units:
+(D/Ang)^2.amu^-1).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.Z">
+<em class="property">property </em><code class="sig-name descname">Z</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.Z" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Matrix measuring the derivative of the dipole moment with
+respect to atomic displacements (units: (D/A).amu^-1/2).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy array of dimension <span class="math notranslate nohighlight">\(3 * 3 n_{at}\)</span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.Zbvs">
+<em class="property">property </em><code class="sig-name descname">Zbvs</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.Zbvs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Intensities of the phonons.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.post_proc">
+<code class="sig-name descname">post_proc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/infraredspectrum.html#InfraredSpectrum.post_proc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.post_proc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the infrared intensities, the Z matrix and the Z
+matrices for each normal mode and set their values (you can
+access their values via the attributes <a class="reference internal" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.intensities" title="mybigdft.workflows.infraredspectrum.InfraredSpectrum.intensities"><code class="xref py py-attr docutils literal notranslate"><span class="pre">intensities</span></code></a>,
+<a class="reference internal" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.Z" title="mybigdft.workflows.infraredspectrum.InfraredSpectrum.Z"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Z</span></code></a> and <a class="reference internal" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.Zbvs" title="mybigdft.workflows.infraredspectrum.InfraredSpectrum.Zbvs"><code class="xref py py-attr docutils literal notranslate"><span class="pre">Zbvs</span></code></a>, respectively).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.is_completed">
+<em class="property">property </em><code class="sig-name descname">is_completed</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.is_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if all the post-processing attributes are no longer
+set to their default value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.logfiles">
+<em class="property">property </em><code class="sig-name descname">logfiles</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of all the logfiles of the workflow, with the
+name of the associated job as key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.queue">
+<em class="property">property </em><code class="sig-name descname">queue</code><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All the jobs of the workflow.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.infraredspectrum.InfraredSpectrum.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">nmpi=1</em>, <em class="sig-param">nomp=1</em>, <em class="sig-param">force_run=False</em>, <em class="sig-param">dry_run=False</em>, <em class="sig-param">restart_if_incomplete=False</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mybigdft.workflows.infraredspectrum.InfraredSpectrum.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the calculations if the post-processing was not already
+performed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <cite>force_run</cite> or <cite>dry_run</cite> is set to <cite>True</cite>, then any
+previous value of the post-processing attributes is deleted
+and set back to their default value, so that the
+post-processing is not considered as being performed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmpi</strong> (<em>int</em>) – Number of MPI tasks.</p></li>
+<li><p><strong>nomp</strong> (<em>int</em>) – Number of OpenMP tasks.</p></li>
+<li><p><strong>force_run</strong> (<em>bool</em>) – If <cite>True</cite>, the calculations are run even though a logfile
+already exists.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – If <cite>True</cite>, the input files are written on disk, but the
+bigdft-tool command is run instead of the bigdft one.</p></li>
+<li><p><strong>restart_if_incomplete</strong> (<em>bool</em>) – If <cite>True</cite>, the job is restarted if the existing logfile is
+incomplete.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>int</em><em> or </em><em>None</em>) – Number of minutes after which each job must be stopped.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Warns</dt>
+<dd class="field-even"><p><strong>UserWarning</strong> – If the post-processing was already completed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="raman.html" class="btn btn-neutral float-right" title="Raman spectrum" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="phonons.html" class="btn btn-neutral float-left" title="Phonon energies" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,1032 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.job &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.job</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.job</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`Job` class is the base class defining a BigDFT calculation.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="k">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">mybigdft.iofiles</span> <span class="k">import</span> <span class="n">InputParams</span><span class="p">,</span> <span class="n">Logfile</span>
+<span class="kn">from</span> <span class="nn">mybigdft.iofiles.logfiles</span> <span class="k">import</span> <span class="n">GeoptLogfile</span>
+<span class="kn">from</span> <span class="nn">mybigdft.iofiles.inputparams</span> <span class="k">import</span> <span class="n">clean</span>
+<span class="kn">from</span> <span class="nn">.globals</span> <span class="k">import</span> <span class="n">BIGDFT_PATH</span><span class="p">,</span> <span class="n">BIGDFT_TOOL_PATH</span><span class="p">,</span> <span class="n">DEFAULT_PARAMETERS</span>
+
+
+<div class="viewcode-block" id="Job"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job">[docs]</a><span class="k">class</span> <span class="nc">Job</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class is meant to define a BigDFT calculation. :meth:`run` is</span>
+<span class="sd">    its main method and it must be used in a context manager to ensure</span>
+<span class="sd">    that the calculation is run the desired directory.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+        <span class="n">inputparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">posinp</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">run_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">ref_data_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">skip</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">pseudos</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        You may pass input parameters and/or initial geometry (posinp).</span>
+<span class="sd">        Make sure to at least provide initial positions, either via the</span>
+<span class="sd">        posinp or the input parameters.</span>
+
+<span class="sd">        You may give a `name` for the calculation, used to name the</span>
+<span class="sd">        input and output files written on disk (default naming</span>
+<span class="sd">        conventions are used if not). You can also specify the directory</span>
+<span class="sd">        where to run the calculation with `run_dir`.</span>
+
+<span class="sd">        A reference calculation may be given in order to copy its data</span>
+<span class="sd">        directory to the present calculation (main use: restart from the</span>
+<span class="sd">        wavefunctions of the reference calculation).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        inputparams : InputParams or None</span>
+<span class="sd">            BigDFT input parameters.</span>
+<span class="sd">        posinp : Posinp or None</span>
+<span class="sd">            BigDFT initial geometry file.</span>
+<span class="sd">        name : str</span>
+<span class="sd">            Prefix of the BigDFT calculation (used to define the input</span>
+<span class="sd">            and output file names).</span>
+<span class="sd">        run_dir : str or None</span>
+<span class="sd">            Folder where to run the calculation (default to current</span>
+<span class="sd">            directory).</span>
+<span class="sd">        ref_data_dir : str</span>
+<span class="sd">            Path to the data directory of a reference BigDFT</span>
+<span class="sd">            calculation.</span>
+<span class="sd">        skip : bool</span>
+<span class="sd">            If `True`, the calculation will be skipped. (Note: Might not</span>
+<span class="sd">            be useful now, since we check for the existence of the</span>
+<span class="sd">            logfile before running, which might be the actual check of</span>
+<span class="sd">            the skip option of BigDFT.)</span>
+<span class="sd">        pseudos : bool</span>
+<span class="sd">            If `True`, the pseudopotential files stored in $PSEUDODIR</span>
+<span class="sd">            will be used to complete the job.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        ValueError</span>
+<span class="sd">            If no initial positions are given in the posinp or the input</span>
+<span class="sd">            parameters.</span>
+
+
+<span class="sd">        A Job instance can be initialized by using a posinp only:</span>
+
+<span class="sd">        &gt;&gt;&gt; from mybigdft import Posinp, Atom</span>
+<span class="sd">        &gt;&gt;&gt; pos = Posinp(</span>
+<span class="sd">        ...     [Atom(&#39;N&#39;, [2.9763078243490115e-23, 6.872205952043537e-23,</span>
+<span class="sd">        ...                 0.01071619987487793]),</span>
+<span class="sd">        ...      Atom(&#39;N&#39;, [-1.1043449194501671e-23, -4.873421744830746e-23,</span>
+<span class="sd">        ...                 1.104273796081543])], &quot;angstroem&quot;, &quot;free&quot;</span>
+<span class="sd">        ... )</span>
+<span class="sd">        &gt;&gt;&gt; job = Job(posinp=pos, run_dir=&quot;tests&quot;)</span>
+
+<span class="sd">        Default values are therefore used for the input parameters:</span>
+
+<span class="sd">        &gt;&gt;&gt; job.inputparams</span>
+<span class="sd">        {}</span>
+
+<span class="sd">        Input and output file names are defined from the `name` passed</span>
+<span class="sd">        as argument. Here, no name is passed, so that default names are</span>
+<span class="sd">        used:</span>
+
+<span class="sd">        &gt;&gt;&gt; job.input_name</span>
+<span class="sd">        &#39;input.yaml&#39;</span>
+<span class="sd">        &gt;&gt;&gt; job.posinp_name</span>
+<span class="sd">        &#39;posinp.xyz&#39;</span>
+<span class="sd">        &gt;&gt;&gt; job.logfile_name</span>
+<span class="sd">        &#39;log.yaml&#39;</span>
+
+<span class="sd">        The directories are defined from the `run_dir` argument:</span>
+
+<span class="sd">        &gt;&gt;&gt; import os</span>
+<span class="sd">        &gt;&gt;&gt; os.getcwd() == job.init_dir</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; os.path.basename(job.init_dir) != &#39;tests&#39;</span>
+<span class="sd">        True</span>
+<span class="sd">        &gt;&gt;&gt; os.path.basename(job.run_dir)</span>
+<span class="sd">        &#39;tests&#39;</span>
+
+<span class="sd">        There is no logfile associated to the job yet as it was not run:</span>
+
+<span class="sd">        &gt;&gt;&gt; job.logfile == {}</span>
+<span class="sd">        True</span>
+
+<span class="sd">        To run the job, do it from a context manager:</span>
+
+<span class="sd">        &gt;&gt;&gt; with job as j:</span>
+<span class="sd">        ...     j.run()</span>
+<span class="sd">        ...</span>
+<span class="sd">        /.../tests</span>
+<span class="sd">        Logfile log.yaml already exists!</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+
+<span class="sd">        A logfile being found, it is read and not computed again:</span>
+
+<span class="sd">        &gt;&gt;&gt; job.logfile == {}</span>
+<span class="sd">        False</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check the input parameters of the calculation</span>
+        <span class="k">if</span> <span class="n">inputparams</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">inputparams</span> <span class="o">=</span> <span class="n">InputParams</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">posinp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">posinp</span> <span class="o">=</span> <span class="n">inputparams</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="k">if</span> <span class="n">inputparams</span><span class="o">.</span><span class="n">posinp</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posinp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Please provide initial positions.&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">inputparams</span><span class="o">.</span><span class="n">posinp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">posinp</span> <span class="o">!=</span> <span class="n">inputparams</span><span class="o">.</span><span class="n">posinp</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inputparams and posinp do not define the same posinp.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Set the base attributes</span>
+        <span class="n">inputparams</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">inputparams</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">inputparams</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">posinp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_data_dir</span> <span class="o">=</span> <span class="n">ref_data_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span> <span class="o">=</span> <span class="n">pseudos</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;ixc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">101130</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ixc&quot;</span><span class="p">:</span> <span class="o">-</span><span class="mi">101130</span><span class="p">}</span>
+
+        <span class="c1"># Derive the rest of the attributes from the other arguments</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_directory_attributes</span><span class="p">(</span><span class="n">run_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_filename_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_cmd_attributes</span><span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Base name of the calculation used to set the names of</span>
+<span class="sd">            files and directories as well as the commands.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Input parameters of the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Posinp or None</span>
+<span class="sd">            Initial positions of the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Logfile or None</span>
+<span class="sd">            Logfile of the calculation (output of the bigdft or</span>
+<span class="sd">            bigdft-tool executable).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ref_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Reference directory where some relevant data (such as</span>
+<span class="sd">            wavefunctions) is stored.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ref_data_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">pseudos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        _______</span>
+<span class="sd">        bool</span>
+<span class="sd">            if `True`, the calculation uses the pseudopotential files</span>
+<span class="sd">            in $PSEUDODIR (environment variable).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            If `True`, the calculation will be skipped. (Note: Might not</span>
+<span class="sd">            be useful now, since we check for the existence of the</span>
+<span class="sd">            logfile before running, which might be the actual check of</span>
+<span class="sd">            the skip option of BigDFT.)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">init_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Absolute path to the initial directory of the calculation</span>
+<span class="sd">            (can differ from :meth:`~mybigdft.job.Job.run_dir`).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Absolute path to the directory where the calculation is run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Absolute path to the data directory of the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bigdft_tool_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Base command to run the bigdft-tool executable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">bigdft_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Base command to run the bigdft executable.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">input_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Name of the input parameters file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinp_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Name of the input position file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logfile_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Name of the logfile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            `True` if the job has already run successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span>
+
+    <span class="k">def</span> <span class="nf">_set_directory_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the attributes regarding the directories used to run the</span>
+<span class="sd">        calculation and to store data.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        run_dir : str or None</span>
+<span class="sd">            Folder where to run the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_init_and_run_directories</span><span class="p">(</span><span class="n">run_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_data_directory</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_init_and_run_directories</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the attributes regarding the directories used to run the</span>
+<span class="sd">        calculation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        run_dir : str or None</span>
+<span class="sd">            Folder where to run the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set the initial directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="c1"># Set the directory where the calculation will be run</span>
+        <span class="k">if</span> <span class="n">run_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># A run directory was given, find the common prefix with the</span>
+            <span class="c1"># current working directory</span>
+            <span class="n">basename</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">commonprefix</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">])</span>
+            <span class="k">if</span> <span class="n">basename</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="c1"># If there is no common prefix, then the run directory</span>
+                <span class="c1"># is already well defined, and the absolute directory is</span>
+                <span class="c1"># the concatenation of the current working directory and</span>
+                <span class="c1"># the run directory</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Else, find the relative path with the common prefix to</span>
+                <span class="c1"># define run_dir, and use run_dir to define the</span>
+                <span class="c1"># absolute directory. The initial directory is changed to the</span>
+                <span class="c1"># common prefix.</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span> <span class="o">=</span> <span class="n">basename</span>
+                <span class="n">new_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">basename</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">new_run_dir</span><span class="p">)</span>
+                <span class="c1"># print(&quot;run_dir switched from {} to {}&quot;</span>
+                <span class="c1">#       .format(run_dir, new_run_dir))</span>
+
+    <span class="k">def</span> <span class="nf">_set_data_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the attributes regarding the directories used to store data.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set the data directory</span>
+        <span class="n">data_dir</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>  <span class="c1"># base name for the BigDFT data directory</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="n">data_dir</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_set_cmd_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the base commands to run bigdft or bigdft-tool.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The base bigdft-tool command is always the same</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_TOOL_PATH</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;--name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="c1"># The base bigdft command depends on name and on skip</span>
+        <span class="n">skip_option</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip</span><span class="p">:</span>
+            <span class="n">skip_option</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;Yes&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
+
+    <span class="k">def</span> <span class="nf">_set_filename_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the attributes regarding the name of the input and output</span>
+<span class="sd">        files.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span>  <span class="c1"># input file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.xyz&quot;</span>  <span class="c1"># posinp file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span>  <span class="c1"># output file name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span> <span class="o">=</span> <span class="s2">&quot;input.yaml&quot;</span>  <span class="c1"># input file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span> <span class="o">=</span> <span class="s2">&quot;posinp.xyz&quot;</span>  <span class="c1"># posinp file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log.yaml&quot;</span>  <span class="c1"># output file name</span>
+
+<div class="viewcode-block" id="Job.__enter__"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When entering the context manager:</span>
+
+<span class="sd">        * create the directory where the calculations must be run,</span>
+<span class="sd">        * go to that directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">]:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">):</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span></div>
+
+<div class="viewcode-block" id="Job.__exit__"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.__exit__">[docs]</a>    <span class="k">def</span> <span class="nf">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        When leaving the context manager, go back to the initial</span>
+<span class="sd">        directory.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">chdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Job.run"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">nmpi</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">nomp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">force_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the BigDFT calculation if it was not already performed.</span>
+<span class="sd">        The number of MPI and OpenMP tasks may be specified.</span>
+
+<span class="sd">        You may force the calculation to run even though it was</span>
+<span class="sd">        previously successful (*e.g.*, a logfile already exists) by</span>
+<span class="sd">        setting `force_run` to `True`.</span>
+
+<span class="sd">        If `dry_run` is set to `True`, then bigdft-tool is run instead</span>
+<span class="sd">        of the BigDFT executable.</span>
+
+<span class="sd">        If `restart_if_incomplete` is set to `True`, the previously</span>
+<span class="sd">        existing logfile is removed and the calculation restarts.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculation is run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which the job must be stopped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Copy the data directory of a reference calculation</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># Copy the data directory only when bigdft has to run</span>
+            <span class="k">if</span> <span class="n">force_run</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_copy_reference_data_dir</span><span class="p">()</span>
+            <span class="c1"># Always update the input file, so that it reads the</span>
+            <span class="c1"># reference wavefunctions in the data directory</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_read_wavefunctions_from_data_dir</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="n">dry_run</span> <span class="ow">or</span> <span class="n">force_run</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">):</span>
+            <span class="c1"># Run bigdft (if dry_run is False) or bigdft-tool (if</span>
+            <span class="c1"># dry_run is True)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_set_environment</span><span class="p">(</span><span class="n">nomp</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">write_input_files</span><span class="p">()</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_command</span><span class="p">(</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">)</span>
+            <span class="n">output_msg</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_launch_calculation</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_write_bigdft_tool_output</span><span class="p">(</span><span class="n">output_msg</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">output_msg</span> <span class="o">=</span> <span class="n">output_msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">output_msg</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The logfile is incomplete!&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Timeout exceded (</span><span class="si">{}</span><span class="s2"> minutes)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_clean_data_dir</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The logfile already exists: the initial positions and the</span>
+            <span class="c1"># initial parameters used to perform that calculation must</span>
+            <span class="c1"># correspond to the ones used to initialize the current job.</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logfile </span><span class="si">{}</span><span class="s2"> already exists!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">))</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">incomplete_log</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The logfile is incomplete!&quot;</span>
+                <span class="k">if</span> <span class="n">incomplete_log</span> <span class="ow">and</span> <span class="n">restart_if_incomplete</span><span class="p">:</span>
+                    <span class="c1"># Remove the logfile and restart the calculation</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;The logfile was incomplete, restart calculation&quot;</span><span class="p">)</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                        <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span>
+                        <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span>
+                        <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+                        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+                        <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+                        <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_logfile_posinp</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_check_logfile_inputparams</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+    <span class="k">def</span> <span class="nf">_copy_reference_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Copy the reference data directory to the current calculation</span>
+<span class="sd">        directory so as to restart the new calculation from the result</span>
+<span class="sd">        of the reference calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">exists</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">curdir</span><span class="p">):</span>
+                <span class="c1"># Remove the previously existing data directory before</span>
+                <span class="c1"># copying the reference data directory (otherwise,</span>
+                <span class="c1"># shutil.copytree raises an error).</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copytree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data directory copied from </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Data directory </span><span class="si">{}</span><span class="s2"> not found.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span><span class="p">))</span>
+
+    <span class="k">def</span> <span class="nf">_read_wavefunctions_from_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the input parameters to read the wavefunctions from the data</span>
+<span class="sd">        directory if they exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Check that there are wavefunction files</span>
+        <span class="n">wf_files</span> <span class="o">=</span> <span class="p">[</span><span class="n">f</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span> <span class="k">if</span> <span class="s2">&quot;wavefunction&quot;</span> <span class="ow">in</span> <span class="n">f</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">wf_files</span><span class="p">:</span>
+            <span class="c1"># If there are wavefunction files, add the</span>
+            <span class="c1"># option to read them from files.</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;inputpsiid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;inputpsiid&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Else, delete the option from the input file, if</span>
+            <span class="c1"># it is equal to 2 (might be better than completely</span>
+            <span class="c1"># removing inputpsiid ?).</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;inputpsiid&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;inputpsiid&quot;</span><span class="p">]</span>
+            <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_set_environment</span><span class="p">(</span><span class="n">nomp</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the number of OpenMP threads.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nomp</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nomp</span><span class="p">)</span>  <span class="c1"># Make sure you get an integer</span>
+        <span class="k">if</span> <span class="n">nomp</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;OMP_NUM_THREADS&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">nomp</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_get_command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        command : list</span>
+<span class="sd">            The command to run bigdft if `dry_run` is set to `False`,</span>
+<span class="sd">            else the command to run bigdft-tool.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">nmpi</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">nmpi</span><span class="p">)</span>  <span class="c1"># Make sure you get an integer</span>
+        <span class="n">mpi_option</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nmpi</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">mpi_option</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;-n&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">nmpi</span><span class="p">)]</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_tool_cmd</span> <span class="o">+</span> <span class="n">mpi_option</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">nmpi</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">mpi_option</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;mpirun&quot;</span><span class="p">,</span> <span class="s2">&quot;-np&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">nmpi</span><span class="p">)]</span>
+            <span class="n">command</span> <span class="o">=</span> <span class="n">mpi_option</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_cmd</span>
+        <span class="k">return</span> <span class="n">command</span>
+
+<div class="viewcode-block" id="Job.write_input_files"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.write_input_files">[docs]</a>    <span class="k">def</span> <span class="nf">write_input_files</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the input files on disk (there might be no posinp to write,</span>
+<span class="sd">        since the initial positions can be defined in the input</span>
+<span class="sd">        parameters).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span><span class="p">:</span>
+            <span class="n">elements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="p">])</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;PSEUDODIR&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="s2">&quot;psppar.&quot;</span> <span class="o">+</span> <span class="n">element</span><span class="p">,</span> <span class="s2">&quot;psppar.&quot;</span> <span class="o">+</span> <span class="n">element</span>
+                <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_launch_calculation</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Launch the command to run the bigdft or bigdft-tool command.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        command : list</span>
+<span class="sd">            The command to run bigdft or bigdft-tool.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        RuntimeError</span>
+<span class="sd">            If the calculation ended with an error message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Print the command in a human readable way</span>
+        <span class="n">to_str</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> &quot;</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">command</span><span class="p">)</span>
+        <span class="n">command_msg</span> <span class="o">=</span> <span class="n">to_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">command</span><span class="p">)</span> <span class="o">+</span> <span class="s2">&quot;...&quot;</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">command_msg</span><span class="p">)</span>
+        <span class="c1"># Run the calculation for at most timeout minutes</span>
+        <span class="n">run</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">command</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">timeout</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="c1"># 60 years timeout should be enough...</span>
+            <span class="n">timeout</span> <span class="o">=</span> <span class="mi">60</span> <span class="o">*</span> <span class="mi">365</span> <span class="o">*</span> <span class="mi">24</span> <span class="o">*</span> <span class="mi">60</span>
+        <span class="n">timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">(</span><span class="n">timeout</span> <span class="o">*</span> <span class="mi">60</span><span class="p">,</span> <span class="n">run</span><span class="o">.</span><span class="n">kill</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">timer</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">out</span><span class="p">,</span> <span class="n">err</span> <span class="o">=</span> <span class="n">run</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+            <span class="n">error_msg</span> <span class="o">=</span> <span class="n">err</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">timer</span><span class="o">.</span><span class="n">cancel</span><span class="p">()</span>
+        <span class="c1"># Raise an error if the calculation ended badly, else return the</span>
+        <span class="c1"># decoded output message</span>
+        <span class="k">if</span> <span class="n">error_msg</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span>
+                <span class="s2">&quot;The calculation ended with the following error message:</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">error_msg</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">out</span>
+
+    <span class="k">def</span> <span class="nf">_write_bigdft_tool_output</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">output_msg</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the output of the bigdft-tool command on disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        output_msg : str</span>
+<span class="sd">            Output of the bigdft-tool command as a Logfile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_stream</span><span class="p">(</span><span class="n">output_msg</span><span class="p">)</span>
+        <span class="n">log</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_clean_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean the data directory, namely delete the wavefunctions in</span>
+<span class="sd">        the data folder if it was not requested to output them, and</span>
+<span class="sd">        delete the output files of a geopt calculation if a geopt</span>
+<span class="sd">        was not performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delete the wavefunction files in the data directory and</span>
+        <span class="c1"># replace them by empty files if needed.</span>
+        <span class="n">inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">DEFAULT_PARAMETERS</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span>
+        <span class="n">write_orbitals</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">inp</span>
+            <span class="ow">and</span> <span class="s2">&quot;orbitals&quot;</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+            <span class="ow">and</span> <span class="n">inp</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">default</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;output&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inp</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">write_orbitals</span><span class="p">:</span>
+            <span class="n">wf_files</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;wavefunction&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">wf_file</span> <span class="ow">in</span> <span class="n">wf_files</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">wf_file</span><span class="p">)</span>
+                <span class="c1"># Equivalent to touch wf_file in bash</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">wf_file</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">):</span>
+                    <span class="n">os</span><span class="o">.</span><span class="n">utime</span><span class="p">(</span><span class="n">wf_file</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="c1"># Delete geopt data if no geopt was required</span>
+        <span class="k">if</span> <span class="s2">&quot;geopt&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">:</span>
+            <span class="c1"># Delete the posout files</span>
+            <span class="n">posout_files</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="n">filename</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">listdir</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">filename</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;posout&quot;</span><span class="p">)</span>
+            <span class="p">]</span>
+            <span class="k">for</span> <span class="n">posout_file</span> <span class="ow">in</span> <span class="n">posout_files</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">posout_file</span><span class="p">)</span>
+            <span class="c1"># Delete the geopt.mon file</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span><span class="p">,</span> <span class="s2">&quot;geopt.mon&quot;</span><span class="p">))</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="k">pass</span>
+
+    <span class="k">def</span> <span class="nf">_check_logfile_posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the posinp used in the logfile corresponds to the one</span>
+<span class="sd">        used to initialize the job.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the initial geometry of the job does not correspond to</span>
+<span class="sd">            the one of the Logfile previously read from the disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="p">,</span> <span class="n">GeoptLogfile</span><span class="p">):</span>
+            <span class="n">log_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">posinps</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">log_pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="k">if</span> <span class="n">log_pos</span> <span class="o">!=</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span>
+                <span class="s2">&quot;The initial geometry of this job do not correspond to the &quot;</span>
+                <span class="s2">&quot;one used in the Logfile:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Logfile posinp:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">Actual posinp:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">log_pos</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">_check_logfile_inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Check that the input parameters used in the logfile correspond</span>
+<span class="sd">        to the ones used to initialize the job.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the input parameters of the job does not correspond to</span>
+<span class="sd">            the one used in the Logfile previously read from the disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">log_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">inputparams</span>
+        <span class="n">base_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span>
+        <span class="c1"># Clean the disablesym key:</span>
+        <span class="n">disablesym_in_log_inp</span> <span class="o">=</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">log_inp</span> <span class="ow">and</span> <span class="s2">&quot;disablesym&quot;</span> <span class="ow">in</span> <span class="n">log_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span>
+        <span class="n">disablesym_not_in_log_inp</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">log_inp</span> <span class="ow">and</span> <span class="s2">&quot;disablesym&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">log_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="n">disablesym_in_base_inp</span> <span class="o">=</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">base_inp</span> <span class="ow">and</span> <span class="s2">&quot;disablesym&quot;</span> <span class="ow">in</span> <span class="n">base_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span>
+        <span class="n">disablesym_not_in_base_inp</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">base_inp</span> <span class="ow">and</span> <span class="s2">&quot;disablesym&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">base_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span>
+        <span class="p">)</span>
+        <span class="c1"># - if present only in the log_inp</span>
+        <span class="k">if</span> <span class="n">disablesym_in_log_inp</span> <span class="ow">and</span> <span class="n">disablesym_not_in_base_inp</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">log_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;disablesym&quot;</span><span class="p">]</span>
+            <span class="n">log_inp</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">log_inp</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="c1"># - if present only in the base_inp</span>
+        <span class="k">if</span> <span class="n">disablesym_not_in_log_inp</span> <span class="ow">and</span> <span class="n">disablesym_in_base_inp</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">base_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;disablesym&quot;</span><span class="p">]</span>
+            <span class="n">base_inp</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">log_inp</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">base_inp</span> <span class="o">!=</span> <span class="n">log_inp</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">UserWarning</span><span class="p">(</span>
+                <span class="s2">&quot;The input parameters of this job do not correspond to the &quot;</span>
+                <span class="s2">&quot;ones used in the Logfile:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="s2">&quot;Logfile input parameters:</span><span class="se">\n</span><span class="si">{}</span><span class="se">\n</span><span class="s2">Actual input parameters:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">log_inp</span><span class="p">,</span> <span class="n">base_inp</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+<div class="viewcode-block" id="Job.clean"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.clean">[docs]</a>    <span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">logfiles_dir</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Delete all input and output files on disk as well as some</span>
+<span class="sd">        directories if required.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data_dir : bool</span>
+<span class="sd">            If `True`, removes the data directory that might exist.</span>
+<span class="sd">        logfiles : bool</span>
+<span class="sd">            If `True`, removes the logfiles directory that might exist.</span>
+
+
+<span class="sd">        .. Warning::</span>
+
+<span class="sd">            The directories are forced to be removed when the above-</span>
+<span class="sd">            mentioned options are set to `True`: use with caution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Delete the input and output files</span>
+        <span class="n">filenames</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span><span class="p">,</span>
+            <span class="s2">&quot;forces_&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span><span class="p">,</span>
+            <span class="s2">&quot;forces.xyz&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;time.yaml&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;input_minimal.yaml&quot;</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;_minimal.yaml&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+        <span class="k">for</span> <span class="n">filename</span> <span class="ow">in</span> <span class="n">filenames</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">filename</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">OSError</span><span class="p">:</span>
+                <span class="k">pass</span>
+        <span class="c1"># Delete the required directories</span>
+        <span class="n">directories</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">if</span> <span class="n">data_dir</span><span class="p">:</span>
+            <span class="n">directories</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;data&quot;</span><span class="p">,</span> <span class="s2">&quot;data-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">logfiles_dir</span><span class="p">:</span>
+            <span class="n">directories</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;logfiles&quot;</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">directories</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">directory</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,628 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Job &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Workflows" href="workflows.html" />
+    <link rel="prev" title="Logfile" href="logfile.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+      <li>Job</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/job.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.job">
+<span id="job"></span><h1>Job<a class="headerlink" href="#module-mybigdft.job" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#mybigdft.job.Job" title="mybigdft.job.Job"><code class="xref py py-class docutils literal notranslate"><span class="pre">Job</span></code></a> class is the base class defining a BigDFT calculation.</p>
+<dl class="class">
+<dt id="mybigdft.job.Job">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.job.</code><code class="sig-name descname">Job</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">inputparams=None</em>, <em class="sig-param">posinp=None</em>, <em class="sig-param">run_dir=None</em>, <em class="sig-param">ref_data_dir=None</em>, <em class="sig-param">skip=False</em>, <em class="sig-param">pseudos=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class is meant to define a BigDFT calculation. <a class="reference internal" href="#mybigdft.job.Job.run" title="mybigdft.job.Job.run"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run()</span></code></a> is
+its main method and it must be used in a context manager to ensure
+that the calculation is run the desired directory.</p>
+<p>You may pass input parameters and/or initial geometry (posinp).
+Make sure to at least provide initial positions, either via the
+posinp or the input parameters.</p>
+<p>You may give a <cite>name</cite> for the calculation, used to name the
+input and output files written on disk (default naming
+conventions are used if not). You can also specify the directory
+where to run the calculation with <cite>run_dir</cite>.</p>
+<p>A reference calculation may be given in order to copy its data
+directory to the present calculation (main use: restart from the
+wavefunctions of the reference calculation).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputparams</strong> (<a class="reference internal" href="inputparams.html#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams"><em>InputParams</em></a><em> or </em><em>None</em>) – BigDFT input parameters.</p></li>
+<li><p><strong>posinp</strong> (<a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp"><em>Posinp</em></a><em> or </em><em>None</em>) – BigDFT initial geometry file.</p></li>
+<li><p><strong>name</strong> (<em>str</em>) – Prefix of the BigDFT calculation (used to define the input
+and output file names).</p></li>
+<li><p><strong>run_dir</strong> (<em>str</em><em> or </em><em>None</em>) – Folder where to run the calculation (default to current
+directory).</p></li>
+<li><p><strong>ref_data_dir</strong> (<em>str</em>) – Path to the data directory of a reference BigDFT
+calculation.</p></li>
+<li><p><strong>skip</strong> (<em>bool</em>) – If <cite>True</cite>, the calculation will be skipped. (Note: Might not
+be useful now, since we check for the existence of the
+logfile before running, which might be the actual check of
+the skip option of BigDFT.)</p></li>
+<li><p><strong>pseudos</strong> (<em>bool</em>) – If <cite>True</cite>, the pseudopotential files stored in $PSEUDODIR
+will be used to complete the job.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>ValueError</strong> – If no initial positions are given in the posinp or the input
+    parameters.</p>
+</dd>
+</dl>
+<p>A Job instance can be initialized by using a posinp only:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Posinp</span><span class="p">,</span> <span class="n">Atom</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">2.9763078243490115e-23</span><span class="p">,</span> <span class="mf">6.872205952043537e-23</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="mf">0.01071619987487793</span><span class="p">]),</span>
+<span class="gp">... </span>     <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="o">-</span><span class="mf">1.1043449194501671e-23</span><span class="p">,</span> <span class="o">-</span><span class="mf">4.873421744830746e-23</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="mf">1.104273796081543</span><span class="p">])],</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="s2">&quot;free&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="s2">&quot;tests&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Default values are therefore used for the input parameters:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">inputparams</span>
+<span class="go">{}</span>
+</pre></div>
+</div>
+<p>Input and output file names are defined from the <cite>name</cite> passed
+as argument. Here, no name is passed, so that default names are
+used:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">input_name</span>
+<span class="go">&#39;input.yaml&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">posinp_name</span>
+<span class="go">&#39;posinp.xyz&#39;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">logfile_name</span>
+<span class="go">&#39;log.yaml&#39;</span>
+</pre></div>
+</div>
+<p>The directories are defined from the <cite>run_dir</cite> argument:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">os</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span> <span class="o">==</span> <span class="n">job</span><span class="o">.</span><span class="n">init_dir</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">init_dir</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">&#39;tests&#39;</span>
+<span class="go">True</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">basename</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">run_dir</span><span class="p">)</span>
+<span class="go">&#39;tests&#39;</span>
+</pre></div>
+</div>
+<p>There is no logfile associated to the job yet as it was not run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span> <span class="o">==</span> <span class="p">{}</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>To run the job, do it from a context manager:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">job</span> <span class="k">as</span> <span class="n">j</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">j</span><span class="o">.</span><span class="n">run</span><span class="p">()</span>
+<span class="gp">...</span>
+<span class="go">/.../tests</span>
+<span class="go">Logfile log.yaml already exists!</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+</pre></div>
+</div>
+<p>A logfile being found, it is read and not computed again:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span> <span class="o">==</span> <span class="p">{}</span>
+<span class="go">False</span>
+</pre></div>
+</div>
+<dl class="method">
+<dt id="mybigdft.job.Job.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#mybigdft.job.Job.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Base name of the calculation used to set the names of
+files and directories as well as the commands.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.inputparams">
+<em class="property">property </em><code class="sig-name descname">inputparams</code><a class="headerlink" href="#mybigdft.job.Job.inputparams" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Input parameters of the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="inputparams.html#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams">InputParams</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.job.Job.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Initial positions of the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.logfile">
+<em class="property">property </em><code class="sig-name descname">logfile</code><a class="headerlink" href="#mybigdft.job.Job.logfile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Logfile of the calculation (output of the bigdft or
+bigdft-tool executable).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="logfile.html#mybigdft.iofiles.logfiles.Logfile" title="mybigdft.iofiles.logfiles.Logfile">Logfile</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.ref_data_dir">
+<em class="property">property </em><code class="sig-name descname">ref_data_dir</code><a class="headerlink" href="#mybigdft.job.Job.ref_data_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Reference directory where some relevant data (such as
+wavefunctions) is stored.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.pseudos">
+<em class="property">property </em><code class="sig-name descname">pseudos</code><a class="headerlink" href="#mybigdft.job.Job.pseudos" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>if <cite>True</cite>, the calculation uses the pseudopotential files
+in $PSEUDODIR (environment variable).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.skip">
+<em class="property">property </em><code class="sig-name descname">skip</code><a class="headerlink" href="#mybigdft.job.Job.skip" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <cite>True</cite>, the calculation will be skipped. (Note: Might not
+be useful now, since we check for the existence of the
+logfile before running, which might be the actual check of
+the skip option of BigDFT.)</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.init_dir">
+<em class="property">property </em><code class="sig-name descname">init_dir</code><a class="headerlink" href="#mybigdft.job.Job.init_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Absolute path to the initial directory of the calculation
+(can differ from <a class="reference internal" href="#mybigdft.job.Job.run_dir" title="mybigdft.job.Job.run_dir"><code class="xref py py-meth docutils literal notranslate"><span class="pre">run_dir()</span></code></a>).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.run_dir">
+<em class="property">property </em><code class="sig-name descname">run_dir</code><a class="headerlink" href="#mybigdft.job.Job.run_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Absolute path to the directory where the calculation is run.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.data_dir">
+<em class="property">property </em><code class="sig-name descname">data_dir</code><a class="headerlink" href="#mybigdft.job.Job.data_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Absolute path to the data directory of the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.bigdft_tool_cmd">
+<em class="property">property </em><code class="sig-name descname">bigdft_tool_cmd</code><a class="headerlink" href="#mybigdft.job.Job.bigdft_tool_cmd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Base command to run the bigdft-tool executable.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.bigdft_cmd">
+<em class="property">property </em><code class="sig-name descname">bigdft_cmd</code><a class="headerlink" href="#mybigdft.job.Job.bigdft_cmd" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Base command to run the bigdft executable.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.input_name">
+<em class="property">property </em><code class="sig-name descname">input_name</code><a class="headerlink" href="#mybigdft.job.Job.input_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of the input parameters file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.posinp_name">
+<em class="property">property </em><code class="sig-name descname">posinp_name</code><a class="headerlink" href="#mybigdft.job.Job.posinp_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of the input position file.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.logfile_name">
+<em class="property">property </em><code class="sig-name descname">logfile_name</code><a class="headerlink" href="#mybigdft.job.Job.logfile_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of the logfile.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.is_completed">
+<em class="property">property </em><code class="sig-name descname">is_completed</code><a class="headerlink" href="#mybigdft.job.Job.is_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if the job has already run successfully.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.__enter__">
+<code class="sig-name descname">__enter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job.__enter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job.__enter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>When entering the context manager:</p>
+<ul class="simple">
+<li><p>create the directory where the calculations must be run,</p></li>
+<li><p>go to that directory.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.__exit__">
+<code class="sig-name descname">__exit__</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job.__exit__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job.__exit__" title="Permalink to this definition">¶</a></dt>
+<dd><p>When leaving the context manager, go back to the initial
+directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">nmpi=1</em>, <em class="sig-param">nomp=1</em>, <em class="sig-param">force_run=False</em>, <em class="sig-param">dry_run=False</em>, <em class="sig-param">restart_if_incomplete=False</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run the BigDFT calculation if it was not already performed.
+The number of MPI and OpenMP tasks may be specified.</p>
+<p>You may force the calculation to run even though it was
+previously successful (<em>e.g.</em>, a logfile already exists) by
+setting <cite>force_run</cite> to <cite>True</cite>.</p>
+<p>If <cite>dry_run</cite> is set to <cite>True</cite>, then bigdft-tool is run instead
+of the BigDFT executable.</p>
+<p>If <cite>restart_if_incomplete</cite> is set to <cite>True</cite>, the previously
+existing logfile is removed and the calculation restarts.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmpi</strong> (<em>int</em>) – Number of MPI tasks.</p></li>
+<li><p><strong>nomp</strong> (<em>int</em>) – Number of OpenMP tasks.</p></li>
+<li><p><strong>force_run</strong> (<em>bool</em>) – If <cite>True</cite>, the calculation is run even though a logfile
+already exists.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – If <cite>True</cite>, the input files are written on disk, but the
+bigdft-tool command is run instead of the bigdft one.</p></li>
+<li><p><strong>restart_if_incomplete</strong> (<em>bool</em>) – If <cite>True</cite>, the job is restarted if the existing logfile is
+incomplete.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>int</em><em> or </em><em>None</em>) – Number of minutes after which the job must be stopped.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.write_input_files">
+<code class="sig-name descname">write_input_files</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job.write_input_files"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job.write_input_files" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the input files on disk (there might be no posinp to write,
+since the initial positions can be defined in the input
+parameters).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.job.Job.clean">
+<code class="sig-name descname">clean</code><span class="sig-paren">(</span><em class="sig-param">data_dir=False</em>, <em class="sig-param">logfiles_dir=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/job.html#Job.clean"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.job.Job.clean" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete all input and output files on disk as well as some
+directories if required.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>data_dir</strong> (<em>bool</em>) – If <cite>True</cite>, removes the data directory that might exist.</p></li>
+<li><p><strong>logfiles</strong> (<em>bool</em>) – If <cite>True</cite>, removes the logfiles directory that might exist.</p></li>
+</ul>
+</dd>
+</dl>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The directories are forced to be removed when the above-
+mentioned options are set to <cite>True</cite>: use with caution.</p>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="workflows.html" class="btn btn-neutral float-right" title="Workflows" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="logfile.html" class="btn btn-neutral float-left" title="Logfile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

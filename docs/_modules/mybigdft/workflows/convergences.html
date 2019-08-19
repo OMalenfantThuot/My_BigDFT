@@ -1,0 +1,881 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.convergences &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.convergences</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.convergences</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Here are defined the various classes allowing to perform the convergence</span>
+<span class="sd">of a BigDFT calculation with respect to some input parameters,</span>
+<span class="sd">including:</span>
+
+<span class="sd">* AbstractConvergence, which is the base class for all the other classes</span>
+<span class="sd">  here,</span>
+<span class="sd">* HgridsConvergence for the grid steps of the wavelet grid in each</span>
+<span class="sd">  direction,</span>
+<span class="sd">* RmultConvergence for the grid extension of the wavelet grid(s).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">EV_TO_HA</span>
+<span class="kn">from</span> <span class="nn">mybigdft.workflows.workflow</span> <span class="k">import</span> <span class="n">AbstractWorkflow</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ABC</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ABC</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ABC&#39;</span><span class="p">),</span> <span class="p">(),</span> <span class="p">{})</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;HgridsConvergence&quot;</span><span class="p">,</span> <span class="s2">&quot;RmultConvergence&quot;</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">AbstractConvergence</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">,</span> <span class="n">ABC</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is the base class allowing to run a convergence procedure.</span>
+<span class="sd">    Starting from a reference value for the considered input parameter,</span>
+<span class="sd">    a queue of jobs is defined, each job with a value of that input</span>
+<span class="sd">    parameter that should lead to results of decreasing quality.</span>
+
+<span class="sd">    When the worklfow is run, the jobs are run by decreasing quality.</span>
+<span class="sd">    After each job is run, its energy is compared to the reference</span>
+<span class="sd">    energy and must lie in a given precision window, defined by an</span>
+<span class="sd">    energy per atom to be defined as converged. Once a job is not in the</span>
+<span class="sd">    acceptable range, this means that lower quality jobs won&#39;t be</span>
+<span class="sd">    neither, so the workflow is stopped, even if more jobs are in the</span>
+<span class="sd">    queue.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;converged&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_job</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span>
+                 <span class="n">precision_per_atom</span><span class="o">=</span><span class="mf">0.01</span><span class="o">*</span><span class="n">EV_TO_HA</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        One must provide a base `Job` instance defining the system</span>
+<span class="sd">        considered and possibly non-default input parameters. Then, one</span>
+<span class="sd">        must give the reference value of the input</span>
+<span class="sd">        parameter for which the convergence is considered. A delta value</span>
+<span class="sd">        of this input parameter is then used to initialize a given</span>
+<span class="sd">        number of jobs (`n_jobs`) of decreasing quality. Finally, a</span>
+<span class="sd">        precision per atom (in Ha) is required (default to 0.3675 mHa</span>
+<span class="sd">        (= 10 meV) par atom).</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        base_job : Job</span>
+<span class="sd">            Template for all the other jobs of this workflow.</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+<span class="sd">        n_jobs : int</span>
+<span class="sd">            Maximal number of jobs to be run.</span>
+<span class="sd">        precision_per_atom : float</span>
+<span class="sd">            Precision per atom for a job to be considered as converged,</span>
+<span class="sd">            the reference energy being that of the job using the</span>
+<span class="sd">            reference input parameter (units: Ha).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">reference</span><span class="p">,</span> <span class="n">delta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_clean_initial_parameters</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">)</span>
+        <span class="c1"># Set all the important attributes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_base_job</span> <span class="o">=</span> <span class="n">base_job</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_precision_per_atom</span> <span class="o">=</span> <span class="n">precision_per_atom</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_queue</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">AbstractConvergence</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">base_job</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Job</span>
+<span class="sd">            Template for all the other jobs of this workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_base_job</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">precision_per_atom</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Precision per atom for a job to be considered as converged.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_precision_per_atom</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">converged</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Job</span>
+<span class="sd">            Job with the highest hgrids and an energy that can be</span>
+<span class="sd">            considered as converged (given a precision per atom).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_converged</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">first_column_label</span><span class="p">,</span> <span class="n">first_column_values</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print a summary of the convergence workflow.</span>
+
+<span class="sd">        This method must be called at the end of each child method</span>
+<span class="sd">        :meth:`summary`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        first_column_label: str</span>
+<span class="sd">            Label of the first column.</span>
+<span class="sd">        first_column_values: list of str</span>
+<span class="sd">            String representation of the value of the varied parameter</span>
+<span class="sd">            for each job that ran.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">shift</span> <span class="o">=</span> <span class="mi">2</span>
+        <span class="n">unformatted</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;</span><span class="si">{:.2e}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">&quot;</span><span class="p">]</span>
+        <span class="n">other_labels</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;precision_per_atom (Ha)&quot;</span><span class="p">,</span> <span class="s2">&quot;is_converged&quot;</span><span class="p">]</span>
+        <span class="n">other_lengths</span> <span class="o">=</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span> <span class="o">+</span> <span class="n">shift</span> <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">other_labels</span><span class="p">]</span>
+        <span class="c1"># Print the desired precision per atom</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Requested precision per atom: </span><span class="si">{:.2e}</span><span class="s2"> (Ha)&quot;</span>
+              <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">precision_per_atom</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">first_column_values</span> <span class="o">!=</span> <span class="p">[]:</span>
+            <span class="c1"># Print the header of the table</span>
+            <span class="n">first_column_length</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">first_column_values</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">+</span> <span class="n">shift</span>
+            <span class="n">first_column</span> <span class="o">=</span> <span class="n">first_column_label</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="n">first_column_length</span><span class="p">)</span>
+            <span class="n">other_columns</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+            <span class="k">for</span> <span class="n">label</span> <span class="ow">in</span> <span class="n">other_labels</span><span class="p">:</span>
+                <span class="n">other_columns</span> <span class="o">+=</span> <span class="n">label</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">label</span><span class="p">)</span><span class="o">+</span><span class="n">shift</span><span class="p">)</span>
+            <span class="n">header</span> <span class="o">=</span> <span class="n">first_column</span> <span class="o">+</span> <span class="n">other_columns</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+            <span class="nb">print</span><span class="p">(</span><span class="n">header</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;-&quot;</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">header</span><span class="p">))</span>
+            <span class="c1"># Print each line of the table</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">first_column_values</span><span class="p">):</span>
+                <span class="n">first_column</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="n">first_column_length</span><span class="p">)</span>
+                <span class="n">job</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="n">job</span><span class="o">.</span><span class="n">precision_per_atom</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">is_converged</span><span class="p">]</span>
+                <span class="n">other_columns</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+                <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">values</span><span class="p">):</span>
+                    <span class="n">other_columns</span> <span class="o">+=</span> <span class="n">unformatted</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>\
+                                     <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">value</span><span class="p">)</span><span class="o">.</span><span class="n">center</span><span class="p">(</span><span class="n">other_lengths</span><span class="p">[</span><span class="n">i</span><span class="p">])</span>
+                <span class="nb">print</span><span class="p">(</span><span class="n">first_column</span> <span class="o">+</span> <span class="n">other_columns</span><span class="p">)</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_initial_parameters</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean the value of the initial parameters.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of length 2</span>
+<span class="sd">            Reference value and delta value of the varied parameter.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the jobs to be run in order to perform the hgrids</span>
+<span class="sd">        convergence.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+<span class="sd">        n_jobs : int</span>
+<span class="sd">            Maximal number of jobs to be run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Queue of jobs to be run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Define the parameters to be used during this workflow</span>
+        <span class="n">param_variations</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_param_variations</span><span class="p">(</span>
+            <span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">)</span>
+        <span class="c1"># Set the queue of jobs according to the hgrids defined</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">param</span> <span class="ow">in</span> <span class="n">param_variations</span><span class="p">:</span>
+            <span class="c1"># The input parameters and the run directory of the base job</span>
+            <span class="c1"># are updated given the value of the parameter</span>
+            <span class="n">new_inp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_inputparams</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="n">new_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_new_run_dir</span><span class="p">(</span><span class="n">param</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="n">new_inp</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+                      <span class="n">run_dir</span><span class="o">=</span><span class="n">new_run_dir</span><span class="p">)</span>
+            <span class="n">job</span><span class="o">.</span><span class="n">param</span> <span class="o">=</span> <span class="n">param</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queue</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_initialize_param_variations</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the value of the input parameter that varies</span>
+<span class="sd">        for each job to be created.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+<span class="sd">        n_jobs : int</span>
+<span class="sd">            Maximal number of jobs to be run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Values of the input parameter for all the jobs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_new_inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the input parameters of the new job, according to the</span>
+<span class="sd">        value of the varied parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of the varied parameter</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Value of the new input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_new_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the directory where the new job must run according</span>
+<span class="sd">        to the value of the varied parameter.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of the varied parameter</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Value of the new run_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
+             <span class="n">timeout</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method runs the jobs until the hgrids are too high to</span>
+<span class="sd">        stop giving results in the desired precision range.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculations are run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which each job must be stopped.</span>
+
+<span class="sd">        Warns</span>
+<span class="sd">        ------</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the job with minimal energy does not correspond to the</span>
+<span class="sd">            job with minimal hgrids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Run the first job of the queue and get the reference energy</span>
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">as</span> <span class="n">ref_job</span><span class="p">:</span>
+            <span class="n">ref_job</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+                        <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                        <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">)</span>
+        <span class="n">ref_job</span><span class="o">.</span><span class="n">is_converged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">ref_job</span><span class="o">.</span><span class="n">precision_per_atom</span> <span class="o">=</span> <span class="mf">0.0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_converged</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="n">min_en</span> <span class="o">=</span> <span class="n">ref_job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span>
+        <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">ref_job</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+        <span class="c1"># Run the jobs until the energy of a given run is above the</span>
+        <span class="c1"># requested precision</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">is_converged</span><span class="p">:</span>
+                <span class="c1"># If the previous job is not converged, then neither is</span>
+                <span class="c1"># this one.</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">is_converged</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="n">job</span> <span class="k">as</span> <span class="n">j</span><span class="p">:</span>
+                    <span class="n">j</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+                          <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                          <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">)</span>
+                <span class="c1"># Warn a UserWarning if the current job gives a lower</span>
+                <span class="c1"># energy than the reference one</span>
+                <span class="n">en</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span>
+                <span class="k">if</span> <span class="n">en</span> <span class="o">&lt;=</span> <span class="n">min_en</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_too_low_energy_msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="c1"># Assess if the job is converged or not</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">precision_per_atom</span> <span class="o">=</span> <span class="p">(</span><span class="n">en</span><span class="o">-</span><span class="n">min_en</span><span class="p">)</span> <span class="o">/</span> <span class="n">n_at</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">is_converged</span> <span class="o">=</span> \
+                    <span class="n">job</span><span class="o">.</span><span class="n">precision_per_atom</span> <span class="o">&lt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">precision_per_atom</span>
+                <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_converged</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_converged</span> <span class="o">=</span> <span class="n">job</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_proc</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_completed</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;You must define all post-processing &quot;</span>
+                                       <span class="s2">&quot;attributes in post_proc.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_too_low_energy_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the message telling the user what steps he mighy consider</span>
+<span class="sd">        to remove the UserWarning in :method:`_run`.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If only the reference job can be considered as converged or</span>
+<span class="sd">            if all the jobs are below the requested precision.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Warn the user if he is too conservative</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_converged</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_all_converged_msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="c1"># Warn the user if he must consider using parameters giving</span>
+        <span class="c1"># better results</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">is_converged</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_only_reference_converged_msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_all_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the message warning the user when he is being too</span>
+<span class="sd">        conservative with the current set of varied input parameters.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">_only_reference_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the message warning the user that he should probably</span>
+<span class="sd">        increase the quality of the calculations.</span>
+
+<span class="sd">        Raises</span>
+<span class="sd">        ------</span>
+<span class="sd">        NotImplementedError</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+
+
+<div class="viewcode-block" id="HgridsConvergence"><a class="viewcode-back" href="../../../hgrids_convergence.html#mybigdft.workflows.convergences.HgridsConvergence">[docs]</a><span class="k">class</span> <span class="nc">HgridsConvergence</span><span class="p">(</span><span class="n">AbstractConvergence</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BigDFT uses wavelets on a grid to represent the wavefunctions and</span>
+<span class="sd">    density of the system. One key parameter of a BigDFT calculation</span>
+<span class="sd">    therefore is the grid spacing (noted hgrids) between two grid points</span>
+<span class="sd">    (which must be defined in the three directions of space).</span>
+
+<span class="sd">    This class allows to run all the necessary calculations to determine</span>
+<span class="sd">    the largest hgrids which must be used so that the energy error</span>
+<span class="sd">    compared to the reference calculation (with the lowest hgrid</span>
+<span class="sd">    considered) lie within the required precision per atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="HgridsConvergence.summary"><a class="viewcode-back" href="../../../hgrids_convergence.html#mybigdft.workflows.convergences.HgridsConvergence.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print a summary of the results of the hgrids convergence</span>
+<span class="sd">        workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_column_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;[</span><span class="si">{:.2f}</span><span class="s2">, </span><span class="si">{:.2f}</span><span class="s2">, </span><span class="si">{:.2f}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">job</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">HgridsConvergence</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="s2">&quot;hgrids&quot;</span><span class="p">,</span>
+                                               <span class="n">first_column_values</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_initial_parameters</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean the value of the initial parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple made of two numpy arrays of length 3</span>
+<span class="sd">            Reference value and delta value of hgrids.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make sure all the received hgrids are lists of length 3</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">delta</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">delta</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">delta</span><span class="p">)]</span><span class="o">*</span><span class="mi">3</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">reference</span> <span class="o">=</span> <span class="p">[</span><span class="nb">float</span><span class="p">(</span><span class="n">reference</span><span class="p">)]</span><span class="o">*</span><span class="mi">3</span>
+        <span class="k">for</span> <span class="n">hgrids</span> <span class="ow">in</span> <span class="p">[</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">hgrids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">3</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not of length 3&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">hgrids</span><span class="p">)</span>
+        <span class="c1"># Make sure the signs in delta are positive</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">delta</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">delta</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_initialize_param_variations</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the value of hgrids for each job to be created.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+<span class="sd">        n_jobs : int</span>
+<span class="sd">            Maximal number of jobs to be run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Values of hgrids for all the jobs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">reference</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="n">delta</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_new_inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the input parameters of the new job, according to the</span>
+<span class="sd">        value of hgrids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of hgrids</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Value of the new input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_inp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">inputparams</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_inp</span><span class="p">:</span>
+            <span class="n">new_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;hgrids&quot;</span><span class="p">:</span> <span class="n">param</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;hgrids&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="k">return</span> <span class="n">new_inp</span>
+
+    <span class="k">def</span> <span class="nf">_new_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the directory where the new job must run according</span>
+<span class="sd">        to the value of hgrids.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of hgrids</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Value of the new run_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">run_dir</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_run_dir</span><span class="p">,</span>
+                            <span class="s2">&quot;</span><span class="si">{:.2f}</span><span class="s2">_</span><span class="si">{:.2f}</span><span class="s2">_</span><span class="si">{:.2f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">param</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_too_low_energy_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message telling the user what steps he mighy consider</span>
+<span class="sd">            to remove the UserWarning he is going to receive because</span>
+<span class="sd">            a lower quality calculation gave a lower energy than the</span>
+<span class="sd">            reference calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;The job with minimal energy does not correspond to the job &quot;</span>
+                <span class="s2">&quot;with minimal hgrids. Consider increasing rmult or the &quot;</span>
+                <span class="s2">&quot;reference hgrids.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_all_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message warning the user he is being too conservative with</span>
+<span class="sd">            this set of varied input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;You may want to test higher hgrids as there is still room &quot;</span>
+                <span class="s2">&quot;to increase hgrids while staying below the requested &quot;</span>
+                <span class="s2">&quot;precision per atom.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_only_reference_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message warning the user he should probably increase the</span>
+<span class="sd">            quality of the calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;You may want to consider smaller values of hgrids to make &quot;</span>
+                <span class="s2">&quot;sure convergence was achieved.&quot;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RmultConvergence"><a class="viewcode-back" href="../../../rmult_convergence.html#mybigdft.workflows.convergences.RmultConvergence">[docs]</a><span class="k">class</span> <span class="nc">RmultConvergence</span><span class="p">(</span><span class="n">AbstractConvergence</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    BigDFT uses wavelets on a grid to represent the wavefunctions and</span>
+<span class="sd">    density of the system. One key parameter of a BigDFT calculation</span>
+<span class="sd">    therefore is the grid extension (noted rmult). There are actually</span>
+<span class="sd">    two grids centered on the atoms of the system: a coarse grid, with a</span>
+<span class="sd">    shorter extension and one fine grid, with a longer extension.</span>
+
+<span class="sd">    This class allows to run all the necessary calculations to determine</span>
+<span class="sd">    the smallest rmult which must be used so that the energy error</span>
+<span class="sd">    compared to the reference calculation (with the largest grid</span>
+<span class="sd">    extension considered) lie within the required precision per atom.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="RmultConvergence.summary"><a class="viewcode-back" href="../../../rmult_convergence.html#mybigdft.workflows.convergences.RmultConvergence.summary">[docs]</a>    <span class="k">def</span> <span class="nf">summary</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Print a summary of the results of the rmult convergence</span>
+<span class="sd">        workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">first_column_values</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;[</span><span class="si">{:.1f}</span><span class="s2">, </span><span class="si">{:.1f}</span><span class="s2">]&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">job</span><span class="o">.</span><span class="n">param</span><span class="p">)</span>
+                               <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span> <span class="k">if</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RmultConvergence</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">summary</span><span class="p">(</span><span class="s2">&quot;rmult&quot;</span><span class="p">,</span>
+                                              <span class="n">first_column_values</span><span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_clean_initial_parameters</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean the value of the initial parameters.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple made of two numpy arrays of length 2</span>
+<span class="sd">            Reference value and delta value of rmult.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Make sure the rmults are lists of length 2</span>
+        <span class="k">for</span> <span class="n">rmult</span> <span class="ow">in</span> <span class="p">[</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">]:</span>
+            <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">rmult</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2"> not of length 2&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rmult</span><span class="p">)</span>
+        <span class="c1"># Make sure the signs in delta are positive</span>
+        <span class="n">delta</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="o">-</span><span class="nb">abs</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="k">for</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">delta</span><span class="p">])</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">float</span><span class="p">),</span> <span class="n">delta</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_initialize_param_variations</span><span class="p">(</span><span class="n">reference</span><span class="p">,</span> <span class="n">delta</span><span class="p">,</span> <span class="n">n_jobs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the value of rmult for each job to be created.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        reference</span>
+<span class="sd">            Reference input parameter, giving high quality results.</span>
+<span class="sd">        delta</span>
+<span class="sd">            Variation of of the input parameter between two runs.</span>
+<span class="sd">        n_jobs : int</span>
+<span class="sd">            Maximal number of jobs to be run.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Values of rmults for all the jobs.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">[(</span><span class="n">reference</span> <span class="o">+</span> <span class="n">i</span><span class="o">*</span><span class="n">delta</span><span class="p">)</span><span class="o">.</span><span class="n">round</span><span class="p">(</span><span class="n">decimals</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+                <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">n_jobs</span><span class="p">)]</span>
+
+    <span class="k">def</span> <span class="nf">_new_inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the input parameters of the new job, according to the</span>
+<span class="sd">        value of rmult.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of rmult</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Value of the new input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">new_inp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">inputparams</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">new_inp</span><span class="p">:</span>
+            <span class="n">new_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rmult&quot;</span><span class="p">:</span> <span class="n">param</span><span class="p">}</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">new_inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;rmult&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">param</span>
+        <span class="k">return</span> <span class="n">new_inp</span>
+
+    <span class="k">def</span> <span class="nf">_new_run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Define the directory where the new job must run according</span>
+<span class="sd">        to the value of rmult.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        param</span>
+<span class="sd">            Value of rmult</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Value of the new run_dir</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">base_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">base_job</span><span class="o">.</span><span class="n">run_dir</span>
+        <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">base_run_dir</span><span class="p">,</span> <span class="s2">&quot;</span><span class="si">{:.1f}</span><span class="s2">_</span><span class="si">{:.1f}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">*</span><span class="n">param</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_too_low_energy_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message telling the user what steps he mighy consider</span>
+<span class="sd">            to remove the UserWarning he is going to receive because</span>
+<span class="sd">            a lower quality calculation gave a lower energy than the</span>
+<span class="sd">            reference calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;The job with minimal energy does not correspond to the job &quot;</span>
+                <span class="s2">&quot;with maximal rmult. Consider decreasing hgrids or the &quot;</span>
+                <span class="s2">&quot;reference rmult.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_all_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message warning the user he is being too conservative with</span>
+<span class="sd">            this set of varied input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;You may want to test lower rmult as there is still room to &quot;</span>
+                <span class="s2">&quot;decrease rmult while staying below the requested precision &quot;</span>
+                <span class="s2">&quot;per atom.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_only_reference_converged_msg</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str</span>
+<span class="sd">            Message warning the user he should probably increase the</span>
+<span class="sd">            quality of the calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="s2">&quot;You may want to consider larger values of rmult to make sure &quot;</span>
+                <span class="s2">&quot;convergence was achieved.&quot;</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

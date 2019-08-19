@@ -1,0 +1,1168 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Manipulate BigDFT input files &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../_static/jquery.js"></script>
+        <script type="text/javascript" src="../_static/underscore.js"></script>
+        <script type="text/javascript" src="../_static/doctools.js"></script>
+        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Run BigDFT and manipulate its output files" href="Job_and_Logfile.html" />
+    <link rel="prev" title="MyBigDFT tutorials" href="../tutorials.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="../tutorials.html">MyBigDFT tutorials</a><ul class="current">
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Manipulate BigDFT input files</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#The-Posinp-class">The Posinp class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main-attributes">Main attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Representation-of-a-Posinp-instance">Representation of a Posinp instance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Equality-of-Posinp-instances">Equality of Posinp instances</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Iterating-over-a-Posinp-instance">Iterating over a Posinp instance</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Class-methods-to-intialize-a-Posinp-instance">Class methods to intialize a Posinp instance</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#The-InputParams-class">The InputParams class</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Main-attributes">Main attributes</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#An-InputParams-instance-behaves-like-a-dictionary">An InputParams instance behaves like a dictionary</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Class-methods-to-intialize-a-InputParams-instance">Class methods to intialize a InputParams instance</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="Job_and_Logfile.html">Run BigDFT and manipulate its output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Convergences.html">Convergence classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="PolTensor.html">Compute the electronic polarizability tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Phonons_and_RamanSpectrum.html">Compute the phonons and the Raman spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Phonons_and_InfraredSpectrum.html">Compute the phonons and the infrared spectrum</a></li>
+<li class="toctree-l2"><a class="reference internal" href="VibPolTensor.html">Compute the vibrational polarizability tensor</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Dissociation_curve.html">Dissociation curve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="Geopt.html">Geometry optimization</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../tutorials.html">MyBigDFT tutorials</a> &raquo;</li>
+        
+      <li>Manipulate BigDFT input files</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/notebooks/Input_files.ipynb.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS for nbsphinx extension */
+
+/* remove conflicting styling from Sphinx themes */
+div.nbinput,
+div.nbinput div.prompt,
+div.nbinput div.input_area,
+div.nbinput div[class*=highlight],
+div.nbinput div[class*=highlight] pre,
+div.nboutput,
+div.nbinput div.prompt,
+div.nbinput div.output_area,
+div.nboutput div[class*=highlight],
+div.nboutput div[class*=highlight] pre {
+    background: none;
+    border: none;
+    padding: 0 0;
+    margin: 0;
+    box-shadow: none;
+}
+
+/* avoid gaps between output lines */
+div.nboutput div[class*=highlight] pre {
+    line-height: normal;
+}
+
+/* input/output containers */
+div.nbinput,
+div.nboutput {
+    display: -webkit-flex;
+    display: flex;
+    align-items: flex-start;
+    margin: 0;
+    width: 100%;
+}
+@media (max-width: 540px) {
+    div.nbinput,
+    div.nboutput {
+        flex-direction: column;
+    }
+}
+
+/* input container */
+div.nbinput {
+    padding-top: 5px;
+}
+
+/* last container */
+div.nblast {
+    padding-bottom: 5px;
+}
+
+/* input prompt */
+div.nbinput div.prompt pre {
+    color: #307FC1;
+}
+
+/* output prompt */
+div.nboutput div.prompt pre {
+    color: #BF5B3D;
+}
+
+/* all prompts */
+div.nbinput div.prompt,
+div.nboutput div.prompt {
+    min-width: 5ex;
+    padding-top: 0.4em;
+    padding-right: 0.4em;
+    text-align: right;
+    flex: 0;
+}
+@media (max-width: 540px) {
+    div.nbinput div.prompt,
+    div.nboutput div.prompt {
+        text-align: left;
+        padding: 0.4em;
+    }
+    div.nboutput div.prompt.empty {
+        padding: 0;
+    }
+}
+
+/* disable scrollbars on prompts */
+div.nbinput div.prompt pre,
+div.nboutput div.prompt pre {
+    overflow: hidden;
+}
+
+/* input/output area */
+div.nbinput div.input_area,
+div.nboutput div.output_area {
+    padding: 0.4em;
+    -webkit-flex: 1;
+    flex: 1;
+    overflow: auto;
+}
+@media (max-width: 540px) {
+    div.nbinput div.input_area,
+    div.nboutput div.output_area {
+        width: 100%;
+    }
+}
+
+/* input area */
+div.nbinput div.input_area {
+    border: 1px solid #e0e0e0;
+    border-radius: 2px;
+    background: #f5f5f5;
+}
+
+/* override MathJax center alignment in output cells */
+div.nboutput div[class*=MathJax] {
+    text-align: left !important;
+}
+
+/* override sphinx.ext.imgmath center alignment in output cells */
+div.nboutput div.math p {
+    text-align: left;
+}
+
+/* standard error */
+div.nboutput div.output_area.stderr {
+    background: #fdd;
+}
+
+/* ANSI colors */
+.ansi-black-fg { color: #3E424D; }
+.ansi-black-bg { background-color: #3E424D; }
+.ansi-black-intense-fg { color: #282C36; }
+.ansi-black-intense-bg { background-color: #282C36; }
+.ansi-red-fg { color: #E75C58; }
+.ansi-red-bg { background-color: #E75C58; }
+.ansi-red-intense-fg { color: #B22B31; }
+.ansi-red-intense-bg { background-color: #B22B31; }
+.ansi-green-fg { color: #00A250; }
+.ansi-green-bg { background-color: #00A250; }
+.ansi-green-intense-fg { color: #007427; }
+.ansi-green-intense-bg { background-color: #007427; }
+.ansi-yellow-fg { color: #DDB62B; }
+.ansi-yellow-bg { background-color: #DDB62B; }
+.ansi-yellow-intense-fg { color: #B27D12; }
+.ansi-yellow-intense-bg { background-color: #B27D12; }
+.ansi-blue-fg { color: #208FFB; }
+.ansi-blue-bg { background-color: #208FFB; }
+.ansi-blue-intense-fg { color: #0065CA; }
+.ansi-blue-intense-bg { background-color: #0065CA; }
+.ansi-magenta-fg { color: #D160C4; }
+.ansi-magenta-bg { background-color: #D160C4; }
+.ansi-magenta-intense-fg { color: #A03196; }
+.ansi-magenta-intense-bg { background-color: #A03196; }
+.ansi-cyan-fg { color: #60C6C8; }
+.ansi-cyan-bg { background-color: #60C6C8; }
+.ansi-cyan-intense-fg { color: #258F8F; }
+.ansi-cyan-intense-bg { background-color: #258F8F; }
+.ansi-white-fg { color: #C5C1B4; }
+.ansi-white-bg { background-color: #C5C1B4; }
+.ansi-white-intense-fg { color: #A1A6B2; }
+.ansi-white-intense-bg { background-color: #A1A6B2; }
+
+.ansi-default-inverse-fg { color: #FFFFFF; }
+.ansi-default-inverse-bg { background-color: #000000; }
+
+.ansi-bold { font-weight: bold; }
+.ansi-underline { text-decoration: underline; }
+
+/* Some additional styling taken form the Jupyter notebook CSS */
+div.rendered_html table {
+  border: none;
+  border-collapse: collapse;
+  border-spacing: 0;
+  color: black;
+  font-size: 12px;
+  table-layout: fixed;
+}
+div.rendered_html thead {
+  border-bottom: 1px solid black;
+  vertical-align: bottom;
+}
+div.rendered_html tr,
+div.rendered_html th,
+div.rendered_html td {
+  text-align: right;
+  vertical-align: middle;
+  padding: 0.5em 0.5em;
+  line-height: normal;
+  white-space: normal;
+  max-width: none;
+  border: none;
+}
+div.rendered_html th {
+  font-weight: bold;
+}
+div.rendered_html tbody tr:nth-child(odd) {
+  background: #f5f5f5;
+}
+div.rendered_html tbody tr:hover {
+  background: rgba(66, 165, 245, 0.2);
+}
+
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="Manipulate-BigDFT-input-files">
+<h1>Manipulate BigDFT input files<a class="headerlink" href="#Manipulate-BigDFT-input-files" title="Permalink to this headline">¶</a></h1>
+<p>The goal of this notebook is to present how the <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/">MyBigDFT</a> package allows to manipulate BigDFT input files. In order to run a BigDFT calculation, it is required to provide an initial geometry and generally a set of input parameters (even though default parameters are used if none are given).</p>
+<p>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp">Posinp</a> and <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Atom">Atom</a> classes allow to create input geometries while the <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/inputparams.html#mybigdft.iofiles.inputparams.InputParams">InputParams</a> class is meant to specify the input parameters of a BigDFT calculation. All of them are presented in this notebook.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Posinp</span><span class="p">,</span> <span class="n">Atom</span><span class="p">,</span> <span class="n">InputParams</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="The-Posinp-class">
+<h2>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp">Posinp</a> class<a class="headerlink" href="#The-Posinp-class" title="Permalink to this headline">¶</a></h2>
+<p>This class allows to manipulate the BigDFT input geometries in the xyz format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="mi">2</span>   <span class="n">angstroem</span>  <span class="c1"># Number of atoms, units</span>
+<span class="n">free</span>  <span class="c1"># Boundary conditions</span>
+<span class="n">N</span>   <span class="mf">0.0</span>   <span class="mf">0.0</span>   <span class="mf">0.0</span>  <span class="c1"># Atom type and cartesion coordinates of each atom</span>
+<span class="n">N</span>   <span class="mf">0.0</span>   <span class="mf">0.0</span>   <span class="mf">1.1</span>
+</pre></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])]</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<p>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Atom">Atom</a> class is mostly used to store the data related to a given atom. It requires an atom type and the cartesian coordinates but does not worry about the units used. It has some extra functionalities, such as a <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Atom.translate">translate</a> method, taking a vector as argument (three components) returning another <code class="docutils literal notranslate"><span class="pre">Atom</span></code> instance,
+whose positions are the ones of the pre-existing atom translated by the vector:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">translate</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>Atom(&#39;N&#39;, [0.0, 0.0, 1.0])
+</pre></div>
+</div>
+</div>
+<div class="section" id="Main-attributes">
+<h3>Main attributes<a class="headerlink" href="#Main-attributes" title="Permalink to this headline">¶</a></h3>
+<p>A <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instance has some attributes:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">assert</span> <span class="n">pos</span><span class="o">.</span><span class="n">atoms</span> <span class="o">==</span> <span class="n">atoms</span>
+<span class="k">assert</span> <span class="n">pos</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;angstroem&quot;</span>
+<span class="k">assert</span> <span class="n">pos</span><span class="o">.</span><span class="n">boundary_conditions</span> <span class="o">==</span> <span class="s2">&quot;free&quot;</span>
+<span class="k">assert</span> <span class="n">pos</span><span class="o">.</span><span class="n">cell</span> <span class="ow">is</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+<p>They cannot be set afterwards:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">pos</span><span class="o">.</span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">])]</span>
+<span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+AttributeError(&#34;can&#39;t set attribute&#34;)
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Representation-of-a-Posinp-instance">
+<h3>Representation of a Posinp instance<a class="headerlink" href="#Representation-of-a-Posinp-instance" title="Permalink to this headline">¶</a></h3>
+<p>Printing a <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instance returns a string representation in the xyz format:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2   angstroem
+free
+N   0.0   0.0   0.0
+N   0.0   0.0   1.1
+
+</pre></div></div>
+</div>
+<p>The actual representation of a <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instance is the following:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">pos</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Posinp([Atom(&#39;N&#39;, [0.0, 0.0, 0.0]), Atom(&#39;N&#39;, [0.0, 0.0, 1.1])], &#39;angstroem&#39;, &#39;free&#39;, cell=None)
+</pre></div></div>
+</div>
+<p>Note that the cell optional argument is set to <code class="docutils literal notranslate"><span class="pre">None</span></code> here: this is because there is no need to define a cell for free boundary conditions.</p>
+</div>
+<div class="section" id="Equality-of-Posinp-instances">
+<h3>Equality of Posinp instances<a class="headerlink" href="#Equality-of-Posinp-instances" title="Permalink to this headline">¶</a></h3>
+<p>The order of the atoms is not relevant: changing the order of the atoms in the list do not mean the <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instances are different:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">shuffled_atoms</span> <span class="o">=</span> <span class="p">[</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">]),</span> <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">])]</span>
+<span class="n">shuffled_pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span><span class="n">shuffled_atoms</span><span class="p">,</span> <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">shuffled_pos</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">shuffled_pos</span> <span class="o">==</span> <span class="n">pos</span>  <span class="c1"># If the two were different,</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2   angstroem
+free
+N   0.0   0.0   1.1
+N   0.0   0.0   0.0
+
+</pre></div></div>
+</div>
+<p>It behaves as expected if, for instance, there is not the same number of atoms or if the atomic types are different:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># One atom is missing</span>
+<span class="k">assert</span> <span class="n">pos</span> <span class="o">!=</span> <span class="n">Posinp</span><span class="p">([</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])],</span>
+                     <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+<span class="c1"># One atom has a different type</span>
+<span class="k">assert</span> <span class="n">pos</span> <span class="o">!=</span> <span class="n">Posinp</span><span class="p">([</span><span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]),</span> <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;N&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">])],</span>
+                     <span class="n">units</span><span class="o">=</span><span class="s2">&quot;angstroem&quot;</span><span class="p">,</span> <span class="n">boundary_conditions</span><span class="o">=</span><span class="s2">&quot;free&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="Iterating-over-a-Posinp-instance">
+<h3>Iterating over a Posinp instance<a class="headerlink" href="#Iterating-over-a-Posinp-instance" title="Permalink to this headline">¶</a></h3>
+<p>You can easily iterate over the atoms of a <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instance:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">pos</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;&#39;</span><span class="si">{atom.type}</span><span class="s2">&#39;: </span><span class="si">{atom.position}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+&#39;N&#39;: [0. 0. 0.]
+&#39;N&#39;: [0.  0.  1.1]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Class-methods-to-intialize-a-Posinp-instance">
+<h3>Class methods to intialize a Posinp instance<a class="headerlink" href="#Class-methods-to-intialize-a-Posinp-instance" title="Permalink to this headline">¶</a></h3>
+<p>Other ways of initializing a <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> instance are provided:</p>
+<div class="section" id="The-from_file-class-method">
+<h4>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp.from_file">from_file</a> class method<a class="headerlink" href="#The-from_file-class-method" title="Permalink to this headline">¶</a></h4>
+<p>It allows to read an xyz file written on disk, given a path to this input file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;../../../tests/free.xyz&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+4   atomic
+free
+C   0.6661284109   0.0   1.153768252
+C   3.330642055   0.0   1.153768252
+C   4.662898877   0.0   3.461304757
+C   7.327412521   0.0   3.461304757
+
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="The-from_string-class-method">
+<h4>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp.from_string">from_string</a> class method<a class="headerlink" href="#The-from_string-class-method" title="Permalink to this headline">¶</a></h4>
+<p>This method is mostly meant to allow the formatting of the string representation of a posinp:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pos_str</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">4   reduced</span>
+<span class="s2">surface   </span><span class="si">{x}</span><span class="s2">   inf   </span><span class="si">{z}</span><span class="s2"></span>
+<span class="s2">C   0.08333333333   0.5   0.25</span>
+<span class="s2">C   0.41666666666   0.5   0.25</span>
+<span class="s2">C   0.58333333333   0.5   0.75</span>
+<span class="s2">C   0.91666666666   0.5   0.75&quot;&quot;&quot;</span>
+<span class="k">for</span> <span class="n">aCC</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">2.65</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">]:</span>
+    <span class="n">new_str</span> <span class="o">=</span> <span class="n">pos_str</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">x</span><span class="o">=</span><span class="mi">3</span><span class="o">*</span><span class="n">aCC</span><span class="p">,</span> <span class="n">z</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">aCC</span><span class="p">)</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">new_str</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;cell size for aCC=</span><span class="si">{aCC:.2f}</span><span class="s2">: </span><span class="si">{pos.cell}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cell size for aCC=2.65: [7.949999999999999, &#39;inf&#39;, 4.589934640057525]
+cell size for aCC=2.70: [8.100000000000001, &#39;inf&#39;, 4.676537180435969]
+</pre></div></div>
+</div>
+<p>It would actually be possible to achieve the same thing without having to go through the string formatting. The following example should be the preferred way:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">atoms</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.08333333333</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]),</span>
+    <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.41666666666</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]),</span>
+    <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.58333333333</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]),</span>
+    <span class="n">Atom</span><span class="p">(</span><span class="s1">&#39;C&#39;</span><span class="p">,</span> <span class="p">[</span><span class="mf">0.91666666666</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]),</span>
+<span class="p">]</span>
+<span class="k">for</span> <span class="n">aCC</span> <span class="ow">in</span> <span class="p">[</span><span class="mf">2.65</span><span class="p">,</span> <span class="mf">2.7</span><span class="p">]:</span>
+    <span class="n">cell</span> <span class="o">=</span> <span class="p">[</span><span class="mi">3</span><span class="o">*</span><span class="n">aCC</span><span class="p">,</span> <span class="s1">&#39;inf&#39;</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="mi">3</span><span class="p">)</span><span class="o">*</span><span class="n">aCC</span><span class="p">]</span>
+    <span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="p">(</span><span class="n">atoms</span><span class="p">,</span> <span class="s2">&quot;reduced&quot;</span><span class="p">,</span> <span class="s2">&quot;surface&quot;</span><span class="p">,</span> <span class="n">cell</span><span class="o">=</span><span class="n">cell</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;cell size for aCC=</span><span class="si">{aCC:.2f}</span><span class="s2">: </span><span class="si">{pos.cell}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cell size for aCC=2.65: [7.949999999999999, &#39;inf&#39;, 4.589934640057525]
+cell size for aCC=2.70: [8.100000000000001, &#39;inf&#39;, 4.676537180435969]
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="The-from_dict-class-method">
+<h4>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp.from_dict">from_dict</a> class method<a class="headerlink" href="#The-from_dict-class-method" title="Permalink to this headline">¶</a></h4>
+<p>This last class method is meant to initialize a posinp instance from a dictionary. You can use it to initialize your input files, but know using it creates more verbose code than the usual initialization (presented in the begeinning of the notebook). It was actually implemented to retrieve the posinp from a valid input parameters file (when the posinp is defined in it) or from a valid logfile (output file of a BigDFT calculation).</p>
+<p>Also, there is no key to specify the boundary conditions: it has to be inferred from the value of the <code class="docutils literal notranslate"><span class="pre">&quot;cell&quot;</span></code> key. If there is no such key, it means that free boundary conditions must be used. However, when it exists, you must be careful with the values. For instance, if you want to use surface boundary conditions, you must set the second element of the <code class="docutils literal notranslate"><span class="pre">&quot;cell&quot;</span></code> key to <code class="docutils literal notranslate"><span class="pre">&quot;inf&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;.inf&quot;</span></code>.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">pos_dict</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;reduced&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;cell&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">8.07007483423</span><span class="p">,</span> <span class="s1">&#39;inf&#39;</span><span class="p">,</span> <span class="mf">4.65925987792</span><span class="p">],</span>
+    <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.08333333333</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]},</span>
+        <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.41666666666</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.25</span><span class="p">]},</span>
+        <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.58333333333</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]},</span>
+        <span class="p">{</span><span class="s1">&#39;C&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.91666666666</span><span class="p">,</span> <span class="mf">0.5</span><span class="p">,</span> <span class="mf">0.75</span><span class="p">]},</span>
+    <span class="p">]</span>
+<span class="p">}</span>
+<span class="n">pos</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">pos_dict</span><span class="p">)</span>
+<span class="k">assert</span> <span class="n">pos</span><span class="o">.</span><span class="n">boundary_conditions</span> <span class="o">==</span> <span class="s2">&quot;surface&quot;</span>
+</pre></div>
+</div>
+</div>
+<p>See the <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/posinp.html#mybigdft.iofiles.posinp.Posinp">documentation</a> to check the extra possibilities offered by the Posinp class.</p>
+</div>
+</div>
+</div>
+<div class="section" id="The-InputParams-class">
+<h2>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/inputparams.html#inputparams">InputParams</a> class<a class="headerlink" href="#The-InputParams-class" title="Permalink to this headline">¶</a></h2>
+<p>This class allows to manage the BigDFT input parameters, in the yaml format:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">dft</span><span class="p">:</span>
+    <span class="n">hgrids</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">,</span> <span class="mf">0.35</span><span class="p">]</span>
+</pre></div>
+</div>
+<p>It is therefore convenient to initialize this class via a dictionary representing the input parameters:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span> <span class="o">=</span> <span class="n">InputParams</span><span class="p">({</span><span class="s2">&quot;dft&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hgrids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{&#39;dft&#39;: {&#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+</pre></div></div>
+</div>
+<p>If the given value of a parameter corresponds to its default value, it is as if nothing was given:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">InputParams</span><span class="p">({</span><span class="s2">&quot;dft&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;hgrids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.45</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{}
+</pre></div>
+</div>
+</div>
+<p>The validity of the input dictionary is also checked:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dfpt&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrids&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+KeyError(&#34;Unknown key &#39;dfpt&#39;&#34;)
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span>
+    <span class="n">InputParams</span><span class="p">({</span><span class="s1">&#39;dft&#39;</span><span class="p">:</span> <span class="p">{</span><span class="s1">&#39;hgrid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+KeyError(&#34;Unknown key &#39;hgrid&#39; in &#39;dft&#39;&#34;)
+</pre></div></div>
+</div>
+<div class="section" id="Main-attributes">
+<h3>Main attributes<a class="headerlink" href="#Main-attributes" title="Permalink to this headline">¶</a></h3>
+<p>The input parameters may contain the input positions under the <code class="docutils literal notranslate"><span class="pre">&quot;posinp&quot;</span></code> key (whose content must be a dictionary allowing to create a <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> via the <code class="docutils literal notranslate"><span class="pre">from_dict</span></code>, see the example above). Here, no input parameters were given:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">assert</span> <span class="n">inp</span><span class="o">.</span><span class="n">posinp</span> <span class="ow">is</span> <span class="kc">None</span>
+</pre></div>
+</div>
+</div>
+<p>The dictionary of parameters is actually stored by the <code class="docutils literal notranslate"><span class="pre">params</span></code> attribute:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="o">.</span><span class="n">params</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{&#39;dft&#39;: {&#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="An-InputParams-instance-behaves-like-a-dictionary">
+<h3>An InputParams instance behaves like a dictionary<a class="headerlink" href="#An-InputParams-instance-behaves-like-a-dictionary" title="Permalink to this headline">¶</a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{&#39;hgrids&#39;: [0.35, 0.35, 0.35]}
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;hgrids&#39;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>[0.35, 0.35, 0.35]
+</pre></div>
+</div>
+</div>
+<p>You can modify the content of a key afterwards, the validity of the keys will also be checked:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># This modification is valid, and therefore taken into account</span>
+<span class="n">inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;rmult&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">]}</span>
+<span class="n">inp</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[24]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">try</span><span class="p">:</span>
+    <span class="c1"># hgrid is not a valid key: an error is raised!</span>
+    <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;hgrid&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+KeyError(&#34;Unknown key &#39;hgrid&#39; in &#39;dft&#39;&#34;)
+</pre></div></div>
+</div>
+<p>However, modifying the input parameters in this fashion is not checked, you must be careful when using that:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s2">&quot;hgrid&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.45</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span>
+</pre></div>
+</div>
+</div>
+<p>One way of doing making sure that the modified input parameters are still valid is by cleaning them:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="kn">from</span> <span class="nn">mybigdft.iofiles.inputparams</span> <span class="k">import</span> <span class="n">clean</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+<span class="k">except</span> <span class="ne">KeyError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+    <span class="nb">print</span><span class="p">(</span><span class="nb">repr</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+    <span class="k">del</span> <span class="n">inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;hgrid&quot;</span><span class="p">]</span>  <span class="c1"># Delete the bad key</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+KeyError(&#34;Unknown key &#39;hgrid&#39; in &#39;dft&#39;&#34;)
+</pre></div></div>
+</div>
+<p>This is what is actually done when initializing or updating the input parameters. It is also performed before writing the input parameters on a file on disk, so that using bad keys on-the-fly will still be catched before running a BigDFT calculation.</p>
+<p>You can also add initial positions to the input parameters by using its <code class="docutils literal notranslate"><span class="pre">dict</span></code> representation:</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="p">[</span><span class="s2">&quot;posinp&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;units&quot;</span><span class="p">:</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;positions&quot;</span><span class="p">:</span> <span class="p">[</span>
+        <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">]},</span>
+        <span class="p">{</span><span class="s1">&#39;N&#39;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">,</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.1</span><span class="p">]},</span>
+    <span class="p">],</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+<p>It won’t reflect in the content of the input parameters:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="output_area highlight-none notranslate"><div class="highlight"><pre>
+<span></span>{&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}
+</pre></div>
+</div>
+</div>
+<p>However, the <code class="docutils literal notranslate"><span class="pre">posinp</span></code> attribute is not <code class="docutils literal notranslate"><span class="pre">None</span></code> anymore:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[29]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="nb">print</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+2   angstroem
+free
+N   0.0   0.0   0.0
+N   0.0   0.0   1.1
+
+</pre></div></div>
+</div>
+<p>A much simpler way is to directly update the posinp parameter:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[30]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">pos</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">inp</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+4   reduced
+surface   8.07007483423   inf   4.65925987792
+C   0.08333333333   0.5   0.25
+C   0.41666666666   0.5   0.25
+C   0.58333333333   0.5   0.75
+C   0.91666666666   0.5   0.75
+
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="Class-methods-to-intialize-a-InputParams-instance">
+<h3>Class methods to intialize a InputParams instance<a class="headerlink" href="#Class-methods-to-intialize-a-InputParams-instance" title="Permalink to this headline">¶</a></h3>
+<p>Other ways of initializing a <code class="docutils literal notranslate"><span class="pre">InputParams</span></code> instance are provided. They are very similar to the ones of the <code class="docutils literal notranslate"><span class="pre">Posinp</span></code> class. The <code class="docutils literal notranslate"><span class="pre">from_dict</span></code> method is however missing : it would be redundant with the basic way of initializing an <code class="docutils literal notranslate"><span class="pre">InputParams</span></code> instance.</p>
+<div class="section" id="The-from_file-method">
+<h4>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/inputparams.html#mybigdft.iofiles.inputparams.InputParams.from_file">from_file</a> method<a class="headerlink" href="#The-from_file-method" title="Permalink to this headline">¶</a></h4>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="n">inp</span> <span class="o">=</span> <span class="n">InputParams</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;../../../tests/test.yaml&quot;</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">inp</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+{}
+</pre></div></div>
+</div>
+</div>
+<div class="section" id="The-from_string-method">
+<h4>The <a class="reference external" href="https://mmoriniere.gitlab.io/MyBigDFT/inputparams.html#mybigdft.iofiles.inputparams.InputParams.from_string">from_string</a> method<a class="headerlink" href="#The-from_string-method" title="Permalink to this headline">¶</a></h4>
+<p>This allows to initialize an InputParams instance from a string written as a yaml file:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="c1"># You can even format that string to modify it according to your needs</span>
+<span class="n">base_inp</span> <span class="o">=</span> <span class="s2">&quot;&quot;&quot;</span><span class="se">\</span>
+<span class="s2">dft:</span>
+<span class="s2">    rmult: </span><span class="si">{}</span><span class="s2"></span>
+<span class="s2">    hgrids: [0.35, 0.35, 0.35]&quot;&quot;&quot;</span>
+<span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]):</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">InputParams</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">base_inp</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">rm</span><span class="p">))</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Input parameters n°{i+1}: </span><span class="si">{inp}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Input parameters n°1: {&#39;dft&#39;: {&#39;rmult&#39;: [5, 7], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+Input parameters n°2: {&#39;dft&#39;: {&#39;rmult&#39;: [6, 8], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+Input parameters n°3: {&#39;dft&#39;: {&#39;rmult&#39;: [7, 9], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+</pre></div></div>
+</div>
+<p>However, the same result can be achieved by using the basic initialization procedure. The following code should be prefered:</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre>
+<span></span><span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">rm</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">([[</span><span class="mi">5</span><span class="p">,</span> <span class="mi">7</span><span class="p">],</span> <span class="p">[</span><span class="mi">6</span><span class="p">,</span> <span class="mi">8</span><span class="p">],</span> <span class="p">[</span><span class="mi">7</span><span class="p">,</span> <span class="mi">9</span><span class="p">]]):</span>
+    <span class="n">inp</span> <span class="o">=</span> <span class="n">InputParams</span><span class="p">({</span><span class="s2">&quot;dft&quot;</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;rmult&quot;</span><span class="p">:</span> <span class="n">rm</span><span class="p">,</span> <span class="s2">&quot;hgrids&quot;</span><span class="p">:</span> <span class="p">[</span><span class="mf">0.35</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span><span class="p">}})</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">f</span><span class="s2">&quot;Input parameters n°{i+1}: </span><span class="si">{inp}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Input parameters n°1: {&#39;dft&#39;: {&#39;rmult&#39;: [5, 7], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+Input parameters n°2: {&#39;dft&#39;: {&#39;rmult&#39;: [6, 8], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+Input parameters n°3: {&#39;dft&#39;: {&#39;rmult&#39;: [7, 9], &#39;hgrids&#39;: [0.35, 0.35, 0.35]}}
+</pre></div></div>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="Job_and_Logfile.html" class="btn btn-neutral float-right" title="Run BigDFT and manipulate its output files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../tutorials.html" class="btn btn-neutral float-left" title="MyBigDFT tutorials" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
