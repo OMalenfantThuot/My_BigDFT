@@ -1,7 +1,7 @@
 Welcome to My_BigDFT's documentation!
 =====================================
 
-..mdinclude:: ../../README.md
+#..mdinclude:: ../../README.md
 
 .. toctree::
    :maxdepth: 2

@@ -63,7 +63,7 @@ same directory as the bigdft one (*i.e.* BUILDDIR/install/bin)
 ## Documentation
 
 The documentation of MyBigDFT can be found
-[here](https://mmoriniere.gitlab.io/MyBigDFT/index.html).
+[here](https://omalenfantthuot.github.io/My_BigDFT/).
 
 It can also be built locally by running the following commands (where
 MYBIGDFT\_SOURCES is the directory where this README.md file is located):
