@@ -1,0 +1,612 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Logfile &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Job" href="job.html" />
+    <link rel="prev" title="Posinp and Atom" href="posinp.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="iofiles.html">Input and Output files</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="inputparams.html">InputParams</a></li>
+<li class="toctree-l3"><a class="reference internal" href="posinp.html">Posinp and Atom</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Logfile</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="iofiles.html">Input and Output files</a> &raquo;</li>
+        
+      <li>Logfile</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/logfile.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.iofiles.logfiles">
+<span id="logfile"></span><h1>Logfile<a class="headerlink" href="#module-mybigdft.iofiles.logfiles" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#mybigdft.iofiles.logfiles.Logfile" title="mybigdft.iofiles.logfiles.Logfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">Logfile</span></code></a> class is the base class you want to be
+using all the time. It is mainly meant to manipulate the output of a BigDFT
+calculation (written using the YAML format).</p>
+<p>However, it might happen that the output actually contains many documents (for
+instance, one document per geometry optimization procedure). In such cases,
+the initialization of a <code class="docutils literal notranslate"><span class="pre">Logfile</span></code> actually gives another type of object,
+deriving from the <a class="reference internal" href="#mybigdft.iofiles.logfiles.MultipleLogfile" title="mybigdft.iofiles.logfiles.MultipleLogfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">MultipleLogfile</span></code></a> class. Be careful:
+these objects behave as a list of <code class="docutils literal notranslate"><span class="pre">Logfile</span></code> instances, not as a <code class="docutils literal notranslate"><span class="pre">Logfile</span></code>
+instance (even though they are initialized <em>via</em> the <code class="docutils literal notranslate"><span class="pre">Logfile</span></code> class).
+To keep the same example as above, the output file of a geometry optimization
+calculation can be read via the <a class="reference internal" href="#mybigdft.iofiles.logfiles.Logfile.from_file" title="mybigdft.iofiles.logfiles.Logfile.from_file"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Logfile.from_file()</span></code></a>
+method of the <code class="docutils literal notranslate"><span class="pre">Logfile</span></code> class, returning a
+<a class="reference internal" href="#mybigdft.iofiles.logfiles.GeoptLogfile" title="mybigdft.iofiles.logfiles.GeoptLogfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">GeoptLogfile</span></code></a> instance.</p>
+<dl class="class">
+<dt id="mybigdft.iofiles.logfiles.Logfile">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.iofiles.logfiles.</code><code class="sig-name descname">Logfile</code><span class="sig-paren">(</span><em class="sig-param">log=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#Logfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Mapping</span></code></p>
+<p>Class allowing to initialize, read, write and interact with an
+output file of a BigDFT calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>log</strong> (<em>dict</em>) – Output of the BigDFT code as a yaml dictionary.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.from_file">
+<em class="property">classmethod </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#Logfile.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.from_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the Logfile from a file on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the logfile.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Logfile initialized from a file on disk.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mybigdft.iofiles.logfiles.Logfile" title="mybigdft.iofiles.logfiles.Logfile">Logfile</a> or <a class="reference internal" href="#mybigdft.iofiles.logfiles.GeoptLogfile" title="mybigdft.iofiles.logfiles.GeoptLogfile">GeoptLogfile</a> or <a class="reference internal" href="#mybigdft.iofiles.logfiles.MultipleLogfile" title="mybigdft.iofiles.logfiles.MultipleLogfile">MultipleLogfile</a></p>
+</dd>
+</dl>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">log</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;tests/log.yaml&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">log</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+<span class="go">2   angstroem</span>
+<span class="go">free</span>
+<span class="go">N   2.97630782434901e-23   6.87220595204354e-23   0.0107161998748779</span>
+<span class="go">N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154</span>
+<span class="go">&lt;BLANKLINE&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">log</span><span class="o">.</span><span class="n">energy</span>
+<span class="go">-19.884659235401838</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.from_stream">
+<em class="property">classmethod </em><code class="sig-name descname">from_stream</code><span class="sig-paren">(</span><em class="sig-param">stream</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#Logfile.from_stream"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.from_stream" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize the Logfile from a stream.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stream</strong> – Logfile as a stream.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>Logfile initialized from a stream.</p>
+</dd>
+<dt class="field-odd">Return type</dt>
+<dd class="field-odd"><p><a class="reference internal" href="#mybigdft.iofiles.logfiles.Logfile" title="mybigdft.iofiles.logfiles.Logfile">Logfile</a> or <a class="reference internal" href="#mybigdft.iofiles.logfiles.GeoptLogfile" title="mybigdft.iofiles.logfiles.GeoptLogfile">GeoptLogfile</a> or <a class="reference internal" href="#mybigdft.iofiles.logfiles.MultipleLogfile" title="mybigdft.iofiles.logfiles.MultipleLogfile">MultipleLogfile</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.log">
+<em class="property">property </em><code class="sig-name descname">log</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.log" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Yaml dictionary of the output of the BigDFT code.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#mybigdft.iofiles.logfiles.Logfile" title="mybigdft.iofiles.logfiles.Logfile">Logfile</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.__dir__">
+<code class="sig-name descname">__dir__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#Logfile.__dir__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.__dir__" title="Permalink to this definition">¶</a></dt>
+<dd><p>The base attributes are not found when doing <cite>dir()</cite> on a
+<cite>Logfile</cite> instance, but their counterpart with a preceding
+underscore is. What is done here is a removal of the underscored
+names, replaced by the bare names (in order to avoid name
+repetition).</p>
+<p>The bare attributes still behave as properties, while their
+value might be updated via the underscored attribute.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#Logfile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the logfile on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the logfile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Posinp used during the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.Logfile.inputparams">
+<em class="property">property </em><code class="sig-name descname">inputparams</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.Logfile.inputparams" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Input parameters used during the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="inputparams.html#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams">InputParams</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="data">
+<dt id="mybigdft.iofiles.logfiles.mybigdft.iofiles.logfiles.ATTRIBUTES">
+<code class="sig-prename descclassname">mybigdft.iofiles.logfiles.</code><code class="sig-name descname">ATTRIBUTES</code><em class="property"> Definition of the base attributes of a Logfile instance (and
+where to look for them in the logfile).</em><a class="headerlink" href="#mybigdft.iofiles.logfiles.mybigdft.iofiles.logfiles.ATTRIBUTES" title="Permalink to this definition">¶</a></dt>
+<dd><p>These attributes allow to get most of the relevant data contained in a Logfile. They provide simple shortcuts instead of having to know exactly where to look for them in the yaml output file, represented by the Logfile class. If some attributes do not appear in the BigDFT output, they default to <cite>None</cite>.</p>
+<dl class="simple">
+<dt>evals</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Orbital energies and occupations.</p>
+</dd>
+</dl>
+</dd>
+<dt>forcemax_cv</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Convergence criterion on forces.</p>
+</dd>
+</dl>
+</dd>
+<dt>kpts</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Grid of k-points.</p>
+</dd>
+</dl>
+</dd>
+<dt>magnetization</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Total magnetization of the system.</p>
+</dd>
+</dl>
+</dd>
+<dt>symmetry</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Symmetry group.</p>
+</dd>
+</dl>
+</dd>
+<dt>energy</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Energy (Hartree).</p>
+</dd>
+</dl>
+</dd>
+<dt>astruct</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Atomic structure.</p>
+</dd>
+</dl>
+</dd>
+<dt>support_functions</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Support functions.</p>
+</dd>
+</dl>
+</dd>
+<dt>electrostatic_multipoles</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Electrostatic multipoles.</p>
+</dd>
+</dl>
+</dd>
+<dt>force_fluct</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Threshold fluctuation of Forces.</p>
+</dd>
+</dl>
+</dd>
+<dt>n_at</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of Atoms.</p>
+</dd>
+</dl>
+</dd>
+<dt>dipole</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Electric Dipole Moment (AU).</p>
+</dd>
+</dl>
+</dd>
+<dt>cell</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Cell size.</p>
+</dd>
+</dl>
+</dd>
+<dt>forces</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Atomic Forces (Ha/Bohr).</p>
+</dd>
+</dl>
+</dd>
+<dt>WARNINGS</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Warnings raised during the BigDFT run.</p>
+</dd>
+</dl>
+</dd>
+<dt>kpt_mesh</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>No. of Monkhorst-Pack grid points.</p>
+</dd>
+</dl>
+</dd>
+<dt>pressure</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Pressure (GPa).</p>
+</dd>
+</dl>
+</dd>
+<dt>fermi_level</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Fermi level.</p>
+</dd>
+</dl>
+</dd>
+<dt>atom_types</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of the atomic types present in the posinp.</p>
+</dd>
+</dl>
+</dd>
+<dt>walltime</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Walltime since initialization.</p>
+</dd>
+</dl>
+</dd>
+<dt>boundary_conditions</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Boundary Conditions.</p>
+</dd>
+</dl>
+</dd>
+<dt>forcemax</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Maximum value of forces.</p>
+</dd>
+</dl>
+</dd>
+<dt>sdos</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>SDos files.</p>
+</dd>
+</dl>
+</dd>
+<dt>gnrm_cv</dt><dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Convergence criterion on wavefunction residue.</p>
+</dd>
+</dl>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="class">
+<dt id="mybigdft.iofiles.logfiles.MultipleLogfile">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.iofiles.logfiles.</code><code class="sig-name descname">MultipleLogfile</code><span class="sig-paren">(</span><em class="sig-param">logs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#MultipleLogfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.MultipleLogfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">collections.abc.Sequence</span></code></p>
+<p>Class allowing to initialize, read, write and interact with an
+output file of a BigDFT calculation containing multiple documents.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>logs</strong> (<em>list</em>) – List of the various documents contained in the logfile of a
+BigDFT calculation.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.MultipleLogfile.logs">
+<em class="property">property </em><code class="sig-name descname">logs</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.MultipleLogfile.logs" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of the documents read from a single output of a BigDFT
+calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.MultipleLogfile.write">
+<code class="sig-name descname">write</code><span class="sig-paren">(</span><em class="sig-param">filename</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#MultipleLogfile.write"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.MultipleLogfile.write" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the logfile on disk.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>filename</strong> (<em>str</em>) – Name of the logfile.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mybigdft.iofiles.logfiles.GeoptLogfile">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.iofiles.logfiles.</code><code class="sig-name descname">GeoptLogfile</code><span class="sig-paren">(</span><em class="sig-param">logs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/iofiles/logfiles.html#GeoptLogfile"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.iofiles.logfiles.GeoptLogfile" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mybigdft.iofiles.logfiles.MultipleLogfile" title="mybigdft.iofiles.logfiles.MultipleLogfile"><code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.iofiles.logfiles.MultipleLogfile</span></code></a></p>
+<p>Class allowing to initialize, read, write and interact with an
+output file of a geometry optimization calculation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>logs</strong> (<em>list</em>) – List of the various documents contained in the logfile of a
+geometry optimization calculation.</p>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.GeoptLogfile.inputparams">
+<em class="property">property </em><code class="sig-name descname">inputparams</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.GeoptLogfile.inputparams" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Input parameters used for each step of the geometry
+optimization procedure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="inputparams.html#mybigdft.iofiles.inputparams.InputParams" title="mybigdft.iofiles.inputparams.InputParams">InputParams</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.iofiles.logfiles.GeoptLogfile.posinps">
+<em class="property">property </em><code class="sig-name descname">posinps</code><a class="headerlink" href="#mybigdft.iofiles.logfiles.GeoptLogfile.posinps" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List of the input positions for each step of the geometry
+optimization procedure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="job.html" class="btn btn-neutral float-right" title="Job" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="posinp.html" class="btn btn-neutral float-left" title="Posinp and Atom" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

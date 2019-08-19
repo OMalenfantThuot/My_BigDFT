@@ -1,0 +1,439 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.ramanspectrum &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.ramanspectrum</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.ramanspectrum</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`RamanSpectrum` class allows to compute the normal modes</span>
+<span class="sd">and their respective Raman intensities, allowing one to study the Raman</span>
+<span class="sd">spectrum.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">AMU_TO_EMU</span><span class="p">,</span> <span class="n">EMU_TO_AMU</span><span class="p">,</span> <span class="n">B_TO_ANG</span><span class="p">,</span> <span class="n">ANG_TO_B</span>
+<span class="kn">from</span> <span class="nn">.workflow</span> <span class="k">import</span> <span class="n">AbstractWorkflow</span>
+<span class="kn">from</span> <span class="nn">.poltensor</span> <span class="k">import</span> <span class="n">PolTensor</span>
+
+
+<div class="viewcode-block" id="RamanSpectrum"><a class="viewcode-back" href="../../../raman.html#mybigdft.workflows.ramanspectrum.RamanSpectrum">[docs]</a><span class="k">class</span> <span class="nc">RamanSpectrum</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to run all the calculations enabling the</span>
+<span class="sd">    computation of the Raman spectrum of a given system, that is its</span>
+<span class="sd">    normal modes of vibration (or phonons) associated to a given energy</span>
+<span class="sd">    and a Raman intensity. The so-called depolarization ratios of each</span>
+<span class="sd">    phonon mode are also be computed.</span>
+
+<span class="sd">    One therefore needs to compute the phonons first. This is done by</span>
+<span class="sd">    solving the dynamical matrix (the eigenvalues giving the phonon</span>
+<span class="sd">    energies and the eigenvectors the normal modes). This matrix is</span>
+<span class="sd">    computed at the expense of :math:`6 n_{at}` BigDFT calculations,</span>
+<span class="sd">    where each atom is in turns translated by a small amount around its</span>
+<span class="sd">    equilibrium positions. You may want to refer to the</span>
+<span class="sd">    :class:`~mybigdft.workflows.phonons.Phonons` class for more details.</span>
+
+<span class="sd">    To get the Raman intensities (or activities) of the spectrum, one</span>
+<span class="sd">    must compute the derivative of the polarizability tensor along the</span>
+<span class="sd">    normal modes. To that end, one must compute the polarizability</span>
+<span class="sd">    tensor at each of the positons used to get the vibrational energies,</span>
+<span class="sd">    and this means applying an external electric field along each</span>
+<span class="sd">    coordinate. One calculation per space coordinate lead to 3 extra</span>
+<span class="sd">    calculations, meaning that :math:`18 n_{at}` additional BigDFT</span>
+<span class="sd">    standard calculations are required to obtain a Raman spectrum</span>
+<span class="sd">    intensities, leading to :math:`24 n_{at}` calculations in total.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;intensities&quot;</span><span class="p">,</span> <span class="s2">&quot;depolarization_ratios&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phonons</span><span class="p">,</span> <span class="n">ef_amplitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From a phonon calculation, one is able to compute the Raman</span>
+<span class="sd">        spectrum of a given system by only specifying the electric field</span>
+<span class="sd">        amplitudes used to compute the polarizability tensor at each</span>
+<span class="sd">        out-of-equilibrium positions used to compute the phonons.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phonons : Phonons</span>
+<span class="sd">            Phonon energies workflow.</span>
+<span class="sd">        ef_amplitudes : list or numpy array of length 3</span>
+<span class="sd">            Amplitude of the electric field to be applied in the three</span>
+<span class="sd">            directions of space (:math:`x`, :math:`y`, :math:`z`).</span>
+<span class="sd">        order : int</span>
+<span class="sd">            Order of the numerical differentiation used to compute the</span>
+<span class="sd">            polarizability tensors that are then used to compute the</span>
+<span class="sd">            Raman intensities. If second (resp. first) order, then six</span>
+<span class="sd">            (resp. three) calculations per atom are to be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Initialize the attributes that are specific to this workflow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phonons</span> <span class="o">=</span> <span class="n">phonons</span>
+        <span class="c1"># Some other quantities are not yet computed</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># mean polarizability derivatives</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span> <span class="o">=</span> <span class="kc">None</span>  <span class="c1"># anisotropies of pol. tensor deriv.</span>
+        <span class="c1"># Initialize the poltensor workflows to run</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_poltensor_workflows</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">PolTensor</span><span class="p">(</span><span class="n">job</span><span class="p">,</span> <span class="n">ef_amplitudes</span><span class="o">=</span><span class="n">ef_amplitudes</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">order</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">queue</span>
+        <span class="p">]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RamanSpectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="p">[])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phonons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Phonons</span>
+<span class="sd">            Workflow allowing to compute the phonon energies of the</span>
+<span class="sd">            system under consideration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phonons</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array or None</span>
+<span class="sd">            Phonon energies of the system (units: cm^-1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">energies</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list or None</span>
+<span class="sd">            Raman intensities of the phonons (units: Ang^4.amu^-1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">depolarization_ratios</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list or None</span>
+<span class="sd">            Depolarization ratios of the phonons.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_depolarization_ratios</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">poltensor_workflows</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Polarizability tensor workflows to be performed in order to</span>
+<span class="sd">            compute the Raman intensities.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poltensor_workflows</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
+             <span class="n">timeout</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the calculations allowing to compute the phonon energies and</span>
+<span class="sd">        the related Raman intensities in order to be able to plot the</span>
+<span class="sd">        Raman spectrum of the system under consideration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculations are run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which each job must be stopped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poltensor_workflows</span><span class="p">:</span>
+            <span class="n">pt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">RamanSpectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span>
+            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RamanSpectrum.post_proc"><a class="viewcode-back" href="../../../raman.html#mybigdft.workflows.ramanspectrum.RamanSpectrum.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the Raman intensities and depolarization ratio of each</span>
+<span class="sd">        normal mode and set their values (you can access their values</span>
+<span class="sd">        via the attributes :attr:`intensities` and</span>
+<span class="sd">        :attr:`depolarization_ratios`, respectively).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># - Set the derivatives of the polarizability tensors</span>
+        <span class="c1">#   along each displacement directions</span>
+        <span class="n">deriv_pol_tensors</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_deriv_pol_tensors</span><span class="p">()</span>
+        <span class="c1"># - Loop over the normal modes to get the the mean</span>
+        <span class="c1">#   polarizability derivative (alphas) and of the anisotropy of</span>
+        <span class="c1">#   the polarizability tensor derivative (betas_sq)</span>
+        <span class="n">alphas</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">betas_sq</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">deriv_pol_tensors</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">normal_modes</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
+            <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="mf">3.</span><span class="p">)</span>
+            <span class="n">evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
+            <span class="n">beta_sq</span> <span class="o">=</span> <span class="p">((</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                       <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
+                       <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+            <span class="n">betas_sq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta_sq</span><span class="p">)</span>
+            <span class="c1"># beta_sq = 1./2. * ((pt[0][0]-pt[1][1])**2 +</span>
+            <span class="c1">#                    (pt[0][0]-pt[2][2])**2 +</span>
+            <span class="c1">#                    (pt[1][1]-pt[2][2])**2 +</span>
+            <span class="c1">#                    6.*(pt[0][1]**2+pt[0][2]**2+pt[1][2]**2))</span>
+            <span class="c1"># betas_sq.append(beta_sq)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">alphas</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">betas_sq</span><span class="p">)</span>
+        <span class="c1"># From the two previous quantities, it is possible to</span>
+        <span class="c1"># compute the intensity (converted from atomic units</span>
+        <span class="c1"># to Ang^4.amu^-1) and the depolarization ratio</span>
+        <span class="c1"># of the normal mode.</span>
+        <span class="n">conversion</span> <span class="o">=</span> <span class="n">B_TO_ANG</span><span class="o">**</span><span class="mi">4</span> <span class="o">/</span> <span class="n">EMU_TO_AMU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span> <span class="o">=</span> \
+            <span class="p">(</span><span class="mi">45</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span> <span class="o">*</span> <span class="n">conversion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depolarization_ratios</span> <span class="o">=</span> \
+            <span class="mi">3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span> <span class="o">/</span> <span class="p">(</span><span class="mi">45</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_deriv_pol_tensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the derivative of the polarizability tensor along all</span>
+<span class="sd">        the atomic displacements.</span>
+
+<span class="sd">        All the elements of the derivative of the polarizability tensor</span>
+<span class="sd">        along one displacement direction are represented by a line of</span>
+<span class="sd">        the returned array. There are :math:`3 n_at` such lines (because</span>
+<span class="sd">        there are 3 displacements per atom). This representation allows</span>
+<span class="sd">        for a simpler evaluation of these derivatives along the normal</span>
+<span class="sd">        modes.</span>
+
+<span class="sd">        Note that each element is also weighted by the inverse of the</span>
+<span class="sd">        square root of the mass of the atom that is moved.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        2D np.array of shape :math:`(3, 3, 3 n_{at})`</span>
+<span class="sd">            Derivatives of the polarizability tensor.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+        <span class="n">deriv_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="o">*</span><span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">pt_wfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poltensor_workflows</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">ref_pt</span> <span class="o">=</span> <span class="n">pt_wfs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">pol_tensors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt_wfs</span><span class="p">,</span> <span class="p">[</span><span class="n">ref_pt</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">pt_wfs</span><span class="p">))</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">pol_tensors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt_wfs</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">pt_wfs</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">pt1</span><span class="p">,</span> <span class="n">pt2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">pol_tensors</span><span class="p">)):</span>
+            <span class="c1"># Get the value of the delta of move amplitudes</span>
+            <span class="n">gs1</span> <span class="o">=</span> <span class="n">pt1</span><span class="o">.</span><span class="n">ground_state</span>
+            <span class="n">amp</span> <span class="o">=</span> <span class="n">gs1</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">delta_x</span> <span class="o">=</span> <span class="n">amp</span>
+            <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+                <span class="n">delta_x</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">amp</span>
+            <span class="k">if</span> <span class="n">gs1</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;angstroem&#39;</span><span class="p">:</span>
+                <span class="n">delta_x</span> <span class="o">*=</span> <span class="n">ANG_TO_B</span>
+            <span class="c1"># Get the value of the delta of poltensors</span>
+            <span class="n">i_at</span> <span class="o">=</span> <span class="n">gs1</span><span class="o">.</span><span class="n">moved_atom</span>
+            <span class="n">delta_pol_tensor</span> <span class="o">=</span> <span class="n">pt1</span><span class="o">.</span><span class="n">pol_tensor</span> <span class="o">-</span> <span class="n">pt2</span><span class="o">.</span><span class="n">pol_tensor</span>
+            <span class="c1"># Compute the derivative of the polarizability tensor</span>
+            <span class="n">mass</span> <span class="o">=</span> <span class="n">gs1</span><span class="o">.</span><span class="n">posinp</span><span class="p">[</span><span class="n">i_at</span><span class="p">]</span><span class="o">.</span><span class="n">mass</span> <span class="o">*</span> <span class="n">AMU_TO_EMU</span>
+            <span class="n">deriv_pts</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_pol_tensor</span> <span class="o">/</span> <span class="n">delta_x</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mass</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">deriv_pts</span><span class="o">.</span><span class="n">T</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

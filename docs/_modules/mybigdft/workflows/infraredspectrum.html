@@ -1,0 +1,369 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.infraredspectrum &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.infraredspectrum</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.infraredspectrum</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`InfraredSpectrum` class allows to compute the normal modes</span>
+<span class="sd">and their respective infrared intensities, allowing one to study the</span>
+<span class="sd">infrared spectrum.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">ANG_TO_B</span><span class="p">,</span> <span class="n">B_TO_ANG</span><span class="p">,</span> <span class="n">AU_TO_DEBYE</span>
+<span class="kn">from</span> <span class="nn">.workflow</span> <span class="k">import</span> <span class="n">AbstractWorkflow</span>
+
+
+<div class="viewcode-block" id="InfraredSpectrum"><a class="viewcode-back" href="../../../infrared.html#mybigdft.workflows.infraredspectrum.InfraredSpectrum">[docs]</a><span class="k">class</span> <span class="nc">InfraredSpectrum</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to run all the calculations enabling the</span>
+<span class="sd">    computation of the infrared spectrum of a given system, that is its</span>
+<span class="sd">    normal modes of vibration (or phonons) associated to a given energy</span>
+<span class="sd">    and an infrared intensity.</span>
+
+<span class="sd">    One therefore needs to compute the phonons first. This is done by</span>
+<span class="sd">    solving the dynamical matrix (the eigenvalues giving the phonon</span>
+<span class="sd">    energies and the eigenvectors the normal modes). This matrix is</span>
+<span class="sd">    computed at the expense of :math:`6 n_{at}` BigDFT calculations,</span>
+<span class="sd">    where each atom is in turns translated by a small amount around its</span>
+<span class="sd">    equilibrium positions. You may want to refer to the</span>
+<span class="sd">    :class:`~mybigdft.workflows.phonons.Phonons` class for more details.</span>
+
+<span class="sd">    To get the intensities of the infrared spectrum, one must compute</span>
+<span class="sd">    the derivative of the dipole moment along the normal modes. All the</span>
+<span class="sd">    necessary dipole moments to use are readily found in the logfiles of</span>
+<span class="sd">    the BigDFT calculations performed to compute the phonons: no extra</span>
+<span class="sd">    calculation is required.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;intensities&quot;</span><span class="p">,</span> <span class="s2">&quot;Z&quot;</span><span class="p">,</span> <span class="s2">&quot;Zbvs&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">phonons</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From a phonon calculation, one is able to compute the infrared</span>
+<span class="sd">        spectrum of a given system by only measuring the dipole moment</span>
+<span class="sd">        at each out-of-equilibrium positions used to compute the</span>
+<span class="sd">        phonons.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        phonons : Phonons</span>
+<span class="sd">            Phonon energies workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_phonons</span> <span class="o">=</span> <span class="n">phonons</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InfraredSpectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="p">[])</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">phonons</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Phonons</span>
+<span class="sd">            Workflow allowing to compute the phonon energies of the</span>
+<span class="sd">            system under consideration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_phonons</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array or None</span>
+<span class="sd">            Phonon energies of the system (units: cm^-1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">energies</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">intensities</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list or None</span>
+<span class="sd">            Infrared intensities of the phonons (units:</span>
+<span class="sd">            (D/Ang)^2.amu^-1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Z</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy array of dimension :math:`3 * 3 n_{at}`:</span>
+<span class="sd">            Matrix measuring the derivative of the dipole moment with</span>
+<span class="sd">            respect to atomic displacements (units: (D/A).amu^-1/2).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Z</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">Zbvs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list or None</span>
+<span class="sd">            Intensities of the phonons.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_Zbvs</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
+             <span class="n">timeout</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the calculations allowing to compute the phonon energies and</span>
+<span class="sd">        the related infrared intensities in order to be able to plot the</span>
+<span class="sd">        infrared spectrum of the system under consideration.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculations are run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which each job must be stopped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">InfraredSpectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span>
+            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InfraredSpectrum.post_proc"><a class="viewcode-back" href="../../../infrared.html#mybigdft.workflows.infraredspectrum.InfraredSpectrum.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the infrared intensities, the Z matrix and the Z</span>
+<span class="sd">        matrices for each normal mode and set their values (you can</span>
+<span class="sd">        access their values via the attributes :attr:`intensities`,</span>
+<span class="sd">        :attr:`Z` and :attr:`Zbvs`, respectively).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Z</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_Z_matrix</span><span class="p">()</span>
+        <span class="n">nms</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">normal_modes</span><span class="o">.</span><span class="n">T</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_Zbvs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">Z</span><span class="o">*</span><span class="n">nm</span> <span class="k">for</span> <span class="n">nm</span> <span class="ow">in</span> <span class="n">nms</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">Zbv</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span>
+                                      <span class="k">for</span> <span class="n">Zbv</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">Zbvs</span><span class="p">])</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_Z_matrix</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy array of dimension :math:`3 * 3 n_{at}`:</span>
+<span class="sd">            Matrix measuring the derivative of the dipole moment with</span>
+<span class="sd">            respect to atomic displacements (units: (D/A).amu^-1/2).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">posinp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">posinp</span><span class="p">)</span>
+        <span class="c1"># Compute the derivatives of the dipole with respect to the atomic</span>
+        <span class="c1"># displacement</span>
+        <span class="n">ZT</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="o">*</span><span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>  <span class="c1"># transpose of the wanted Z matrix</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">job1</span><span class="p">,</span> <span class="n">job2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">queue</span><span class="p">)]</span><span class="o">*</span><span class="mi">2</span><span class="p">)):</span>
+            <span class="c1"># Compute the delta dipole (in atomic units)</span>
+            <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job1</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job2</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
+            <span class="n">delta_dipoles</span> <span class="o">=</span> <span class="n">d1</span> <span class="o">-</span> <span class="n">d2</span>
+            <span class="c1"># Compute the delta displacement (in atomic units or bohr)</span>
+            <span class="n">amp1</span> <span class="o">=</span> <span class="n">job1</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+            <span class="n">amp2</span> <span class="o">=</span> <span class="n">job2</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+            <span class="n">delta_u</span> <span class="o">=</span> <span class="n">amp1</span><span class="o">-</span><span class="n">amp2</span>
+            <span class="k">if</span> <span class="n">job1</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">:</span>
+                <span class="n">delta_u</span> <span class="o">*=</span> <span class="n">ANG_TO_B</span>
+            <span class="c1"># Set the new line of the transpose of the Z matrix</span>
+            <span class="n">ZT</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">delta_dipoles</span><span class="o">*</span><span class="n">AU_TO_DEBYE</span><span class="p">)</span> <span class="o">/</span> <span class="p">(</span><span class="n">delta_u</span><span class="o">*</span><span class="n">B_TO_ANG</span><span class="p">)</span>
+        <span class="c1"># Normalize by the square root of the masses of the displaced atom</span>
+        <span class="n">mass_norm</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([[</span><span class="n">mass</span><span class="p">]</span><span class="o">*</span><span class="mi">9</span> <span class="k">for</span> <span class="n">mass</span> <span class="ow">in</span> <span class="n">posinp</span><span class="o">.</span><span class="n">masses</span><span class="p">])</span>
+        <span class="n">mass_norm</span> <span class="o">=</span> <span class="n">mass_norm</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="mi">3</span><span class="o">*</span><span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">ZT</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">mass_norm</span><span class="p">))</span><span class="o">.</span><span class="n">T</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

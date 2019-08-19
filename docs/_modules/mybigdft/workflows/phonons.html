@@ -1,0 +1,584 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.phonons &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.phonons</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.phonons</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`Phonons` class allows to compute the normal modes of a</span>
+<span class="sd">system.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">namedtuple</span><span class="p">,</span> <span class="n">OrderedDict</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Job</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="p">(</span>
+    <span class="n">COORDS</span><span class="p">,</span>
+    <span class="n">SIGNS</span><span class="p">,</span>
+    <span class="n">AMU_TO_EMU</span><span class="p">,</span>
+    <span class="n">HA_TO_CMM1</span><span class="p">,</span>
+    <span class="n">B_TO_ANG</span><span class="p">,</span>
+    <span class="n">ANG_TO_B</span><span class="p">,</span>
+    <span class="n">DEFAULT_PARAMETERS</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">.workflow</span> <span class="k">import</span> <span class="n">AbstractWorkflow</span>
+
+
+<div class="viewcode-block" id="Phonons"><a class="viewcode-back" href="../../../phonons.html#mybigdft.workflows.phonons.Phonons">[docs]</a><span class="k">class</span> <span class="nc">Phonons</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to run all the calculations enabling the</span>
+<span class="sd">    computation of the phonon energies of a given system.</span>
+
+<span class="sd">    To get the phonon energies of the system, one needs to find the</span>
+<span class="sd">    eigenvalues of the dynamical matrix, that is closely related to the</span>
+<span class="sd">    Hessian. To build these matrices, one must find the derivatives of</span>
+<span class="sd">    the forces when each coordinate of each atom is translated by a</span>
+<span class="sd">    small amount around the equilibrium positions. This derivative must</span>
+<span class="sd">    be performed numerically. For a first order evaluation of the</span>
+<span class="sd">    derivative, :math:`3 n_{at} + 1` DFT calculations must be performed,</span>
+<span class="sd">    where :math:`n_{at}` is the number of atoms of the system, the 3</span>
+<span class="sd">    factors comes from the translations along each space coordinate,</span>
+<span class="sd">    while the extra calculation corresponds to the ground state.</span>
+<span class="sd">    However, this might not be precise enough because you want the</span>
+<span class="sd">    ground state forces to be equal to 0, or at least negligible with</span>
+<span class="sd">    respect to the forces of the out of equilibrium positions. This can</span>
+<span class="sd">    be difficult to obtain. It is therefore advised to evaluate that</span>
+<span class="sd">    derivative with a second order scheme, where each coodinate is</span>
+<span class="sd">    translated positively and negatively, so that the number of BigDFT</span>
+<span class="sd">    calculations amounts to :math:`2*3*n_{at} = 6 n_{at}` (no</span>
+<span class="sd">    :math:`+ 1` here, because there is no need to compute the ground</span>
+<span class="sd">    state anymore).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;dyn_mat&quot;</span><span class="p">,</span> <span class="s2">&quot;energies&quot;</span><span class="p">,</span> <span class="s2">&quot;normal_modes&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ground_state</span><span class="p">,</span> <span class="n">translation_amplitudes</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">2</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        From a ground state calculation, which must correspond to the</span>
+<span class="sd">        equilibrium calculation geometry, the :math:`3 n_{at}+1` or</span>
+<span class="sd">        :math:`6 n_{at}` jobs necessary for the calculation of the</span>
+<span class="sd">        phonon energies are prepared (depending on the order of the</span>
+<span class="sd">        calculation).</span>
+
+<span class="sd">        The distance of the displacement in each direction is controlled</span>
+<span class="sd">        by `translation_amplitudes` (one amplitude per space coordinate</span>
+<span class="sd">        must be given).</span>
+
+<span class="sd">        The phonon energies calculations are computed while post-</span>
+<span class="sd">        processing the results of all the calculations (after running</span>
+<span class="sd">        the run method). They correspond to the energies of the Raman</span>
+<span class="sd">        spectrum. If interested in getting the Raman intensity and</span>
+<span class="sd">        depolarization ratio of each phonon (or normal mode), see</span>
+<span class="sd">        :class:`~mybigdft.workflows.ramanspectrum.RamanSpectrum`. If</span>
+<span class="sd">        interested in getting the infrared intensity of each phonon, see</span>
+<span class="sd">        :class:`~mybigdft.workflows.infreredspectrum.InfraredSpectrum`.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        ground_state : Job</span>
+<span class="sd">            Job of the ground state of the system under consideration.</span>
+<span class="sd">        translation_amplitudes: Sequence of length 3</span>
+<span class="sd">            Amplitudes of the translations to be applied to each atom</span>
+<span class="sd">            along each of the three space coordinates (in atomic units).</span>
+<span class="sd">        order : int</span>
+<span class="sd">            Order of the numerical differentiation used to compute the</span>
+<span class="sd">            dynamical matrix. If second order (resp. first), then six</span>
+<span class="sd">            (resp. three) calculations per atom are to be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Set default translation amplitudes</span>
+        <span class="k">if</span> <span class="n">translation_amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">translation_amplitudes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.45</span> <span class="o">/</span> <span class="mi">64</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="c1"># Check the desired order</span>
+        <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only first and second order available&quot;</span><span class="p">)</span>
+        <span class="c1"># Check the translation amplitudes</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">translation_amplitudes</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span>
+            <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">translation_amplitudes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span>
+        <span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You must provide three electric field &quot;</span>
+                <span class="s2">&quot;amplitudes, one for each space coordinate.&quot;</span>
+            <span class="p">)</span>
+        <span class="n">translation_amplitudes</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">amp</span> <span class="k">if</span> <span class="n">amp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="mf">0.0</span> <span class="k">for</span> <span class="n">amp</span> <span class="ow">in</span> <span class="n">translation_amplitudes</span>
+        <span class="p">]</span>
+        <span class="k">if</span> <span class="mf">0.0</span> <span class="ow">in</span> <span class="n">translation_amplitudes</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+        <span class="c1"># Initialize the attributes that are specific to this workflow</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ground_state</span> <span class="o">=</span> <span class="n">ground_state</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_translation_amplitudes</span> <span class="o">=</span> <span class="n">translation_amplitudes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_order</span> <span class="o">=</span> <span class="n">order</span>
+        <span class="c1"># The displacements define the 3 or 6 translation vectors each</span>
+        <span class="c1"># atom must undergo</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_displacements</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_displacements</span><span class="p">()</span>
+        <span class="c1"># Initialize the queue of jobs for this workflow</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_queue</span><span class="p">()</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Phonons</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="o">=</span><span class="n">queue</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ground_state</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Job</span>
+<span class="sd">            Job of the ground state of the system under consideration.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ground_state</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">translation_amplitudes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Sequence of length 3</span>
+<span class="sd">            Amplitudes of the translations to be applied to each atom</span>
+<span class="sd">            along each of the three space coordinates.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translation_amplitudes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">order</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        order : int</span>
+<span class="sd">            Order of the numerical differentiation used to compute the</span>
+<span class="sd">            dynamical matrix. If second order (resp. first), then six</span>
+<span class="sd">            (resp. three) calculations per atom are to be performed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_order</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">energies</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array or None</span>
+<span class="sd">            Phonon energies of the system (units: cm^-1).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_energies</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">dyn_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array or None</span>
+<span class="sd">            Dynamical matrix deduced from the calculations.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dyn_mat</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">normal_modes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        numpy.array or None</span>
+<span class="sd">            Normal modes of the system found as eigenvectors of the</span>
+<span class="sd">            dynamical matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normal_modes</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">displacements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        OrderedDict of length 3 or 6</span>
+<span class="sd">            Displacements each atom of the system must undergo before</span>
+<span class="sd">            computing the dynamical matrix as post-processing. There are</span>
+<span class="sd">            three or six of them (one or two per space coordinate,</span>
+<span class="sd">            depending on the order of the numerical derivative</span>
+<span class="sd">            procedure) if the forward or central difference scheme is</span>
+<span class="sd">            used, respectively.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_displacements</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the queue of jobs to be run in order to compute the</span>
+<span class="sd">        phonon energies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">gs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span>
+        <span class="c1"># Add the ground state job to the queue if needed</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">gs</span><span class="p">)</span>
+        <span class="c1"># Add the jobs where each atom is displaced along each space</span>
+        <span class="c1"># coordinate</span>
+        <span class="k">for</span> <span class="n">i_at</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">posinp</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">disp</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">displacements</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Prepare the new job by translating an atom</span>
+                <span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="s2">&quot;atom</span><span class="si">{:04d}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i_at</span><span class="p">),</span> <span class="n">key</span><span class="p">)</span>
+                <span class="n">new_posinp</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">translate_atom</span><span class="p">(</span><span class="n">i_at</span><span class="p">,</span> <span class="n">disp</span><span class="o">.</span><span class="n">vector</span><span class="p">)</span>
+                <span class="c1"># Set the correct reference data directory</span>
+                <span class="n">default</span> <span class="o">=</span> <span class="n">DEFAULT_PARAMETERS</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span>
+                <span class="n">write_orbitals</span> <span class="o">=</span> <span class="p">(</span>
+                    <span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span> <span class="ow">and</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">default</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">write_orbitals</span><span class="p">:</span>
+                    <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">data_dir</span>  <span class="c1"># pragma: no cover</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">ref_data_dir</span>
+                <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span>
+                    <span class="n">inputparams</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">,</span>
+                    <span class="n">posinp</span><span class="o">=</span><span class="n">new_posinp</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                    <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span>
+                    <span class="n">skip</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">skip</span><span class="p">,</span>
+                    <span class="n">ref_data_dir</span><span class="o">=</span><span class="n">ref_data_dir</span><span class="p">,</span>
+                    <span class="n">pseudos</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">pseudos</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="c1"># Add attributes to the job to facilitate post-processing</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">moved_atom</span> <span class="o">=</span> <span class="n">i_at</span>
+                <span class="n">job</span><span class="o">.</span><span class="n">displacement</span> <span class="o">=</span> <span class="n">disp</span>
+                <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">queue</span>
+
+    <span class="k">def</span> <span class="nf">_init_displacements</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the displacements each atom must undergo from the amplitudes</span>
+<span class="sd">        of displacement in each direction.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">displacements</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">signs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>  <span class="c1"># One displacement per coordinate</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="n">signs</span> <span class="o">=</span> <span class="n">SIGNS</span>  <span class="c1"># Two displacements per coordinate</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">COORDS</span><span class="p">):</span>
+            <span class="k">for</span> <span class="n">sign</span> <span class="ow">in</span> <span class="n">signs</span><span class="p">:</span>
+                <span class="n">key</span> <span class="o">=</span> <span class="n">coord</span> <span class="o">+</span> <span class="n">sign</span>
+                <span class="n">amplitude</span> <span class="o">=</span> <span class="n">signs</span><span class="p">[</span><span class="n">sign</span><span class="p">]</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">translation_amplitudes</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">:</span>
+                    <span class="n">amplitude</span> <span class="o">*=</span> <span class="n">B_TO_ANG</span>
+                <span class="n">displacements</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">Displacement</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">amplitude</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">displacements</span>
+
+<div class="viewcode-block" id="Phonons.post_proc"><a class="viewcode-back" href="../../../phonons.html#mybigdft.workflows.phonons.Phonons.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run the post-processing of the calculations, here:</span>
+
+<span class="sd">        * compute the dynamical matrix,</span>
+<span class="sd">        * solve it to get the phonons (normal modes) and their energies.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># - Set the dynamical matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_dyn_mat</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_dyn_mat</span><span class="p">()</span>
+        <span class="c1"># - Find the energies as eigenvalues of the dynamical matrix</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energies</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_normal_modes</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_solve_dyn_mat</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_energies</span> <span class="o">*=</span> <span class="n">HA_TO_CMM1</span>  <span class="c1"># Convert from Hartree to cm^-1</span></div>
+
+    <span class="k">def</span> <span class="nf">_compute_dyn_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the dynamical matrix of the system. It is very similar</span>
+<span class="sd">        to the Hessian matrix: its elements are only corrected by a</span>
+<span class="sd">        weight :math:`w,` which is the inverse of the square-root of the</span>
+<span class="sd">        product of the atomic masses of the atoms involved in the</span>
+<span class="sd">        Hessian matrix element.</span>
+
+<span class="sd">        The masses are counted in electronic mass units (which is the</span>
+<span class="sd">        atomic unit of mass, that is different from the atomic mass</span>
+<span class="sd">        unit).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        2D square numpy array of dimension :math:`3 n_{at}`</span>
+<span class="sd">            Dynamical matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Numpy does the ratio of arrays intelligently: by making masses</span>
+        <span class="c1"># an array of the same size as the Hessian, there is nothing but</span>
+        <span class="c1"># the ratio of both arrays to perform to get the dynamical</span>
+        <span class="c1"># matrix.</span>
+        <span class="n">hessian</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_hessian</span><span class="p">()</span>
+        <span class="n">masses</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_compute_masses</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">hessian</span> <span class="o">/</span> <span class="n">masses</span>
+
+    <span class="k">def</span> <span class="nf">_compute_masses</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the masses array used to define the dynamical matrix.</span>
+<span class="sd">        The masses are counted in electronic mass units (which is the</span>
+<span class="sd">        atomic unit of mass, that is different from the atomic mass</span>
+<span class="sd">        unit).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        2D square numpy array of dimension :math:`3 n_{at}`</span>
+<span class="sd">            Masses matrix converted to electronic mass units.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">posinp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="n">to_mesh</span> <span class="o">=</span> <span class="p">[</span><span class="n">atom</span><span class="o">.</span><span class="n">mass</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="n">posinp</span> <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">3</span><span class="p">)]</span>
+        <span class="n">m_i</span><span class="p">,</span> <span class="n">m_j</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">to_mesh</span><span class="p">,</span> <span class="n">to_mesh</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">m_i</span> <span class="o">*</span> <span class="n">m_j</span><span class="p">)</span> <span class="o">*</span> <span class="n">AMU_TO_EMU</span>
+
+    <span class="k">def</span> <span class="nf">_compute_hessian</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Compute the Hessian of the system. Its dimension is</span>
+<span class="sd">        :math:`3 n_{at}`, where :math:`n_{at}` is the number of atoms of</span>
+<span class="sd">        the system.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        2D square numpy array of dimension :math:`3 n_{at}`</span>
+<span class="sd">            Hessian matrix.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">gs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">ground_state</span>
+        <span class="n">pos</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">pos</span><span class="p">)</span>
+        <span class="n">hessian</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span> <span class="o">*</span> <span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span> <span class="o">*</span> <span class="n">n_at</span><span class="p">))</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Compute the first order matrix elements</span>
+            <span class="n">gs_forces</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">job</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="c1"># Get the value of the delta of move amplitudes</span>
+                <span class="n">delta_x</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="c1"># Get the value of the delta of forces</span>
+                <span class="n">forces</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="c1"># Set a new line of the Hessian matrix</span>
+                <span class="n">hessian</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">forces</span> <span class="o">-</span> <span class="n">gs_forces</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta_x</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
+            <span class="c1"># Compute the second order matrix elements</span>
+            <span class="c1"># for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">job1</span><span class="p">,</span> <span class="n">job2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)):</span>
+                <span class="c1"># Get the value of the delta of move amplitudes</span>
+                <span class="n">amp1</span> <span class="o">=</span> <span class="n">job1</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="n">amp2</span> <span class="o">=</span> <span class="n">job2</span><span class="o">.</span><span class="n">displacement</span><span class="o">.</span><span class="n">amplitude</span>
+                <span class="k">assert</span> <span class="n">amp1</span> <span class="o">==</span> <span class="o">-</span><span class="n">amp2</span>
+                <span class="n">delta_x</span> <span class="o">=</span> <span class="n">amp1</span> <span class="o">-</span> <span class="n">amp2</span>
+                <span class="c1"># Get the value of the delta of forces</span>
+                <span class="n">forces1</span> <span class="o">=</span> <span class="n">job1</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="n">forces2</span> <span class="o">=</span> <span class="n">job2</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="o">.</span><span class="n">flatten</span><span class="p">()</span>
+                <span class="c1"># Set a new line of the Hessian matrix</span>
+                <span class="n">hessian</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">forces1</span> <span class="o">-</span> <span class="n">forces2</span><span class="p">)</span> <span class="o">/</span> <span class="n">delta_x</span>
+        <span class="c1"># Convert to atomic units if needed</span>
+        <span class="k">if</span> <span class="n">pos</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">:</span>
+            <span class="n">hessian</span> <span class="o">/=</span> <span class="n">ANG_TO_B</span>
+        <span class="c1"># Return the Hessian matrix as a symmetric numpy array</span>
+        <span class="k">return</span> <span class="o">-</span><span class="p">(</span><span class="n">hessian</span> <span class="o">+</span> <span class="n">hessian</span><span class="o">.</span><span class="n">T</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
+
+    <span class="k">def</span> <span class="nf">_solve_dyn_mat</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Solve the dynamical matrix to get the phonon energies (converted</span>
+<span class="sd">        in Hartree) and the eigenvectors.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple</span>
+<span class="sd">            Tuple made of the eigenvalues (as an array) and the</span>
+<span class="sd">            eigenvectors (as a matrix).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">eigs</span><span class="p">,</span> <span class="n">vecs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eig</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dyn_mat</span><span class="p">)</span>
+        <span class="c1"># eigs actually gives the square of the expected eigenvalues.</span>
+        <span class="c1"># Given they can be negative, enforce a positive value with</span>
+        <span class="c1"># np.where() before taking the signed square-root</span>
+        <span class="n">eigs</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sign</span><span class="p">(</span><span class="n">eigs</span><span class="p">)</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">eigs</span> <span class="o">&lt;</span> <span class="mi">0</span><span class="p">,</span> <span class="o">-</span><span class="n">eigs</span><span class="p">,</span> <span class="n">eigs</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">eigs</span><span class="p">,</span> <span class="n">vecs</span></div>
+
+
+<div class="viewcode-block" id="Displacement"><a class="viewcode-back" href="../../../phonons.html#mybigdft.workflows.phonons.Displacement">[docs]</a><span class="k">class</span> <span class="nc">Displacement</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;Displacement&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;i_coord&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">])):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class defines an atomic displacement from the coordinate index</span>
+<span class="sd">    and the amplitude of the displacement in that direction.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">()</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">vector</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            Displacement vector.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">vector</span> <span class="o">=</span> <span class="p">[</span><span class="mf">0.0</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
+        <span class="n">vector</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">i_coord</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">amplitude</span>
+        <span class="k">return</span> <span class="n">vector</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

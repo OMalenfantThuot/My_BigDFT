@@ -1,0 +1,506 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>PolTensor &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="VibPolTensor" href="vibpoltensor.html" />
+    <link rel="prev" title="Electronic and vibrational polarizability tensors" href="poltensors.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="workflows.html">Workflows</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
+<li class="toctree-l3"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">PolTensor</a></li>
+<li class="toctree-l4"><a class="reference internal" href="vibpoltensor.html">VibPolTensor</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
+<li class="toctree-l3"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="workflows.html">Workflows</a> &raquo;</li>
+        
+          <li><a href="poltensors.html">Electronic and vibrational polarizability tensors</a> &raquo;</li>
+        
+      <li>PolTensor</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/elecpoltensor.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.workflows.poltensor">
+<span id="poltensor"></span><h1>PolTensor<a class="headerlink" href="#module-mybigdft.workflows.poltensor" title="Permalink to this headline">¶</a></h1>
+<p>This module defines the <a class="reference internal" href="#mybigdft.workflows.poltensor.PolTensor" title="mybigdft.workflows.poltensor.PolTensor"><code class="xref py py-class docutils literal notranslate"><span class="pre">PolTensor</span></code></a> workflow.</p>
+<dl class="class">
+<dt id="mybigdft.workflows.poltensor.PolTensor">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.poltensor.</code><code class="sig-name descname">PolTensor</code><span class="sig-paren">(</span><em class="sig-param">ground_state</em>, <em class="sig-param">ef_amplitudes=None</em>, <em class="sig-param">order=1</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/poltensor.html#PolTensor"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="workflow.html#mybigdft.workflows.workflow.AbstractWorkflow" title="mybigdft.workflows.workflow.AbstractWorkflow"><code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.workflows.workflow.AbstractWorkflow</span></code></a></p>
+<p>This workflow allows to compute the (electronic) polarizability
+tensor of a given system.</p>
+<p>The polarizability tensor represents the response of the charges of
+a system (its dipole) to the application of an external electric
+field.</p>
+<p>To compute this polarizability tensor, some BigDFT calculations are
+performed, where the system is subject to an external electric
+field along each direction of space (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span> and
+<span class="math notranslate nohighlight">\(z\)</span>). The elements of the polarizability tensor are then
+defined by the ratio of the delta of the dipole in one direction and
+the delta of the electric field amplitudes:</p>
+<div class="math notranslate nohighlight">
+\[\alpha_{ij} = \frac{\Delta D_i}{\Delta E_j}\]</div>
+<p>where <span class="math notranslate nohighlight">\(i, j \in \{x, y, z\}\)</span>, <span class="math notranslate nohighlight">\(\Delta D_i\)</span> is the
+variation of the dipole along the <span class="math notranslate nohighlight">\(i\)</span> direction and
+<span class="math notranslate nohighlight">\(\Delta E_j\)</span> is the variation of the electric field amplitude
+along the <span class="math notranslate nohighlight">\(j\)</span> direction.</p>
+<p>A PolTensor workflow is initialized by the job of the ground-
+state of the system and three electric field amplitudes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>ground_state</strong> (<a class="reference internal" href="job.html#mybigdft.job.Job" title="mybigdft.job.Job"><em>Job</em></a>) – Job used to compute the ground state of the system under
+consideration.</p></li>
+<li><p><strong>ef_amplitudes</strong> (<em>list</em><em> or </em><em>numpy array of length 3</em>) – Amplitude of the electric field to be applied in the three
+directions of space (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(z\)</span>).</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of the numerical differentiation used to compute the
+polarizability tensor. If second order (resp. first), then
+six (resp. three) calculations per atom are to be performed.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.ground_state">
+<em class="property">property </em><code class="sig-name descname">ground_state</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.ground_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Job of the ground state of the system under consideration.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="job.html#mybigdft.job.Job" title="mybigdft.job.Job">Job</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.ef_amplitudes">
+<em class="property">property </em><code class="sig-name descname">ef_amplitudes</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.ef_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Amplitude of the electric field to be applied in the three
+directions of space (<span class="math notranslate nohighlight">\(x\)</span>, <span class="math notranslate nohighlight">\(y\)</span>, <span class="math notranslate nohighlight">\(z\)</span>).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list or numpy array of length 3</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.order">
+<em class="property">property </em><code class="sig-name descname">order</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.order" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>order</strong> – Order of the numerical differentiation used to compute the
+polarizability tensor. If second order (resp. first), then
+six (resp. three) calculations per atom are to be performed.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.pol_tensor">
+<em class="property">property </em><code class="sig-name descname">pol_tensor</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.pol_tensor" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Polarizability tensor of the system (units: atomic).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.mean_polarizability">
+<em class="property">property </em><code class="sig-name descname">mean_polarizability</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.mean_polarizability" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Mean (electronic) polarizability of the system (units:
+atomic).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>float</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.efields">
+<em class="property">property </em><code class="sig-name descname">efields</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.efields" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Electric fields the system must undergo before computing the
+polarizability tensor as post-processing. There are three or
+six of them (one or two per space coordinate, depending on
+the order of the numerical derivative procedure) if the
+forward or central difference scheme is used, respectively.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>OrderedDict of length 3 or 6</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.post_proc">
+<code class="sig-name descname">post_proc</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/workflows/poltensor.html#PolTensor.post_proc"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.post_proc" title="Permalink to this definition">¶</a></dt>
+<dd><p>Compute the polarisability tensor and set its value (you can
+access its value via the attribute <a class="reference internal" href="#mybigdft.workflows.poltensor.PolTensor.pol_tensor" title="mybigdft.workflows.poltensor.PolTensor.pol_tensor"><code class="xref py py-attr docutils literal notranslate"><span class="pre">pol_tensor</span></code></a>).</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.is_completed">
+<em class="property">property </em><code class="sig-name descname">is_completed</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.is_completed" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><cite>True</cite> if all the post-processing attributes are no longer
+set to their default value.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.logfiles">
+<em class="property">property </em><code class="sig-name descname">logfiles</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.logfiles" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A dictionary of all the logfiles of the workflow, with the
+name of the associated job as key.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>dict</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.queue">
+<em class="property">property </em><code class="sig-name descname">queue</code><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.queue" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>All the jobs of the workflow.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.PolTensor.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">nmpi=1</em>, <em class="sig-param">nomp=1</em>, <em class="sig-param">force_run=False</em>, <em class="sig-param">dry_run=False</em>, <em class="sig-param">restart_if_incomplete=False</em>, <em class="sig-param">timeout=None</em><span class="sig-paren">)</span><a class="headerlink" href="#mybigdft.workflows.poltensor.PolTensor.run" title="Permalink to this definition">¶</a></dt>
+<dd><p>Run all the calculations if the post-processing was not already
+performed.</p>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>If <cite>force_run</cite> or <cite>dry_run</cite> is set to <cite>True</cite>, then any
+previous value of the post-processing attributes is deleted
+and set back to their default value, so that the
+post-processing is not considered as being performed.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>nmpi</strong> (<em>int</em>) – Number of MPI tasks.</p></li>
+<li><p><strong>nomp</strong> (<em>int</em>) – Number of OpenMP tasks.</p></li>
+<li><p><strong>force_run</strong> (<em>bool</em>) – If <cite>True</cite>, the calculations are run even though a logfile
+already exists.</p></li>
+<li><p><strong>dry_run</strong> (<em>bool</em>) – If <cite>True</cite>, the input files are written on disk, but the
+bigdft-tool command is run instead of the bigdft one.</p></li>
+<li><p><strong>restart_if_incomplete</strong> (<em>bool</em>) – If <cite>True</cite>, the job is restarted if the existing logfile is
+incomplete.</p></li>
+<li><p><strong>timeout</strong> (<em>float</em><em> or </em><em>int</em><em> or </em><em>None</em>) – Number of minutes after which each job must be stopped.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Warns</dt>
+<dd class="field-even"><p><strong>UserWarning</strong> – If the post-processing was already completed.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mybigdft.workflows.poltensor.ElectricField">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.workflows.poltensor.</code><code class="sig-name descname">ElectricField</code><a class="reference internal" href="_modules/mybigdft/workflows/poltensor.html#ElectricField"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <a class="reference internal" href="#mybigdft.workflows.poltensor.ElectricField" title="mybigdft.workflows.poltensor.ElectricField"><code class="xref py py-class docutils literal notranslate"><span class="pre">mybigdft.workflows.poltensor.ElectricField</span></code></a></p>
+<p>This class defines an electric field from the coordinate index and
+the amplitude of the electric field in that direction.</p>
+<p>Create new instance of ElectricField(i_coord, amplitude)</p>
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.ElectricField.vector">
+<em class="property">property </em><code class="sig-name descname">vector</code><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField.vector" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>ElectricField vector.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.ElectricField.amplitude">
+<em class="property">property </em><code class="sig-name descname">amplitude</code><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField.amplitude" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 1</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.ElectricField.count">
+<code class="sig-name descname">count</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField.count" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return number of occurrences of value.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.ElectricField.i_coord">
+<em class="property">property </em><code class="sig-name descname">i_coord</code><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField.i_coord" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias for field number 0</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.workflows.poltensor.ElectricField.index">
+<code class="sig-name descname">index</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#mybigdft.workflows.poltensor.ElectricField.index" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return first index of value.</p>
+<p>Raises ValueError if the value is not present.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="vibpoltensor.html" class="btn btn-neutral float-right" title="VibPolTensor" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="poltensors.html" class="btn btn-neutral float-left" title="Electronic and vibrational polarizability tensors" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,429 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.workflows.workflow &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.workflows.workflow</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.workflows.workflow</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The workflows of the MyBigDFT package are meant to ease the calculation</span>
+<span class="sd">of some interesting quantities requiring to launch multiple BigDFT</span>
+<span class="sd">calculations by providing an API that focuses on the main parameters of</span>
+<span class="sd">such nested calculations.</span>
+
+<span class="sd">Here are defined an :class:`AbstractWorkflow` class (meant to be the</span>
+<span class="sd">base class of all the other workflow classes implemented in the</span>
+<span class="sd">workflows module) and a :class:`Workflow` class, which represents the</span>
+<span class="sd">simplest way of implementing such a child class (intended to be used</span>
+<span class="sd">when one wants to create a toy implementation of a new workflow).</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">unicode_literals</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">import</span> <span class="nn">abc</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ABC</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABC</span>
+<span class="k">else</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="n">ABC</span> <span class="o">=</span> <span class="n">abc</span><span class="o">.</span><span class="n">ABCMeta</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="s1">&#39;ABC&#39;</span><span class="p">),</span> <span class="p">(),</span> <span class="p">{})</span>
+
+
+<div class="viewcode-block" id="AbstractWorkflow"><a class="viewcode-back" href="../../../workflow.html#mybigdft.workflows.dissociation.AbstractWorkflow">[docs]</a><span class="k">class</span> <span class="nc">AbstractWorkflow</span><span class="p">(</span><span class="n">ABC</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This abstract class is the base class of all the workflows of this</span>
+<span class="sd">    module. It defines the queue of jobs as a list of</span>
+<span class="sd">    :class:`~mybigdft.job.Job` instances, that are run sequentially when</span>
+<span class="sd">    the :meth:`run` method is used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        queue : list</span>
+<span class="sd">            List of all the jobs to run.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_post_processing_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span> <span class="o">=</span> <span class="n">queue</span>
+
+    <span class="k">def</span> <span class="nf">_initialize_post_processing_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set all the completion attributes to their default value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">POST_PROCESSING_ATTRIBUTES</span><span class="p">:</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">attr</span><span class="p">,</span> <span class="kc">None</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">queue</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            All the jobs of the workflow.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_queue</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logfiles</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            A dictionary of all the logfiles of the workflow, with the</span>
+<span class="sd">            name of the associated job as key.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span><span class="n">job</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">job</span><span class="o">.</span><span class="n">logfile</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">}</span>
+
+<div class="viewcode-block" id="AbstractWorkflow.run"><a class="viewcode-back" href="../../../workflow.html#mybigdft.workflows.dissociation.AbstractWorkflow.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run all the calculations if the post-processing was not already</span>
+<span class="sd">        performed.</span>
+
+<span class="sd">        .. Warning::</span>
+
+<span class="sd">            If `force_run` or `dry_run` is set to `True`, then any</span>
+<span class="sd">            previous value of the post-processing attributes is deleted</span>
+<span class="sd">            and set back to their default value, so that the</span>
+<span class="sd">            post-processing is not considered as being performed.</span>
+
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculations are run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which each job must be stopped.</span>
+
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the post-processing was already completed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">force_run</span> <span class="ow">or</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_post_processing_attributes</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_completed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
+                      <span class="n">timeout</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">warning_msg</span> <span class="o">=</span> <span class="s2">&quot;Calculations already performed; set the argument &quot;</span>\
+                          <span class="s2">&quot;&#39;force_run&#39; to True to re-run them.&quot;</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">warning_msg</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">([</span><span class="ow">not</span> <span class="n">job</span><span class="o">.</span><span class="n">is_completed</span> <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">]):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Some jobs of the workflow were not run.&quot;</span><span class="p">,</span>
+                          <span class="ne">UserWarning</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">is_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            `True` if all the post-processing attributes are no longer</span>
+<span class="sd">            set to their default value.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">all</span><span class="p">([</span><span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">attr</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                    <span class="k">for</span> <span class="n">attr</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">POST_PROCESSING_ATTRIBUTES</span><span class="p">])</span>
+
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
+             <span class="n">timeout</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This method runs all the jobs in the queue sequentially before</span>
+<span class="sd">        running the post_proc method if not in `dry_run` mode.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        nmpi : int</span>
+<span class="sd">            Number of MPI tasks.</span>
+<span class="sd">        nomp : int</span>
+<span class="sd">            Number of OpenMP tasks.</span>
+<span class="sd">        force_run : bool</span>
+<span class="sd">            If `True`, the calculations are run even though a logfile</span>
+<span class="sd">            already exists.</span>
+<span class="sd">        dry_run : bool</span>
+<span class="sd">            If `True`, the input files are written on disk, but the</span>
+<span class="sd">            bigdft-tool command is run instead of the bigdft one.</span>
+<span class="sd">        restart_if_incomplete : bool</span>
+<span class="sd">            If `True`, the job is restarted if the existing logfile is</span>
+<span class="sd">            incomplete.</span>
+<span class="sd">        timeout : float or int or None</span>
+<span class="sd">            Number of minutes after which each job must be stopped.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">job</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">job</span> <span class="k">as</span> <span class="n">j</span><span class="p">:</span>
+                <span class="n">j</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+                      <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                      <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">dry_run</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">post_proc</span><span class="p">()</span>
+            <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_completed</span><span class="p">,</span> <span class="p">(</span><span class="s2">&quot;You must define all post-processing &quot;</span>
+                                       <span class="s2">&quot;attributes in post_proc.&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="AbstractWorkflow.post_proc"><a class="viewcode-back" href="../../../workflow.html#mybigdft.workflows.dissociation.AbstractWorkflow.post_proc">[docs]</a>    <span class="nd">@abc</span><span class="o">.</span><span class="n">abstractmethod</span>
+    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        This should be an abstract method used to post-process the</span>
+<span class="sd">        output of the calculations and get some meaningful results out of</span>
+<span class="sd">        them.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
+
+
+<div class="viewcode-block" id="Workflow"><a class="viewcode-back" href="../../../workflow.html#mybigdft.workflows.dissociation.Workflow">[docs]</a><span class="k">class</span> <span class="nc">Workflow</span><span class="p">(</span><span class="n">AbstractWorkflow</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This is a usable workflow that one can play with, but without</span>
+<span class="sd">    post-processing. This means you can add jobs to the queue and run</span>
+<span class="sd">    them as usual, but you must then code the post-processing yourself,</span>
+<span class="sd">    in a separate function taking the workflow as parameter.</span>
+
+<span class="sd">    This latter scheme can even be part of the development cycle of a</span>
+<span class="sd">    new workflow that could be later added to the MyBigDFT project: you</span>
+<span class="sd">    first define roughly the jobs to be added to the queue for your</span>
+<span class="sd">    workflow, and then develop a post-processing function taking your</span>
+<span class="sd">    workflow as argument. When you are happy with the result, it is</span>
+<span class="sd">    then easy to re-use most of the code to create a workflow class</span>
+<span class="sd">    deriving from the :class:`AbstractWorkflow` class.</span>
+
+<span class="sd">    To do that, you only have to make sure that you override the</span>
+<span class="sd">    `__init__` method to create the queue of jobs, then define which are</span>
+<span class="sd">    the post-processing arguments and create properties to access them,</span>
+<span class="sd">    and finally override the `post_proc` method to make sure these</span>
+<span class="sd">    attributes are properly initialized.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;completed&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">queue</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        queue : list</span>
+<span class="sd">            List of all the jobs to run.</span>
+
+
+<span class="sd">        The queue can be empty:</span>
+
+<span class="sd">        &gt;&gt;&gt; wf = Workflow()</span>
+<span class="sd">        &gt;&gt;&gt; wf.queue</span>
+<span class="sd">        []</span>
+<span class="sd">        &gt;&gt;&gt; wf.logfiles</span>
+<span class="sd">        {}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">queue</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">queue</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">Workflow</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">queue</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            `True` if the post_proc method was run successfully.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_completed</span>
+
+<div class="viewcode-block" id="Workflow.post_proc"><a class="viewcode-back" href="../../../workflow.html#mybigdft.workflows.dissociation.Workflow.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the post-processing attribute ``completed`` to `True`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_completed</span> <span class="o">=</span> <span class="kc">True</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

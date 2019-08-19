@@ -1,0 +1,735 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.iofiles.logfiles &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.iofiles.logfiles</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.iofiles.logfiles</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`Logfile` class is the base class you want to be</span>
+<span class="sd">using all the time. It is mainly meant to manipulate the output of a BigDFT</span>
+<span class="sd">calculation (written using the YAML format).</span>
+
+<span class="sd">However, it might happen that the output actually contains many documents (for</span>
+<span class="sd">instance, one document per geometry optimization procedure). In such cases,</span>
+<span class="sd">the initialization of a ``Logfile`` actually gives another type of object,</span>
+<span class="sd">deriving from the :class:`MultipleLogfile` class. Be careful:</span>
+<span class="sd">these objects behave as a list of ``Logfile`` instances, not as a ``Logfile``</span>
+<span class="sd">instance (even though they are initialized *via* the ``Logfile`` class).</span>
+<span class="sd">To keep the same example as above, the output file of a geometry optimization</span>
+<span class="sd">calculation can be read via the :meth:`Logfile.from_file`</span>
+<span class="sd">method of the ``Logfile`` class, returning a</span>
+<span class="sd">:class:`GeoptLogfile` instance.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Mapping</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">CLoader</span> <span class="k">as</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">CDumper</span> <span class="k">as</span> <span class="n">Dumper</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">Dumper</span>
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">INPUT_PARAMETERS_DEFINITIONS</span>
+<span class="kn">from</span> <span class="nn">.inputparams</span> <span class="k">import</span> <span class="n">InputParams</span><span class="p">,</span> <span class="n">clean</span>
+<span class="kn">from</span> <span class="nn">.posinp</span> <span class="k">import</span> <span class="n">Posinp</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Logfile&quot;</span><span class="p">,</span> <span class="s2">&quot;MultipleLogfile&quot;</span><span class="p">,</span> <span class="s2">&quot;GeoptLogfile&quot;</span><span class="p">]</span>
+
+
+<span class="n">PATHS</span> <span class="o">=</span> <span class="s2">&quot;paths&quot;</span>
+<span class="n">DOC</span> <span class="o">=</span> <span class="s2">&quot;doc&quot;</span>
+<span class="n">LAST_GROUND_STATE_OPTIMIZATION</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ground State Optimization&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+<span class="n">LAST_SUBSPACE_OPTIMIZATION</span> <span class="o">=</span> <span class="n">LAST_GROUND_STATE_OPTIMIZATION</span> <span class="o">+</span> <span class="p">[</span>
+    <span class="s2">&quot;Hamiltonian Optimization&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Subspace Optimization&quot;</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_get_value_from_last_optimization</span><span class="p">(</span><span class="n">key</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">l_1</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">LAST_GROUND_STATE_OPTIMIZATION</span><span class="p">)</span>
+    <span class="n">l_1</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="n">l_2</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">LAST_SUBSPACE_OPTIMIZATION</span><span class="p">)</span>
+    <span class="n">l_2</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+    <span class="k">return</span> <span class="p">[</span><span class="n">l_1</span><span class="p">,</span> <span class="n">l_2</span><span class="p">]</span>
+
+
+<span class="n">ATTRIBUTES</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;n_at&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Number of atoms&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Number of Atoms&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;boundary_conditions&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Boundary Conditions&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Boundary Conditions&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;cell&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Box Sizes (AU)&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Cell size&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;symmetry&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Space group&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Symmetry group&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;atom_types&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Types of atoms&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;List of the atomic types present in the posinp&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;FKS&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;EKS&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;Energy (Hartree)&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Energy (Hartree)&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;astruct&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic structure&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic structure&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;evals&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Complete list of energy eigenvalues&quot;</span><span class="p">]]</span> <span class="o">+</span>
+        <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Orbitals&quot;</span><span class="p">),</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Orbital energies and occupations&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;fermi_level&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Fermi Energy&quot;</span><span class="p">),</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Fermi level&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;magnetization&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Total magnetization&quot;</span><span class="p">),</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Total magnetization of the system&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;kpt_mesh&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;kpt&quot;</span><span class="p">,</span> <span class="s2">&quot;ngkpt&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;No. of Monkhorst-Pack grid points&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;kpts&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;K points&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Grid of k-points&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;gnrm_cv&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;dft&quot;</span><span class="p">,</span> <span class="s2">&quot;gnrm_cv&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Convergence criterion on wavefunction residue&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;forcemax_cv&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;geopt&quot;</span><span class="p">,</span> <span class="s2">&quot;forcemax&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Convergence criterion on forces&quot;</span><span class="p">,</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;forcemax&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;FORCES norm(Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">],</span>
+                <span class="p">[</span><span class="s2">&quot;Clean forces norm (Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Maximum value of forces&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;GPa&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Pressure (GPa)&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Electric Dipole Moment (AU)&quot;</span><span class="p">,</span> <span class="s2">&quot;P vector&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electric Dipole Moment (AU)&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;forces&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;force_fluct&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;FORCES norm(Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;fluct&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Threshold fluctuation of Forces&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;support_functions&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Gross support functions moments&quot;</span><span class="p">,</span> <span class="s2">&quot;Multipole coefficients&quot;</span><span class="p">,</span>
+                 <span class="s2">&quot;values&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Support functions&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;electrostatic_multipoles&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Multipole coefficients&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electrostatic multipoles&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;sdos&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;SDos files&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;SDos files&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;walltime&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Walltime since initialization&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Walltime since initialization&quot;</span>
+    <span class="p">},</span>
+    <span class="s2">&quot;WARNINGS&quot;</span><span class="p">:</span> <span class="p">{</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;WARNINGS&quot;</span><span class="p">]],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Warnings raised during the BigDFT run&quot;</span>
+    <span class="p">},</span>
+<span class="p">}</span>
+
+
+<div class="viewcode-block" id="Logfile"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile">[docs]</a><span class="k">class</span> <span class="nc">Logfile</span><span class="p">(</span><span class="n">Mapping</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class allowing to initialize, read, write and interact with an</span>
+<span class="sd">    output file of a BigDFT calculation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">log</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        log : dict</span>
+<span class="sd">            Output of the BigDFT code as a yaml dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">log</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">log</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_log</span> <span class="o">=</span> <span class="n">log</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_set_builtin_attributes</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_clean_attributes</span><span class="p">()</span>
+        <span class="c1"># It might happen that a geopt calculation has a step whose log</span>
+        <span class="c1"># looks like it is incomplete, but they are actually acceptable.</span>
+        <span class="c1"># To that end, we look for a specific warning message in one of</span>
+        <span class="c1"># the logs (except the initial one). To make sure the current</span>
+        <span class="c1"># log is not the initial one, we look for the &quot;geopt&quot; key, which</span>
+        <span class="c1"># is not repreated in the subsequent logs. It&#39;s a workaround</span>
+        <span class="c1"># which might prove edgy in the future.</span>
+        <span class="k">if</span> <span class="s2">&quot;geopt&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
+            <span class="n">avoidable_warning</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The norm of the residue is too large, need &quot;</span>
+                                 <span class="s2">&quot;to recalculate input wavefunctions&quot;</span><span class="p">)</span>
+            <span class="n">warnings</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;WARNINGS&quot;</span><span class="p">)</span>
+            <span class="n">acceptable_though_incomplete</span> <span class="o">=</span> <span class="p">(</span><span class="n">warnings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
+                                            <span class="n">avoidable_warning</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">acceptable_though_incomplete</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="c1"># Check if the logfile is incomplete</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">!=</span> <span class="p">{}</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">acceptable_though_incomplete</span> <span class="ow">and</span> <span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">walltime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The logfile is incomplete!&quot;</span><span class="p">)</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">INPUT_PARAMETERS_DEFINITIONS</span><span class="p">}</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="n">InputParams</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="o">.</span><span class="n">posinp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_warnings</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_set_builtin_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set all the base attributes of a BigDFT Logfile.</span>
+
+<span class="sd">        They are defined by the ATTRIBUTES dictionary, whose keys are</span>
+<span class="sd">        the base name of each attribute, the values being the</span>
+<span class="sd">        description of the attribute as another dictionary.</span>
+
+<span class="sd">        Once retrieved from the logfile, the attributes are set under</span>
+<span class="sd">        their base name preceded by an underscore (e.g., the number of</span>
+<span class="sd">        atoms read thanks to the `n_at` key of ATTRIBUTES is finally</span>
+<span class="sd">        stored as the attribute `_n_at` of the Logfile instance).</span>
+<span class="sd">        This extra underscore is meant to prevent the user from updating</span>
+<span class="sd">        the value of the attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">description</span> <span class="ow">in</span> <span class="n">ATTRIBUTES</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="c1"># Loop over the various paths (or logfile levels) where the</span>
+            <span class="c1"># value might be stored.</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">description</span><span class="p">[</span><span class="n">PATHS</span><span class="p">]:</span>
+                <span class="c1"># Loop over the different levels of the logfile to</span>
+                <span class="c1"># retrieve the value</span>
+                <span class="n">value</span> <span class="o">=</span> <span class="bp">self</span>  <span class="c1"># Always start from the bare logfile</span>
+                <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">path</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>  <span class="c1"># value can be a dict</span>
+                    <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="n">value</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>  <span class="c1"># value can be a list</span>
+                        <span class="k">except</span> <span class="ne">TypeError</span><span class="p">:</span>
+                            <span class="c1"># This path leads to a dead-end: set a</span>
+                            <span class="c1"># default value before moving to the next</span>
+                            <span class="c1"># possible path.</span>
+                            <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span>
+                            <span class="k">continue</span>
+                <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                    <span class="c1"># A value was found: no need to look for other paths</span>
+                    <span class="k">break</span>
+            <span class="c1"># Set the value to the underscored attribute</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="c1"># Set the attribute as a property</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
+                    <span class="nb">property</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_getter</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
+                             <span class="n">doc</span><span class="o">=</span><span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOC</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)))</span>
+
+    <span class="k">def</span> <span class="nf">_init_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="k">def</span> <span class="nf">getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">getter</span>
+
+    <span class="k">def</span> <span class="nf">_clean_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Clean the value of the built-in attributes.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">boundary_conditions</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_conditions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_boundary_conditions</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+        <span class="c1"># Make the forces as a numpy array of shape (n_at, 3)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">new_forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([])</span>
+            <span class="k">for</span> <span class="n">force</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">forces</span><span class="p">:</span>
+                <span class="n">new_forces</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_forces</span><span class="p">,</span> <span class="nb">list</span><span class="p">(</span><span class="n">force</span><span class="o">.</span><span class="n">values</span><span class="p">())[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">forces</span><span class="p">)</span>
+            <span class="n">new_forces</span> <span class="o">=</span> <span class="n">new_forces</span><span class="o">.</span><span class="n">reshape</span><span class="p">((</span><span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_forces</span> <span class="o">=</span> <span class="n">new_forces</span>
+
+    <span class="k">def</span> <span class="nf">_check_warnings</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If there are some warnings in the Logfile or if the XC of</span>
+<span class="sd">            the pseudo-potentials do not match those of the input</span>
+<span class="sd">            parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">WARNINGS</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">message</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">WARNINGS</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">dict</span><span class="p">):</span>
+                    <span class="c1"># It might happen that a &quot;:&quot; symbol is in the</span>
+                    <span class="c1"># description of a warning, hence it is decoded as a</span>
+                    <span class="c1"># dictionary; make sure to treat it as a string</span>
+                    <span class="c1"># instead</span>
+                    <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">message</span><span class="o">.</span><span class="n">items</span><span class="p">())[</span><span class="mi">0</span><span class="p">]</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="si">{}</span><span class="s2">: </span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+                <span class="k">elif</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;MyBigDFT: weird error message found&quot;</span><span class="p">)</span>
+                    <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">message</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_check_psppar</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_check_psppar</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the XC of the potential is different from the XC of the</span>
+<span class="sd">            input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">atom_type</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">atom_types</span><span class="p">:</span>
+                <span class="n">psp</span> <span class="o">=</span> <span class="s2">&quot;psppar.</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">atom_type</span><span class="p">)</span>
+                <span class="n">psp_ixc</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="n">psp</span><span class="p">][</span><span class="s2">&quot;Pseudopotential XC&quot;</span><span class="p">]</span>
+                <span class="n">inp_ixc</span> <span class="o">=</span> <span class="bp">self</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;ixc&quot;</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">psp_ixc</span> <span class="o">!=</span> <span class="n">inp_ixc</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                        <span class="s2">&quot;The XC of pseudo potentials (</span><span class="si">{}</span><span class="s2">) is different from &quot;</span>
+                        <span class="s2">&quot;the input XC (</span><span class="si">{}</span><span class="s2">) for the &#39;</span><span class="si">{}</span><span class="s2">&#39; atoms&quot;</span>
+                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psp_ixc</span><span class="p">,</span> <span class="n">inp_ixc</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Logfile.from_file"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Logfile from a file on disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the logfile.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Logfile or GeoptLogfile or MultipleLogfile</span>
+<span class="sd">            Logfile initialized from a file on disk.</span>
+
+
+<span class="sd">        &gt;&gt;&gt; log = Logfile.from_file(&quot;tests/log.yaml&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; print(log.posinp)</span>
+<span class="sd">        2   angstroem</span>
+<span class="sd">        free</span>
+<span class="sd">        N   2.97630782434901e-23   6.87220595204354e-23   0.0107161998748779</span>
+<span class="sd">        N  -1.10434491945017e-23  -4.87342174483075e-23   1.10427379608154</span>
+<span class="sd">        &lt;BLANKLINE&gt;</span>
+<span class="sd">        &gt;&gt;&gt; log.energy</span>
+<span class="sd">        -19.884659235401838</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_stream</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Logfile.from_stream"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile.from_stream">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_stream</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">stream</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize the Logfile from a stream.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        stream</span>
+<span class="sd">            Logfile as a stream.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Logfile or GeoptLogfile or MultipleLogfile</span>
+<span class="sd">            Logfile initialized from a stream.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># The logfile might contain multiple documents</span>
+        <span class="n">docs</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load_all</span><span class="p">(</span><span class="n">stream</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">Loader</span><span class="p">)</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="p">[</span><span class="bp">cls</span><span class="p">(</span><span class="n">doc</span><span class="p">)</span> <span class="k">for</span> <span class="n">doc</span> <span class="ow">in</span> <span class="n">docs</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># If only one document, return a Logfile instance</span>
+            <span class="k">return</span> <span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="c1"># If the logfile corresponds to a geopt calculation,</span>
+                <span class="c1"># return a GeoptLogfile instance</span>
+                <span class="k">return</span> <span class="n">GeoptLogfile</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;More than one document found in the logfile!&quot;</span><span class="p">,</span>
+                              <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="c1"># In other cases, just return a MultipleLogfile instance</span>
+                <span class="k">return</span> <span class="n">MultipleLogfile</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">log</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Logfile</span>
+<span class="sd">            Yaml dictionary of the output of the BigDFT code.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_log</span>
+
+<div class="viewcode-block" id="Logfile.__dir__"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile.__dir__">[docs]</a>    <span class="k">def</span> <span class="nf">__dir__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        The base attributes are not found when doing `dir()` on a</span>
+<span class="sd">        `Logfile` instance, but their counterpart with a preceding</span>
+<span class="sd">        underscore is. What is done here is a removal of the underscored</span>
+<span class="sd">        names, replaced by the bare names (in order to avoid name</span>
+<span class="sd">        repetition).</span>
+
+<span class="sd">        The bare attributes still behave as properties, while their</span>
+<span class="sd">        value might be updated via the underscored attribute.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">hidden_attributes</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">ATTRIBUTES</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
+        <span class="k">try</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="nb">super</span><span class="p">(</span><span class="n">Logfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__dir__</span><span class="p">()</span>  <span class="c1"># Python3</span>
+        <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+            <span class="n">base_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">Logfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>  <span class="c1"># Python2</span>
+            <span class="c1"># Add the missing stuff</span>
+            <span class="n">base_dir</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;from_file&quot;</span><span class="p">,</span> <span class="s2">&quot;from_stream&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;posinp&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;inputparams&quot;</span><span class="p">,</span> <span class="s2">&quot;_check_psppar&quot;</span><span class="p">,</span> <span class="s2">&quot;_check_warnings&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;_clean_attributes&quot;</span><span class="p">,</span> <span class="s2">&quot;_set_builtin_attributes&quot;</span><span class="p">,</span>
+                         <span class="s2">&quot;_init_getter&quot;</span><span class="p">]</span>
+            <span class="n">base_dir</span> <span class="o">+=</span> <span class="n">hidden_attributes</span>
+        <span class="c1"># Always remove the underscored attributes (so that there are less</span>
+        <span class="c1"># elements in the returned list)</span>
+        <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">hidden_attributes</span><span class="p">:</span>
+            <span class="n">base_dir</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">base_dir</span></div>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Logfile.write"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the logfile on disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the logfile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Posinp</span>
+<span class="sd">            Posinp used during the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Input parameters used during the calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span></div>
+
+
+<div class="viewcode-block" id="MultipleLogfile"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.MultipleLogfile">[docs]</a><span class="k">class</span> <span class="nc">MultipleLogfile</span><span class="p">(</span><span class="n">Sequence</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class allowing to initialize, read, write and interact with an</span>
+<span class="sd">    output file of a BigDFT calculation containing multiple documents.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        logs : list</span>
+<span class="sd">            List of the various documents contained in the logfile of a</span>
+<span class="sd">            BigDFT calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span> <span class="o">=</span> <span class="n">logs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logs</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of the documents read from a single output of a BigDFT</span>
+<span class="sd">            calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logs</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">)</span>
+
+<div class="viewcode-block" id="MultipleLogfile.write"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.MultipleLogfile.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the logfile on disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the logfile.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="o">.</span><span class="n">log</span> <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">]</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump_all</span><span class="p">(</span>
+                <span class="n">logs</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">,</span> <span class="n">explicit_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="GeoptLogfile"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.GeoptLogfile">[docs]</a><span class="k">class</span> <span class="nc">GeoptLogfile</span><span class="p">(</span><span class="n">MultipleLogfile</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class allowing to initialize, read, write and interact with an</span>
+<span class="sd">    output file of a geometry optimization calculation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logs</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        logs : list</span>
+<span class="sd">            List of the various documents contained in the logfile of a</span>
+<span class="sd">            geometry optimization calculation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">(</span><span class="n">GeoptLogfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
+        <span class="c1"># Update the input parameters and positions of the documents</span>
+        <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;Atomic structure&#39;</span><span class="p">])</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinps</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="o">.</span><span class="n">posinp</span> <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            Input parameters used for each step of the geometry</span>
+<span class="sd">            optimization procedure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">inputparams</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinps</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list</span>
+<span class="sd">            List of the input positions for each step of the geometry</span>
+<span class="sd">            optimization procedure.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinps</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

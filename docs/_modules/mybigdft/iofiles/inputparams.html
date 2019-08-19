@@ -1,0 +1,571 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.iofiles.inputparams &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.iofiles.inputparams</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.iofiles.inputparams</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`InputParams` class is meant to represent the input</span>
+<span class="sd">parameters of a BigDFT calculation in a yaml format.</span>
+
+<span class="sd">It also comes with two functions:</span>
+
+<span class="sd">* :func:`check` to check that a dictionary is only made of valid BigDFT</span>
+<span class="sd">  input parameters.</span>
+<span class="sd">* :func:`clean` to clean a dictionary of input parameters so that only</span>
+<span class="sd">  non-default values are kept in memory.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">MutableMapping</span>
+<span class="kn">import</span> <span class="nn">yaml</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">CLoader</span> <span class="k">as</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">CDumper</span> <span class="k">as</span> <span class="n">Dumper</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
+    <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">Dumper</span>
+<span class="kn">from</span> <span class="nn">mybigdft.globals</span> <span class="k">import</span> <span class="n">DEFAULT_PARAMETERS</span><span class="p">,</span> <span class="n">INPUT_PARAMETERS_DEFINITIONS</span>
+<span class="kn">from</span> <span class="nn">.posinp</span> <span class="k">import</span> <span class="n">Posinp</span>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;check&quot;</span><span class="p">,</span> <span class="s2">&quot;clean&quot;</span><span class="p">,</span> <span class="s2">&quot;InputParams&quot;</span><span class="p">]</span>
+
+
+<div class="viewcode-block" id="InputParams"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams">[docs]</a><span class="k">class</span> <span class="nc">InputParams</span><span class="p">(</span><span class="n">MutableMapping</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Class allowing to initialize, read, write and interact with the</span>
+<span class="sd">    input parameters of a BigDFT calculation.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Input parameters are initialized from a yaml dictionary.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        data : dict</span>
+<span class="sd">            yaml dictionary of the input parameters.</span>
+
+
+<span class="sd">        &gt;&gt;&gt; InputParams({&#39;dft&#39;: {&#39;hgrids&#39;: [0.35]*3}})</span>
+<span class="sd">        {&#39;dft&#39;: {&#39;hgrids&#39;: [0.35, 0.35, 0.35]}}</span>
+
+<span class="sd">        Default values are cleaned from the input parameters:</span>
+
+<span class="sd">        &gt;&gt;&gt; InputParams({&#39;dft&#39;: {&#39;hgrids&#39;: [0.45]*3}})</span>
+<span class="sd">        {}</span>
+
+<span class="sd">        The input parameters can be empty:</span>
+
+<span class="sd">        &gt;&gt;&gt; InputParams()</span>
+<span class="sd">        {}</span>
+
+<span class="sd">        Initializing with unknown parameters raises a ``KeyError``:</span>
+
+<span class="sd">        &gt;&gt;&gt; InputParams({&#39;dfpt&#39;: {&#39;hgrids&#39;: [0.35]*3}})</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        KeyError: &quot;Unknown key &#39;dfpt&#39;&quot;</span>
+<span class="sd">        &gt;&gt;&gt; InputParams({&#39;dft&#39;: {&#39;hgrid&#39;: [0.35]*3}})</span>
+<span class="sd">        Traceback (most recent call last):</span>
+<span class="sd">        ...</span>
+<span class="sd">        KeyError: &quot;Unknown key &#39;hgrid&#39; in &#39;dft&#39;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">params</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="k">if</span> <span class="s2">&quot;posinp&quot;</span> <span class="ow">in</span> <span class="n">params</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;posinp&quot;</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InputParams.from_file"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize an InputParams instance from a BigDFT input file.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the file to read.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            InputParams instance initialized from the file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">stream</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="InputParams.from_string"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams.from_string">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_string</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">string</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initialize an InputParams instance from a string.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        string : str</span>
+<span class="sd">            Input parameters dictionary as a string.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        InputParams</span>
+<span class="sd">            InputParams instance initialized from the string.</span>
+
+
+<span class="sd">        &gt;&gt;&gt; InputParams.from_string(&quot;{&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}&quot;)</span>
+<span class="sd">        {&#39;dft&#39;: {&#39;rmult&#39;: [6, 8]}}</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">params</span> <span class="o">=</span> <span class="n">yaml</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">string</span><span class="p">,</span> <span class="n">Loader</span><span class="o">=</span><span class="n">Loader</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">params</span><span class="o">=</span><span class="n">params</span><span class="p">)</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        dict</span>
+<span class="sd">            Input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Posinp or None</span>
+<span class="sd">            Initial positions contained in the input parameters</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span>
+
+    <span class="nd">@posinp</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">Posinp</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Update the posinp attribute with a Posinp instance&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">new</span>
+
+    <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+<div class="viewcode-block" id="InputParams.__setitem__"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams.__setitem__">[docs]</a>    <span class="k">def</span> <span class="nf">__setitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Set the input parameters after making sure that they are valid.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        key : str</span>
+<span class="sd">            Input parameters key.</span>
+<span class="sd">        value : dict</span>
+<span class="sd">            Value of the given key of input parameters.</span>
+
+<span class="sd">        Warns</span>
+<span class="sd">        -----</span>
+<span class="sd">        UserWarning</span>
+<span class="sd">            If the proposed update does not modify the input parameters.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="s2">&quot;posinp&quot;</span><span class="p">:</span>
+            <span class="c1"># Set the new posinp</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Check that the key and its value are valid.</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">value</span><span class="p">}</span>
+            <span class="n">cleaned_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+            <span class="c1"># Set the input parameters with cleaned parameters</span>
+            <span class="k">if</span> <span class="n">cleaned_params</span> <span class="o">==</span> <span class="p">{}:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Update with default params</span>
+                    <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+                    <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Nothing to update.&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Update with cleaned params</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">cleaned_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="k">def</span> <span class="nf">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="nf">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">repr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+
+<div class="viewcode-block" id="InputParams.write"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams.write">[docs]</a>    <span class="k">def</span> <span class="nf">write</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Write the input parameters on disk.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        filename : str</span>
+<span class="sd">            Name of the input file.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>  <span class="c1"># Make sure it is valid</span>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="clean"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.clean">[docs]</a><span class="k">def</span> <span class="nf">clean</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        Trial BigDFT input parameters.</span>
+<span class="sd">    keyword: NoneType or str</span>
+<span class="sd">        Main key of input parameters key to be checked (used to check</span>
+<span class="sd">        CheSS input parameters).</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    dict</span>
+<span class="sd">        Input parameters whose values are not their default, after</span>
+<span class="sd">        checking that all the keys in `params` correspond to actual</span>
+<span class="sd">        BigDFT parameters.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<span class="c1">#    # Make sure to convert hgrids to a list beforehand</span>
+<span class="c1">#    if &quot;dft&quot; in params and &quot;hgrids&quot; in params[&quot;dft&quot;]:</span>
+<span class="c1">#        hgrids = deepcopy(params[&quot;dft&quot;][&quot;hgrids&quot;])</span>
+<span class="c1">#        if not isinstance(hgrids, list):</span>
+<span class="c1">#            params[&quot;dft&quot;][&quot;hgrids&quot;] = [hgrids]*3</span>
+    <span class="c1"># Use a copy of params to update the input parameters while looping</span>
+    <span class="c1"># on params. This copy will be returned.</span>
+    <span class="n">real_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+    <span class="c1"># Use the correct reference for the input variables</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">DEFAULT_PARAMETERS</span>
+    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">default</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+    <span class="c1"># Set real_params[&#39;output&#39;][&#39;orbitals&#39;] to &#39;None&#39; when it is False</span>
+    <span class="k">if</span> <span class="s1">&#39;output&#39;</span> <span class="ow">in</span> <span class="n">real_params</span> <span class="ow">and</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
+            <span class="s1">&#39;orbitals&#39;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="ow">and</span> \
+            <span class="ow">not</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;orbitals&#39;</span><span class="p">]:</span>
+        <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;orbitals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="c1"># Check the validity of the given input parameters</span>
+    <span class="n">check</span><span class="p">(</span><span class="n">real_params</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="n">keyword</span><span class="p">)</span>
+    <span class="c1"># Return the cleaned input parameters</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># The key might be empty (e.g.: logfile with many documents)</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+            <span class="k">continue</span>
+        <span class="c1"># Delete the child keys whose values are default</span>
+        <span class="k">for</span> <span class="n">child_key</span><span class="p">,</span> <span class="n">child_value</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+            <span class="n">default_value</span> <span class="o">=</span> <span class="n">default</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">child_key</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">child_value</span> <span class="o">==</span> <span class="n">default_value</span><span class="p">:</span>
+                <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">][</span><span class="n">child_key</span><span class="p">]</span>
+        <span class="c1"># Delete the key if it is empty</span>
+        <span class="k">if</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="p">{}:</span>
+            <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+    <span class="c1"># Clean the chess input variables as well</span>
+    <span class="k">if</span> <span class="s1">&#39;chess&#39;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">:</span>
+        <span class="n">chess_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">],</span> <span class="n">keyword</span><span class="o">=</span><span class="s1">&#39;chess&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">chess_params</span> <span class="o">!=</span> <span class="p">{}:</span>
+            <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chess_params</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">]</span>
+    <span class="c1"># Remove the cumbersome geopt key if ncount_cluster_x is the only</span>
+    <span class="c1"># key (it happens when the input parameters are read from a Logfile)</span>
+    <span class="n">dummy_value</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ncount_cluster_x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="k">if</span> <span class="s2">&quot;geopt&quot;</span> <span class="ow">in</span> <span class="n">real_params</span> <span class="ow">and</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dummy_value</span><span class="p">:</span>
+        <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span>
+    <span class="k">return</span> <span class="n">real_params</span></div>
+
+
+<div class="viewcode-block" id="check"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.check">[docs]</a><span class="k">def</span> <span class="nf">check</span><span class="p">(</span><span class="n">params</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check that the keys of `params` correspond to BigDFT parameters.</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    params : dict</span>
+<span class="sd">        Trial input parameters.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    KeyError</span>
+<span class="sd">        If a key or a sub-key is not a BigDFT parameter.</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If a value is invalid (not in the correct range, not in the</span>
+<span class="sd">        possible values, the value of the master key does not allow for</span>
+<span class="sd">        the key to be defined)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">parameters</span> <span class="o">=</span> <span class="n">INPUT_PARAMETERS_DEFINITIONS</span>
+    <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">parameters</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
+    <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="c1"># Check the key</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">parameters</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Unknown key &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+        <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span> <span class="ow">in</span> <span class="n">value</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+                <span class="c1"># Check the subkey</span>
+                <span class="n">key_definition</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+                <span class="k">if</span> <span class="n">subkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key_definition</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
+                        <span class="s2">&quot;Unknown key &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                <span class="c1"># Check the subvalue:</span>
+                <span class="n">check_value</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">key_definition</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">check_value</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">key_definition</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check the value of an input parameter is valid</span>
+
+<span class="sd">    Parameters</span>
+<span class="sd">    ----------</span>
+<span class="sd">    subkey : str</span>
+<span class="sd">        Name of the BigDFT input parameter under consideration.</span>
+<span class="sd">    subvalue</span>
+<span class="sd">        Value of the BigDFT input parameter under consideration.</span>
+<span class="sd">    key : str</span>
+<span class="sd">        Base key of the BigDFT input parameter under consideration.</span>
+<span class="sd">    value : dict</span>
+<span class="sd">        Value of the base key.</span>
+<span class="sd">    key_definition : dict</span>
+<span class="sd">        Definition of the base key.</span>
+
+<span class="sd">    Raises</span>
+<span class="sd">    ------</span>
+<span class="sd">    ValueError</span>
+<span class="sd">        If a value is invalid (not in the correct range, not in the</span>
+<span class="sd">        possible values, the value of the master key does not allow for</span>
+<span class="sd">        the key to be defined)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">subkey_definition</span> <span class="o">=</span> <span class="n">key_definition</span><span class="p">[</span><span class="n">subkey</span><span class="p">]</span>
+    <span class="c1"># If default value, no need to worry anymore</span>
+    <span class="n">default</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;default&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">subvalue</span> <span class="o">==</span> <span class="n">default</span><span class="p">:</span>
+        <span class="k">return</span>
+    <span class="c1"># If the subkey is conditioned by the value of another subkey, check</span>
+    <span class="c1"># that this other subkey has a valid value</span>
+    <span class="n">condition</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CONDITION&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">condition</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">master_key</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s2">&quot;MASTER_KEY&quot;</span><span class="p">]</span>
+        <span class="n">possible_values</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s2">&quot;WHEN&quot;</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="n">master_key</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_values</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;Condition &#39;</span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="s2">&#39; not met for &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; (got </span><span class="si">{}</span><span class="s2">)&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">master_key</span><span class="p">,</span> <span class="n">possible_values</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">))</span>
+    <span class="c1"># It must be in the exclusive values</span>
+    <span class="n">possible_values</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXCLUSIVE&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">possible_values</span> <span class="ow">and</span> <span class="n">subvalue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_values</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in the possible values (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span>
+            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">possible_values</span><span class="p">))</span>
+    <span class="c1"># It must be in the correct range</span>
+    <span class="n">valid_range</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RANGE&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">valid_range</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subvalue</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
+            <span class="n">value_in_range</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">in_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">)</span>
+                                  <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">subvalue</span><span class="p">])</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">value_in_range</span> <span class="o">=</span> <span class="n">in_range</span><span class="p">(</span><span class="n">subvalue</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">value_in_range</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in valid range (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span>
+                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">in_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">):</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Check if the value is in the expected range.</span>
+
+<span class="sd">    Returns</span>
+<span class="sd">    -------</span>
+<span class="sd">    bool</span>
+<span class="sd">        `True` if the value is in the valid range, else `False`</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">valid_range</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">float</span><span class="p">(</span><span class="n">valid_range</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
