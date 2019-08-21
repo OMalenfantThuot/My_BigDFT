@@ -268,6 +268,7 @@ class Jobschnet(object):
         if not forces:
             for prop in available_properties:
                 predictions[prop] = list(raw_predictions[prop])
+            print(predictions["energy"])
         else:
             # Calculate the forces
             pred_idx = 0
@@ -299,6 +300,13 @@ class Jobschnet(object):
                     pred_idx += 12 * len(self._init_posinp[struct_idx])
             print(predictions["energy"])
             print(predictions["forces"])
+        
+        #Reset self._posinp for more calculations
+        try:
+            self._posinp = deepcopy(self._init_posinp)
+        except:
+            pass
+
 
     def _create_additional_structures(self, order, deriv_length=0.01):
         r"""
