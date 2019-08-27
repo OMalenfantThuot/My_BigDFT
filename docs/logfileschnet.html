@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Workflows &mdash; My_BigDFT  documentation</title>
+  <title>Logfileschnet &mdash; My_BigDFT  documentation</title>
   
 
   
@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="AbstractWorkflow and Workflow" href="workflow.html" />
-    <link rel="prev" title="Job" href="job.html" /> 
+    <link rel="next" title="MyBigDFT tutorials" href="tutorials.html" />
+    <link rel="prev" title="Jobschnet" href="jobschnet.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,16 +87,12 @@
 <li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Workflows</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
-<li class="toctree-l3"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
-<li class="toctree-l3"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
-<li class="toctree-l3"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
-<li class="toctree-l3"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Logfileschnet</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
@@ -148,13 +144,15 @@
         
           <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
         
-      <li>Workflows</li>
+          <li><a href="mlobjects.html">Machine Learning Related Classes</a> &raquo;</li>
+        
+      <li>Logfileschnet</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/workflows.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/logfileschnet.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -191,22 +189,27 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="workflows">
-<h1>Workflows<a class="headerlink" href="#workflows" title="Permalink to this headline">¶</a></h1>
-<p>This section focuses on the documentation of the MyBigDFT.workflows module and
-its API.
-You will find here the documentation for the most useful classes and methods,
-that are used to automate some calculations.</p>
-<div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
-<li class="toctree-l1"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
-<li class="toctree-l1"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
-<li class="toctree-l1"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
-<li class="toctree-l1"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
-<li class="toctree-l1"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
-</ul>
-</div>
+<div class="section" id="logfileschnet">
+<h1>Logfileschnet<a class="headerlink" href="#logfileschnet" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mybigdft.jobschnet.Logfileschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Logfileschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Logfileschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.update_results">
+<code class="sig-name descname">update_results</code><span class="sig-paren">(</span><em class="sig-param">predictions</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Logfileschnet.update_results"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.update_results" title="Permalink to this definition">¶</a></dt>
+<dd><p>Method to store Jobschnet results in the Logfileschnet container.
+Useful for the workflows.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>predictions</strong> (<em>dict</em>) – Dictionary containing the predictions returned by the
+Schnetpack calculations</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
 </div>
 
 
@@ -217,10 +220,10 @@ that are used to automate some calculations.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="workflow.html" class="btn btn-neutral float-right" title="AbstractWorkflow and Workflow" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorials.html" class="btn btn-neutral float-right" title="MyBigDFT tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="job.html" class="btn btn-neutral float-left" title="Job" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="jobschnet.html" class="btn btn-neutral float-left" title="Jobschnet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

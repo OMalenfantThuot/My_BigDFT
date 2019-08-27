@@ -42,7 +42,7 @@ element atomic symbol.
 ### To use SchnetPack models (optional)
 
 To be able to use [SchnetPack](https://github.com/OMalenfantThuot/schnetpack) models in calculations,
-the following line msut be added to the `~/.bashrc` file:
+the following line must be added to the `~/.bashrc` file:
 
 `export MODELDIR="/path/to/the/directory/for/trained/models/"`
 

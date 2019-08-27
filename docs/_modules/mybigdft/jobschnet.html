@@ -148,8 +148,8 @@
            <div itemprop="articleBody">
             
   <h1>Source code for mybigdft.jobschnet</h1><div class="highlight"><pre>
-<span></span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">The :class: `JobSchnet` class is the base class defining a SchnetPack calculation.</span>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`Jobschnet` class is the base class defining a SchnetPack calculation.</span>
 <span class="sd">&quot;&quot;&quot;</span>
 
 <span class="kn">from</span> <span class="nn">__future__</span> <span class="k">import</span> <span class="n">print_function</span><span class="p">,</span> <span class="n">absolute_import</span>
@@ -549,7 +549,7 @@
         <span class="k">return</span> <span class="n">forces</span></div>
 
 
-<span class="k">class</span> <span class="nc">Logfileschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Logfileschnet"><a class="viewcode-back" href="../../logfileschnet.html#mybigdft.jobschnet.Logfileschnet">[docs]</a><span class="k">class</span> <span class="nc">Logfileschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="c1"># Container class to emulate the Logfile object used in BigDFT calculations</span>
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posinp</span><span class="p">):</span>
 
@@ -601,7 +601,7 @@
     <span class="k">def</span> <span class="nf">dipole</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dipole</span>
 
-    <span class="k">def</span> <span class="nf">update_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="p">):</span>
+<div class="viewcode-block" id="Logfileschnet.update_results"><a class="viewcode-back" href="../../logfileschnet.html#mybigdft.jobschnet.Logfileschnet.update_results">[docs]</a>    <span class="k">def</span> <span class="nf">update_results</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">predictions</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Method to store Jobschnet results in the Logfileschnet container.</span>
 <span class="sd">        Useful for the workflows.</span>
@@ -626,7 +626,7 @@
         <span class="k">if</span> <span class="s2">&quot;dipole&quot;</span> <span class="ow">in</span> <span class="n">available_properties</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_dipole</span> <span class="o">=</span> <span class="p">[]</span>
             <span class="k">for</span> <span class="n">struct</span> <span class="ow">in</span> <span class="n">posinp</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_dipole</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="s2">&quot;dipole&quot;</span><span class="p">])</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">_dipole</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">predictions</span><span class="p">[</span><span class="s2">&quot;dipole&quot;</span><span class="p">])</span></div></div>
 </pre></div>
 
            </div>
@@ -639,7 +639,7 @@
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+        &copy; Copyright 2019, Maxime Moriniere, Olivier Malenfant-Thuot
 
     </p>
   </div>

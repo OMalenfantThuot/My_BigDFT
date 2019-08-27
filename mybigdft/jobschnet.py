@@ -1,5 +1,5 @@
-"""
-The :class: `JobSchnet` class is the base class defining a SchnetPack calculation.
+r"""
+The :class:`Jobschnet` class is the base class defining a SchnetPack calculation.
 """
 
 from __future__ import print_function, absolute_import

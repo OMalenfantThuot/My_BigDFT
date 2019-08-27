@@ -18,8 +18,8 @@
 # -- Project information -----------------------------------------------------
 
 project = 'My_BigDFT'
-copyright = '2019, mmoriniere, OMalenfantThuot'
-author = 'mmoriniere, OMalenfantThuot'
+copyright = '2019, Maxime Moriniere, Olivier Malenfant-Thuot'
+author = 'Maxime Moriniere, Olivier Malenfant-Thuot'
 
 
 # -- General configuration ---------------------------------------------------

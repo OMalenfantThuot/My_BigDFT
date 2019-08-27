@@ -36,7 +36,9 @@
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
-    <link rel="search" title="Search" href="search.html" /> 
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Logfileschnet" href="logfileschnet.html" />
+    <link rel="prev" title="Machine Learning Related Classes" href="mlobjects.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -81,8 +83,18 @@
             
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="code_doc.html">Code Documentation</a></li>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a><ul class="current">
+<li class="toctree-l3 current"><a class="current reference internal" href="#">Jobschnet</a></li>
+<li class="toctree-l3"><a class="reference internal" href="logfileschnet.html">Logfileschnet</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
 <li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
 </ul>
@@ -130,6 +142,10 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="mlobjects.html">Machine Learning Related Classes</a> &raquo;</li>
+        
       <li>Jobschnet</li>
     
     
@@ -175,7 +191,7 @@
 </style>
 <div class="section" id="module-mybigdft.jobschnet">
 <span id="jobschnet"></span><h1>Jobschnet<a class="headerlink" href="#module-mybigdft.jobschnet" title="Permalink to this headline">¶</a></h1>
-<p>The :class: <cite>JobSchnet</cite> class is the base class defining a SchnetPack calculation.</p>
+<p>The <a class="reference internal" href="#mybigdft.jobschnet.Jobschnet" title="mybigdft.jobschnet.Jobschnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jobschnet</span></code></a> class is the base class defining a SchnetPack calculation.</p>
 <dl class="class">
 <dt id="mybigdft.jobschnet.Jobschnet">
 <em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Jobschnet</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">posinp=None</em>, <em class="sig-param">run_dir=None</em>, <em class="sig-param">skip=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet" title="Permalink to this definition">¶</a></dt>
@@ -253,7 +269,7 @@ files and directories.</p>
 <dd class="field-odd"><p>Object empty or containing the results of the calculation.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>Logfileschnet</p>
+<dd class="field-even"><p><a class="reference internal" href="logfileschnet.html#mybigdft.jobschnet.Logfileschnet" title="mybigdft.jobschnet.Logfileschnet">Logfileschnet</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -358,12 +374,21 @@ the calculation is done.</p></li>
           </div>
           <footer>
   
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="logfileschnet.html" class="btn btn-neutral float-right" title="Logfileschnet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="mlobjects.html" class="btn btn-neutral float-left" title="Machine Learning Related Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+        &copy; Copyright 2019, Maxime Moriniere, Olivier Malenfant-Thuot
 
     </p>
   </div>

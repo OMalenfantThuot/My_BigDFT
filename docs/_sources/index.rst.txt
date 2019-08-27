@@ -1,8 +1,6 @@
 Welcome to My_BigDFT's documentation!
 =====================================
 
-.. mdinclude:: ../../README.md
-
 .. toctree::
    :maxdepth: 2
    :caption: Contents:
@@ -10,6 +8,9 @@ Welcome to My_BigDFT's documentation!
    code_doc
    tutorials
    exercises
+
+.. mdinclude:: ../../README.md
+
 
 
 Indices and tables
