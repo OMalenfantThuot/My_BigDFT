@@ -308,7 +308,7 @@ class Jobschnet(object):
             pass
 
 
-    def _create_additional_structures(self, order, deriv_length=0.01):
+    def _create_additional_structures(self, order, deriv_length=0.005):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
@@ -376,8 +376,8 @@ class Jobschnet(object):
             forces = np.zeros((nat, 3))
             for i in range(3):
                 ener1, ener2 = (
-                    predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
-                    predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
+                    predictions[np.arange(i * nat, (i + 1) * nat, 1)],
+                    predictions[np.arange((i + 3) * nat, (i + 4) * nat, 1)],
                 )
                 forces[:, i] = -(ener1 - ener2).reshape(nat) / (2 * self._deriv_length)
         elif order == 2:
@@ -385,10 +385,10 @@ class Jobschnet(object):
             forces = np.zeros((nat, 3))
             for i in range(3):
                 ener1, ener2, ener3, ener4 = (
-                    predictions[np.arange(2 * i * nat, (2 * i + 1) * nat, 1)],
-                    predictions[np.arange((2 * i + 1) * nat, (2 * i + 2) * nat, 1)],
-                    predictions[np.arange((2 * i + 2) * nat, (2 * i + 3) * nat, 1)],
-                    predictions[np.arange((2 * i + 3) * nat, (2 * i + 4) * nat, 1)],
+                    predictions[np.arange(i * nat, (i + 1) * nat, 1)],
+                    predictions[np.arange((i + 3) * nat, (i + 4) * nat, 1)],
+                    predictions[np.arange((i + 6) * nat, (i + 7) * nat, 1)],
+                    predictions[np.arange((i + 9) * nat, (i + 10) * nat, 1)],
                 )
                 forces[:, i] = -(
                     (-ener1 + 8 * ener2 - 8 * ener3 + ener4).reshape(nat)
