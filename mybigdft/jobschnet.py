@@ -268,7 +268,6 @@ class Jobschnet(object):
         if not forces:
             for prop in available_properties:
                 predictions[prop] = list(raw_predictions[prop])
-            print(predictions["energy"])
         else:
             # Calculate the forces
             pred_idx = 0
@@ -298,9 +297,9 @@ class Jobschnet(object):
                         )
                     )
                     pred_idx += 12 * len(self._init_posinp[struct_idx])
-            print(predictions["energy"])
-            print(predictions["forces"])
         
+        self._logfile._update_results(predictions)
+
         #Reset self._posinp for more calculations
         try:
             self._posinp = deepcopy(self._init_posinp)
@@ -400,7 +399,9 @@ class Jobschnet(object):
 
 
 class Logfileschnet(object):
-    # Container class to emulate the Logfile object used in BigDFT calculations
+    r"""
+    Container class to emulate the Logfile object used in BigDFT calculations
+    """
     def __init__(self, posinp):
 
         self._posinp = posinp
@@ -409,7 +410,7 @@ class Logfileschnet(object):
         self._boundary_conditions = []
         self._cell = []
 
-        for struct in posinp:
+        for struct in self._posinp:
             self._n_at.append(len(struct))
             self._atom_types.append(set([atom.type for atom in struct]))
             self._boundary_conditions.append(struct.boundary_conditions)
@@ -451,7 +452,7 @@ class Logfileschnet(object):
     def dipole(self):
         return self._dipole
 
-    def update_results(self, predictions):
+    def _update_results(self, predictions):
         r"""
         Method to store Jobschnet results in the Logfileschnet container.
         Useful for the workflows.
@@ -466,14 +467,8 @@ class Logfileschnet(object):
         available_properties = list(predictions.keys())
 
         if "energy" in available_properties:
-            self._energy = []
-            for struct in posinp:
-                self._energy.append(predictions["energy"])
+            self._energy = predictions["energy"]
         if "forces" in available_properties:
-            self._forces = []
-            for struct in posinp:
-                self._forces.append(predictions["forces"])
+            self._forces = predictions["forces"]
         if "dipole" in available_properties:
-            self._dipole = []
-            for struct in posinp:
-                self._dipole.append(predictions["dipole"])
+            self._dipole = predictions["dipole"]
