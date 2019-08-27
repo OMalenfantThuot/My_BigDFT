@@ -176,13 +176,104 @@
 </style>
 <div class="section" id="welcome-to-my-bigdft-s-documentation">
 <h1>Welcome to My_BigDFT’s documentation!<a class="headerlink" href="#welcome-to-my-bigdft-s-documentation" title="Permalink to this headline">¶</a></h1>
-<p>#..mdinclude:: ../../README.md</p>
+</div>
+<div class="section" id="mybigdft">
+<h1>MyBigDFT<a class="headerlink" href="#mybigdft" title="Permalink to this headline">¶</a></h1>
+<p align="center">
+<a href="https://github.com/ambv/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
+</p><p>MyBigDFT provides a python wrapper over the BigDFT code.
+It can be considered as a sandbox for the PyBigDFT package.
+It might be used instead of the PyBigDFT package,
+even though both packages do not provide the same API and functionalities.</p>
+<p>It is currently supported for the following python versions: 2.7, 3.6, 3.7.</p>
+<p>Credit to <a class="reference external" href="https://gitlab.com/mmoriniere">mmoriniere</a> for the original <a class="reference external" href="https://gitlab.com/mmoriniere/MyBigDFT">code</a>.</p>
+<div class="section" id="installation">
+<h2>Installation<a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>BigDFT 1.8.2 must be installed in a given build directory (noted BUILDDIR).
+Then, run the following commands (where BUILDDIR is the appropriate build
+directory):</p>
+<ul class="simple">
+<li><p>git clone this package</p></li>
+<li><p>cd BUILDDIR/install/bin</p></li>
+<li><p>source bigdftvars.sh’</p></li>
+<li><p>unset PYTHONPATH</p></li>
+<li><p>cd -</p></li>
+<li><p>cd MyBigDFT</p></li>
+<li><p>pip install .</p></li>
+</ul>
+<p>This will copy the MyBigDFT sources, then set the environment variables
+needed by MyBigDFT before installing it.</p>
+<div class="section" id="to-use-pseudopotential-files-optional">
+<h3>To use pseudopotential files (optional)<a class="headerlink" href="#to-use-pseudopotential-files-optional" title="Permalink to this headline">¶</a></h3>
+<p>To be able to use pseudopotential files in the calculations, the following line
+must be added to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file:</p>
+<p><code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">PSEUDODIR=&quot;/path/to/the/directory/for/pseudos/files/&quot;</span></code></p>
+<p>The desired files must be named <code class="docutils literal notranslate"><span class="pre">psppar.</span></code> with the extension being the corresponding
+element atomic symbol.</p>
+</div>
+<div class="section" id="to-use-schnetpack-models-optional">
+<h3>To use SchnetPack models (optional)<a class="headerlink" href="#to-use-schnetpack-models-optional" title="Permalink to this headline">¶</a></h3>
+<p>To be able to use <a class="reference external" href="https://github.com/OMalenfantThuot/schnetpack">SchnetPack</a> models in calculations,
+the following line msut be added to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file:</p>
+<p><code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">MODELDIR=&quot;/path/to/the/directory/for/trained/models/&quot;</span></code></p>
+</div>
+<div class="section" id="extra-steps-you-might-need-to-follow">
+<h3>Extra steps you might need to follow<a class="headerlink" href="#extra-steps-you-might-need-to-follow" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>Make sure that the BIGDFT_ROOT environment variables does not lead to
+multiple directories. If so, choose only one of them (where BUILDDIR is the path
+to the actual BigDFT build directory you want to use):</p></li>
+<li><p>export BIGDFT_ROOT=’BUILDDIR/install/bin’</p></li>
+<li><p>If your default python version is python3, modify the first line of
+the bigdft-tool executable so that it forces the use of python2 (<em>i.e.</em>,
+set it to ‘#!/usr/bin/env python2’). This executable will be found in the
+same directory as the bigdft one (<em>i.e.</em> BUILDDIR/install/bin)</p></li>
+</ul>
+</div>
+</div>
+<div class="section" id="documentation">
+<h2>Documentation<a class="headerlink" href="#documentation" title="Permalink to this headline">¶</a></h2>
+<p>The documentation of MyBigDFT can be found
+<a class="reference external" href="https://omalenfantthuot.github.io/My_BigDFT/">here</a>.</p>
+<p>It can also be built locally by running the following commands (where
+MYBIGDFT_SOURCES is the directory where this README.md file is located):</p>
+<ul class="simple">
+<li><p>cd MYBIGDFT_SOURCES</p></li>
+<li><p>pip install -e .[doc]</p></li>
+<li><p>cd doc</p></li>
+<li><p>make html</p></li>
+</ul>
+<p>The -e option is optional (use it if you wish to edit some source files
+locally), while the [doc] directive might install extra packages required for
+the doc to build correctly.</p>
+</div>
+<div class="section" id="tests">
+<h2>Tests<a class="headerlink" href="#tests" title="Permalink to this headline">¶</a></h2>
+<p>To be able to run all tests, make sure to install the package by running the
+following commands (where MYBIGDFT_SOURCES is the directory where this
+README.md file is located):</p>
+<ul class="simple">
+<li><p>cd MYBIGDFT_SOURCES</p></li>
+<li><p>pip install -e .[test]</p></li>
+<li><p>pytest</p></li>
+</ul>
+<p>Again, the -e option is optional, use it if you wish to edit the source files.
+The [test] directive might install extra packages required for the tests to run.
+The pytest command should run all the tests (including the doctests).</p>
+<div class="section" id="notes">
+<h3>Notes<a class="headerlink" href="#notes" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><p>If all the python versions supported by MyBigDFT are installed, you can even
+run the ‘tox’ command to launch the tests for each of these versions instead of
+‘pytest’.</p></li>
+</ul>
 <div class="toctree-wrapper compound">
 <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l2"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
 <li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
 </ul>
 </li>
@@ -205,6 +296,8 @@
 </ul>
 </li>
 </ul>
+</div>
+</div>
 </div>
 </div>
 <div class="section" id="indices-and-tables">

@@ -1,0 +1,395 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Jobschnet &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Jobschnet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/jobschnet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="module-mybigdft.jobschnet">
+<span id="jobschnet"></span><h1>Jobschnet<a class="headerlink" href="#module-mybigdft.jobschnet" title="Permalink to this headline">¶</a></h1>
+<p>The :class: <cite>JobSchnet</cite> class is the base class defining a SchnetPack calculation.</p>
+<dl class="class">
+<dt id="mybigdft.jobschnet.Jobschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Jobschnet</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">posinp=None</em>, <em class="sig-param">run_dir=None</em>, <em class="sig-param">skip=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class defines a SchnetPack calculation similarly
+to the Job class for BigDFT.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of the job. Will be used to name the created files.</p></li>
+<li><p><strong>posinp</strong> (<a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp"><em>Posinp</em></a>) – Base atomic positions for the job</p></li>
+<li><p><strong>run_dir</strong> (<em>str</em><em> or </em><em>None</em>) – Folder where to run calculations (default to current directory)</p></li>
+<li><p><strong>skip</strong> (<em>bool</em>) – If <cite>True</cite>, the calculation will be skipped (not used presently).</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Base name of the calculation used to set the names of
+files and directories.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Initial positions of the calculation</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.number_of_structures">
+<em class="property">property </em><code class="sig-name descname">number_of_structures</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.number_of_structures" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Number of different structures when the job is declared</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.skip">
+<em class="property">property </em><code class="sig-name descname">skip</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.skip" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>If <cite>True</cite>, the calculation will be skipped.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.logfile">
+<em class="property">property </em><code class="sig-name descname">logfile</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.logfile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Object empty or containing the results of the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>Logfileschnet</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.init_dir">
+<em class="property">property </em><code class="sig-name descname">init_dir</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.init_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Absolute path to the initial directory of the calculation</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.run_dir">
+<em class="property">property </em><code class="sig-name descname">run_dir</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.run_dir" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Absolute path to the directory where the calculation is run.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.posinp_name">
+<em class="property">property </em><code class="sig-name descname">posinp_name</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.posinp_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of base posinp file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.outfile_name">
+<em class="property">property </em><code class="sig-name descname">outfile_name</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.outfile_name" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Name of the output file</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>str</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.__enter__">
+<code class="sig-name descname">__enter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet.__enter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.__enter__" title="Permalink to this definition">¶</a></dt>
+<dd><p>When entering the context manager:</p>
+<ul class="simple">
+<li><p>create the directory where the calculations must be run,</p></li>
+<li><p>go to that directory.</p></li>
+</ul>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.__exit__">
+<code class="sig-name descname">__exit__</code><span class="sig-paren">(</span><em class="sig-param">*args</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet.__exit__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.__exit__" title="Permalink to this definition">¶</a></dt>
+<dd><p>When leaving the context manager, go back to the initial
+directory.</p>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">model_dir=None</em>, <em class="sig-param">forces=False</em>, <em class="sig-param">device='cpu'</em>, <em class="sig-param">write_to_disk=False</em>, <em class="sig-param">batch_size=128</em>, <em class="sig-param">overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.run" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> (<em>str</em>) – Absolute path to the SchnetPack model to use in calculation</p></li>
+<li><p><strong>forces</strong> (<em>int</em><em> or </em><em>bool</em>) – Order of the force calculations (0, 1 or 2)
+If 0 (or <cite>False</cite>), forces are not evaluated.
+If 1, forces are evaluated on first-order (6N calculations)
+If 2 (or <cite>True</cite>), forces are evaluated on second-order (12N calculations)</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Either ‘cpu’ or ‘cuda’ to run on cpu or gpu</p></li>
+<li><p><strong>write_to_disk</strong> (<em>bool</em>) – If <cite>True</cite>, an outfile will be written after the calculation.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Size of the mini-batches used in predictions</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If <cite>True</cite>, all .db files are removed from the run_dir before
+the calculation is done.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, mmoriniere, OMalenfantThuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
