@@ -17,7 +17,7 @@ class Jobschnet(object):
     to the Job class for BigDFT.
     """
 
-    def __init__(self, name="", posinp=None, run_dir=None, skip=False):
+    def __init__(self, name="", posinp=None, skip=False):
         r"""
         Parameters
         ----------
@@ -25,8 +25,6 @@ class Jobschnet(object):
             Name of the job. Will be used to name the created files.
         posinp : Posinp
             Base atomic positions for the job
-        run_dir : str or None
-            Folder where to run calculations (default to current directory)
         skip : bool
             If `True`, the calculation will be skipped (not used presently).
         """
@@ -48,7 +46,6 @@ class Jobschnet(object):
         self._skip = bool(skip)
         self._logfile = Logfileschnet(self._posinp)
 
-        self._set_directories(run_dir)
         self._set_filenames()
 
     @property
@@ -102,35 +99,15 @@ class Jobschnet(object):
         """
         return self._logfile
 
-    @property
-    def init_dir(self):
-        r"""
-        Returns
-        -------
-        str
-            Absolute path to the initial directory of the calculation
-        """
-        return self._init_dir
-
-    @property
-    def run_dir(self):
-        r"""
-        Returns
-        -------
-        str
-            Absolute path to the directory where the calculation is run.
-        """
-        return self._run_dir
-
-    @property
-    def posinp_name(self):
-        r"""
-        Returns
-        -------
-        str
-            Name of base posinp file
-        """
-        return self._posinp_name
+    #    @property
+    #    def posinp_name(self):
+    #        r"""
+    #        Returns
+    #        -------
+    #        str
+    #            Name of base posinp file
+    #        """
+    #        return self._posinp_name
 
     @property
     def outfile_name(self):
@@ -142,47 +119,13 @@ class Jobschnet(object):
         """
         return self._outfile_name
 
-    def _set_directories(self, run_dir):
-        self._init_dir = os.getcwd()
-        if run_dir is None:
-            self._run_dir = self.init_dir
-        else:
-            basename = os.path.commonprefix([self.init_dir, run_dir])
-            if basename == "":
-                self._run_dir = os.path.join([self.init_dir, run_dir])
-            else:
-                self._init_dir = basename
-                new_run_dir = os.path.relpath(run_dir, start=basename)
-                self._run_dir = os.path.join(self.init_dir, new_run_dir)
-
     def _set_filenames(self):
-        if self.name != "":
-            self._posinp_name = self.name + ".xyz"
+        if self._name != "":
+            #            self._posinp_name = self.name + ".xyz"
             self._outfile_name = self.name + ".out"
         else:
-            self._posinp_name = "posinp.xyz"
+            #            self._posinp_name = "posinp.xyz"
             self._outfile_name = "outfile.out"
-
-    def __enter__(self):
-        r"""
-        When entering the context manager:
-
-        * create the directory where the calculations must be run,
-        * go to that directory.
-        """
-        if self.run_dir not in [".", ""]:
-            if not os.path.exists(self.run_dir):
-                os.makedirs(self.run_dir)
-            os.chdir(self.run_dir)
-        print(os.getcwd())
-        return self
-
-    def __exit__(self, *args):
-        r"""
-        When leaving the context manager, go back to the initial
-        directory.
-        """
-        os.chdir(self.init_dir)
 
     def run(
         self,
@@ -210,7 +153,7 @@ class Jobschnet(object):
         batch_size : int
             Size of the mini-batches used in predictions
         overwrite : bool
-            If `True`, all .db files are removed from the run_dir before 
+            If `True`, all .db files are removed from the directory before 
             the calculation is done.
         """
         # Verify model_dir
@@ -251,7 +194,7 @@ class Jobschnet(object):
             posinp=self._posinp,
             name=self._name,
             device=device,
-            disk_out=write_to_disk,
+            disk_out=False,
             batch_size=batch_size,
             overwrite=overwrite,
             return_values=True,
@@ -268,13 +211,12 @@ class Jobschnet(object):
         if not forces:
             for prop in available_properties:
                 predictions[prop] = list(raw_predictions[prop])
-            print(predictions["energy"])
         else:
             # Calculate the forces
             pred_idx = 0
             predictions["energy"], predictions["forces"] = [], []
             for struct_idx in range(self.number_of_structures):
-                predictions["energy"].append(raw_predictions["energy"][pred_idx])
+                predictions["energy"].append(raw_predictions["energy"][pred_idx][0])
                 pred_idx += 1
                 if forces == 1:
                     predictions["forces"].append(
@@ -298,17 +240,27 @@ class Jobschnet(object):
                         )
                     )
                     pred_idx += 12 * len(self._init_posinp[struct_idx])
-            print(predictions["energy"])
-            print(predictions["forces"])
-        
-        #Reset self._posinp for more calculations
+
+        self._logfile._update_results(predictions)
+
+        # Reset self._posinp for more calculations
         try:
             self._posinp = deepcopy(self._init_posinp)
         except:
             pass
 
+        if write_to_disk:
+            # To improve?
+            with open(self._outfile_name, "w") as out:
+                for idx, struct in enumerate(self._posinp):
+                    out.write("Structure {}\n".format(idx))
+                    out.write("-------------------\n")
+                    out.write("Energy : {}\n".format(self._logfile.energy[idx]))
+                    out.write("Forces : \n")
+                    np.savetxt(out, self._logfile.forces[idx])
+                    out.write("\n")
 
-    def _create_additional_structures(self, order, deriv_length=0.005):
+    def _create_additional_structures(self, order, deriv_length=0.02):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
@@ -400,7 +352,10 @@ class Jobschnet(object):
 
 
 class Logfileschnet(object):
-    # Container class to emulate the Logfile object used in BigDFT calculations
+    r"""
+    Container class to emulate the Logfile object used in BigDFT calculations
+    """
+
     def __init__(self, posinp):
 
         self._posinp = posinp
@@ -409,7 +364,7 @@ class Logfileschnet(object):
         self._boundary_conditions = []
         self._cell = []
 
-        for struct in posinp:
+        for struct in self._posinp:
             self._n_at.append(len(struct))
             self._atom_types.append(set([atom.type for atom in struct]))
             self._boundary_conditions.append(struct.boundary_conditions)
@@ -421,37 +376,90 @@ class Logfileschnet(object):
 
     @property
     def posinp(self):
+        r"""
+        Returns
+        -------
+        list of Posinps
+            List containing the base Posinp objects for the predictions.
+        """
         return self._posinp
 
     @property
     def n_at(self):
+        r"""
+        Returns
+        -------
+        list of ints
+            List containing the number of atoms of each structure.
+        """
         return self._n_at
 
     @property
     def atom_types(self):
+        r"""
+        Returns
+        -------
+        list of sets
+            List containing sets of the elements present in each structure.
+        """
         return self._atom_types
 
     @property
     def boundary_conditions(self):
+        r"""
+        Returns
+        -------
+        list of strings
+            List containing the boundary conditions, either `free`,
+            `surface` or `periodic`, of each structure.
+        """
         return self._boundary_conditions
 
     @property
     def cell(self):
+        r"""
+        Returns
+        -------
+        list of lists of floats
+            List containing cell dimensions of each structure,
+            None for free boundary conditions.
+        """
         return self._cell
 
     @property
     def energy(self):
+        r"""
+        Returns
+        -------
+        list of floats or None
+            List containing the energy value for each structure.
+            If None, the energies have not been calculated yet.
+        """
         return self._energy
 
     @property
     def forces(self):
+        r"""
+        Returns
+        -------
+        list of arrays of floats or None
+            List containing the forces values for each structure.
+            If None, the forces have not been calculated yet.
+        """
         return self._forces
 
     @property
     def dipole(self):
+        r"""
+        Returns
+        -------
+        list of arrays of floats or None
+            List containing the dipole values for each structure.
+            If None, the dipoles have not been calculated yet.
+        """
         return self._dipole
 
-    def update_results(self, predictions):
+    def _update_results(self, predictions):
         r"""
         Method to store Jobschnet results in the Logfileschnet container.
         Useful for the workflows.
@@ -466,14 +474,8 @@ class Logfileschnet(object):
         available_properties = list(predictions.keys())
 
         if "energy" in available_properties:
-            self._energy = []
-            for struct in posinp:
-                self._energy.append(predictions["energy"])
+            self._energy = predictions["energy"]
         if "forces" in available_properties:
-            self._forces = []
-            for struct in posinp:
-                self._forces.append(predictions["forces"])
+            self._forces = predictions["forces"]
         if "dipole" in available_properties:
-            self._dipole = []
-            for struct in posinp:
-                self._dipole.append(predictions["dipole"])
+            self._dipole = predictions["dipole"]
