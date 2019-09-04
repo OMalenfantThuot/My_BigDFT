@@ -72,7 +72,7 @@ class InputParams(MutableMapping):
             self.posinp = Posinp.from_dict(params.pop("posinp"))
         else:
             self.posinp = None
-        self._params = clean(params)
+        self.params = clean(params)
 
     @classmethod
     def from_file(cls, filename):
@@ -123,6 +123,10 @@ class InputParams(MutableMapping):
             Input parameters.
         """
         return self._params
+
+    @params.setter
+    def params(self, params):
+        self._params = params
 
     @property
     def posinp(self):
@@ -203,7 +207,7 @@ class InputParams(MutableMapping):
             Name of the input file.
         """
         with open(filename, "w") as stream:
-            self._params = clean(self.params)  # Make sure it is valid
+            self.params = clean(self.params)  # Make sure it is valid
             yaml.dump(self.params, stream=stream, Dumper=Dumper)
 
 
