@@ -67,16 +67,11 @@ class Posinp(Sequence):
             units = units[:-2]
         boundary_conditions = boundary_conditions.lower()
         self._check_initial_values(units, boundary_conditions, cell)
-        if cell is not None:
-            cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
-                    for size in cell]
         # Set the base attributes
-        self._atoms = atoms
-        self._units = units
-        self._boundary_conditions = boundary_conditions
-        self._cell = cell
-        # Set extra attributes
-        self._positions = np.array([atom.position for atom in self.atoms])
+        self.atoms = atoms
+        self.units = units
+        self.boundary_conditions = boundary_conditions
+        self.cell = cell
 
     @staticmethod
     def _check_initial_values(units, boundary_conditions, cell):
@@ -278,10 +273,20 @@ class Posinp(Sequence):
         r"""
         Returns
         -------
-        list
+        list of Atoms
             Atoms of the system (atomic type and positions).
         """
         return self._atoms
+
+    @atoms.setter
+    def atoms(self, atoms):
+        if isinstance(atoms, list):
+            if all([isinstance(at, Atom) for at in atoms]):
+                self._atoms = atoms
+            else:
+                raise TypeError("All atoms should be mybigdft.Atoms instances")
+        else:
+            raise TypeError("Atoms should be given in a list")
 
     @property
     def units(self):
@@ -293,6 +298,13 @@ class Posinp(Sequence):
         """
         return self._units
 
+    @units.setter
+    def units(self, units):
+        if isinstance(units, str):
+            self._units = units
+        else:
+            raise TypeError("Units should be given as a string.")
+
     @property
     def boundary_conditions(self):
         r"""
@@ -303,6 +315,10 @@ class Posinp(Sequence):
         """
         return self._boundary_conditions
 
+    @boundary_conditions.setter
+    def boundary_conditions(self, boundary_conditions):
+        self._boundary_conditions = boundary_conditions
+
     @property
     def cell(self):
         r"""
@@ -312,6 +328,13 @@ class Posinp(Sequence):
             Cell size.
         """
         return self._cell
+
+    @cell.setter
+    def cell(self, cell):
+        if cell is not None:
+            cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
+                    for size in cell]
+        self._cell = cell
 
     @property
     def positions(self):
@@ -521,7 +544,7 @@ class Posinp(Sequence):
             You have to make sure that the units of the vector match
             those used by the posinp.
         """
-        new_positions = self._positions + np.array(vector)
+        new_positions = self.positions + np.array(vector)
         atoms = [Atom(atom.type, pos.tolist())
                  for atom, pos in zip(self.atoms, new_positions)]
         return Posinp(atoms, units=self.units, cell=self.cell,
@@ -537,7 +560,7 @@ class Posinp(Sequence):
             New posinp where all the atoms are centered on the geometric
             center of the system.
         """
-        centroid = np.average(self._positions, axis=0)
+        centroid = np.average(self.positions, axis=0)
         return self.translate(-centroid)
 
     def to_barycenter(self):
@@ -551,7 +574,7 @@ class Posinp(Sequence):
             of mass of the system.
         """
         m = self.masses
-        barycenter = np.sum(m*self._positions.T, axis=1) / np.sum(m)
+        barycenter = np.sum(m*self.positions.T, axis=1) / np.sum(m)
         return self.translate(-barycenter)
 
 
@@ -579,10 +602,9 @@ class Atom(object):
         12.011
         """
         # TODO: Check that the atom type exists
-        assert len(position) == 3, "The position must have three components"
-        self._type = atom_type
-        self._position = np.array(position, dtype=float)
-        self._mass = ATOMS_MASS[self.type]
+        self.type = atom_type
+        self.position = position
+        self.mass = ATOMS_MASS[self.type]
 
     @classmethod
     def from_dict(cls, atom_dict):
@@ -607,6 +629,13 @@ class Atom(object):
         """
         return self._type
 
+    @type.setter
+    def type(self, type):
+        if isinstance(type, str):
+            self._type = type
+        else:
+            TypeError("Atom type should be given as a string.")
+
     @property
     def position(self):
         r"""
@@ -617,6 +646,11 @@ class Atom(object):
         """
         return self._position
 
+    @position.setter
+    def position(self, position):
+        assert len(position)==3, "The position must have three components."
+        self._position = np.array(position, dtype=float)
+
     @property
     def mass(self):
         r"""
@@ -626,6 +660,10 @@ class Atom(object):
             Mass of the atom in atomic mass units.
         """
         return self._mass
+
+    @mass.setter
+    def mass(self, mass):
+        self._mass = mass
 
     def translate(self, vector):
         r"""
@@ -648,7 +686,7 @@ class Atom(object):
         """
         assert len(vector) == 3, "The vector must have three components"
         new_atom = deepcopy(self)
-        new_atom._position = self.position + np.array(vector)
+        new_atom.position = self.position + np.array(vector)
         return new_atom
 
     def __str__(self):
@@ -700,7 +738,3 @@ class Atom(object):
                     and self.type == other.type)
         except AttributeError:
             return False
-
-    # def __ne__(self, other):
-    #     # This is only for the python2 version to work correctly
-    #     return not self.__eq__(other)
