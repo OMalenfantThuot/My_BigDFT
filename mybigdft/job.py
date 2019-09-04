@@ -149,7 +149,7 @@ class Job(object):
         self.logfile = Logfile()
         self.ref_data_dir = ref_data_dir
         self.name = name
-        self.skip = bool(skip)
+        self.skip = skip
         self.is_completed = False
         self.pseudos = pseudos
         if self.pseudos:
@@ -266,7 +266,7 @@ class Job(object):
 
     @skip.setter
     def skip(self, skip):
-        self._skip = skip
+        self._skip = bool(skip)
 
     @property
     def init_dir(self):
