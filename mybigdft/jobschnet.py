@@ -17,7 +17,7 @@ class Jobschnet(object):
     to the Job class for BigDFT.
     """
 
-    def __init__(self, name="", posinp=None, skip=False):
+    def __init__(self, name="", posinp=None):
         r"""
         Parameters
         ----------
@@ -25,8 +25,6 @@ class Jobschnet(object):
             Name of the job. Will be used to name the created files.
         posinp : Posinp
             Base atomic positions for the job
-        skip : bool
-            If `True`, the calculation will be skipped (not used presently).
         """
         # Verify there are initial positions
         if posinp is None:
@@ -40,11 +38,10 @@ class Jobschnet(object):
                 )
 
         # Set the base attributes
-        self._posinp = posinp
-        self._number_of_structures = len(self._posinp)
-        self._name = str(name)
-        self._skip = bool(skip)
-        self._logfile = Logfileschnet(self._posinp)
+        self.posinp = posinp
+        self.number_of_structures = len(self.posinp)
+        self.name = name
+        self.logfile = Logfileschnet(self.posinp)
 
         self._set_filenames()
 
@@ -59,6 +56,10 @@ class Jobschnet(object):
         """
         return self._name
 
+    @name.setter
+    def name(self, name):
+        self._name = str(name)
+
     @property
     def posinp(self):
         r"""
@@ -68,6 +69,10 @@ class Jobschnet(object):
             Initial positions of the calculation
         """
         return self._posinp
+
+    @posinp.setter
+    def posinp(self, posinp):
+        self._posinp = posinp
 
     @property
     def number_of_structures(self):
@@ -79,15 +84,9 @@ class Jobschnet(object):
         """
         return self._number_of_structures
 
-    @property
-    def skip(self):
-        r"""
-        Returns
-        -------
-        bool
-            If `True`, the calculation will be skipped.
-        """
-        return self._skip
+    @number_of_structures.setter
+    def number_of_structures(self, number_of_structures):
+        self._number_of_structures = int(number_of_structures)
 
     @property
     def logfile(self):
@@ -99,15 +98,9 @@ class Jobschnet(object):
         """
         return self._logfile
 
-    #    @property
-    #    def posinp_name(self):
-    #        r"""
-    #        Returns
-    #        -------
-    #        str
-    #            Name of base posinp file
-    #        """
-    #        return self._posinp_name
+    @logfile.setter
+    def logfile(self, logfile):
+        self._logfile = logfile
 
     @property
     def outfile_name(self):
@@ -119,13 +112,15 @@ class Jobschnet(object):
         """
         return self._outfile_name
 
+    @outfile_name.setter
+    def outfile_name(self, outfile_name):
+        self._outfile_name = outfile_name
+
     def _set_filenames(self):
-        if self._name != "":
-            #            self._posinp_name = self.name + ".xyz"
-            self._outfile_name = self.name + ".out"
+        if self.name != "":
+            self.outfile_name = self.name + ".out"
         else:
-            #            self._posinp_name = "posinp.xyz"
-            self._outfile_name = "outfile.out"
+            self.outfile_name = "outfile.out"
 
     def run(
         self,
@@ -161,6 +156,10 @@ class Jobschnet(object):
             raise ValueError("This job needs a path to a stored model.")
         if not isinstance(model_dir, str):
             raise TypeError("The path to the stored model must be a string.")
+        try:
+            model_dir = os.environ["MODELDIR"] + model_dir
+        except KeyError:
+            pass
 
         # Forces verification and preparation
         if isinstance(forces, bool):
@@ -191,8 +190,8 @@ class Jobschnet(object):
         # Run the actual calculation
         raw_predictions = predict(
             modelpath=model_dir,
-            posinp=self._posinp,
-            name=self._name,
+            posinp=self.posinp,
+            name=self.name,
             device=device,
             disk_out=False,
             batch_size=batch_size,
@@ -241,23 +240,23 @@ class Jobschnet(object):
                     )
                     pred_idx += 12 * len(self._init_posinp[struct_idx])
 
-        self._logfile._update_results(predictions)
+        self.logfile._update_results(predictions)
 
         # Reset self._posinp for more calculations
         try:
-            self._posinp = deepcopy(self._init_posinp)
+            self.posinp = deepcopy(self._init_posinp)
         except:
             pass
 
         if write_to_disk:
             # To improve?
-            with open(self._outfile_name, "w") as out:
-                for idx, struct in enumerate(self._posinp):
+            with open(self.outfile_name, "w") as out:
+                for idx, struct in enumerate(self.posinp):
                     out.write("Structure {}\n".format(idx))
                     out.write("-------------------\n")
-                    out.write("Energy : {}\n".format(self._logfile.energy[idx]))
+                    out.write("Energy : {}\n".format(self.logfile.energy[idx]))
                     out.write("Forces : \n")
-                    np.savetxt(out, self._logfile.forces[idx])
+                    np.savetxt(out, self.logfile.forces[idx])
                     out.write("\n")
 
     def _create_additional_structures(self, order, deriv_length=0.02):
@@ -267,12 +266,12 @@ class Jobschnet(object):
         """
         if order not in [1, 2]:
             raise ValueError("Order of the forces calculation should be 1 or 2.")
-        self._init_posinp = deepcopy(self._posinp)
+        self._init_posinp = deepcopy(self.posinp)
         self._deriv_length = deriv_length
         all_structs = []
         # First order forces calculation
         if order == 1:
-            for str_idx, struct in enumerate(self._posinp):
+            for str_idx, struct in enumerate(self.posinp):
                 all_structs.append(struct)
                 for factor in [1, -1]:
                     for dim in [
@@ -288,10 +287,10 @@ class Jobschnet(object):
                                 for atom_idx in range(len(struct))
                             ]
                         )
-            self._posinp = all_structs
+            self.posinp = all_structs
         # Second order forces calculations
         elif order == 2:
-            for str_idx, struct in enumerate(self._posinp):
+            for str_idx, struct in enumerate(self.posinp):
                 all_structs.append(struct)
                 for factor in [2, 1, -1, -2]:
                     for dim in [
@@ -307,7 +306,7 @@ class Jobschnet(object):
                                 for atom_idx in range(len(struct))
                             ]
                         )
-            self._posinp = all_structs
+            self.posinp = all_structs
 
     def _calculate_forces(self, predictions, order):
         r"""
@@ -358,21 +357,21 @@ class Logfileschnet(object):
 
     def __init__(self, posinp):
 
-        self._posinp = posinp
-        self._n_at = []
-        self._atom_types = []
-        self._boundary_conditions = []
-        self._cell = []
+        self.posinp = posinp
+        self.n_at = []
+        self.atom_types = []
+        self.boundary_conditions = []
+        self.cell = []
 
-        for struct in self._posinp:
-            self._n_at.append(len(struct))
-            self._atom_types.append(set([atom.type for atom in struct]))
-            self._boundary_conditions.append(struct.boundary_conditions)
-            self._cell.append(struct.cell)
+        for struct in self.posinp:
+            self.n_at.append(len(struct))
+            self.atom_types.append(set([atom.type for atom in struct]))
+            self.boundary_conditions.append(struct.boundary_conditions)
+            self.cell.append(struct.cell)
 
-        self._energy = None
-        self._forces = None
-        self._dipole = None
+        self.energy = None
+        self.forces = None
+        self.dipole = None
 
     @property
     def posinp(self):
@@ -384,6 +383,10 @@ class Logfileschnet(object):
         """
         return self._posinp
 
+    @posinp.setter
+    def posinp(self, posinp):
+        self._posinp = posinp
+
     @property
     def n_at(self):
         r"""
@@ -394,6 +397,10 @@ class Logfileschnet(object):
         """
         return self._n_at
 
+    @n_at.setter
+    def n_at(self, n_at):
+        self._n_at = n_at
+
     @property
     def atom_types(self):
         r"""
@@ -403,6 +410,10 @@ class Logfileschnet(object):
             List containing sets of the elements present in each structure.
         """
         return self._atom_types
+
+    @atom_types.setter
+    def atom_types(self, atom_types):
+        self._atom_types = atom_types
 
     @property
     def boundary_conditions(self):
@@ -415,6 +426,10 @@ class Logfileschnet(object):
         """
         return self._boundary_conditions
 
+    @boundary_conditions.setter
+    def boundary_conditions(self, boundary_conditions):
+        self._boundary_conditions = boundary_conditions
+
     @property
     def cell(self):
         r"""
@@ -425,6 +440,10 @@ class Logfileschnet(object):
             None for free boundary conditions.
         """
         return self._cell
+
+    @cell.setter
+    def cell(self, cell):
+        self._cell = cell
 
     @property
     def energy(self):
@@ -437,6 +456,10 @@ class Logfileschnet(object):
         """
         return self._energy
 
+    @energy.setter
+    def energy(self, energy):
+        self._energy = energy
+
     @property
     def forces(self):
         r"""
@@ -448,6 +471,10 @@ class Logfileschnet(object):
         """
         return self._forces
 
+    @forces.setter
+    def forces(self, forces):
+        self._forces = forces
+
     @property
     def dipole(self):
         r"""
@@ -458,6 +485,10 @@ class Logfileschnet(object):
             If None, the dipoles have not been calculated yet.
         """
         return self._dipole
+
+    @dipole.setter
+    def dipole(self, dipole):
+        self._dipole = dipole
 
     def _update_results(self, predictions):
         r"""
@@ -474,8 +505,8 @@ class Logfileschnet(object):
         available_properties = list(predictions.keys())
 
         if "energy" in available_properties:
-            self._energy = predictions["energy"]
+            self.energy = predictions["energy"]
         if "forces" in available_properties:
-            self._forces = predictions["forces"]
+            self.forces = predictions["forces"]
         if "dipole" in available_properties:
-            self._dipole = predictions["dipole"]
+            self.dipole = predictions["dipole"]
