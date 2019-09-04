@@ -3,7 +3,6 @@ The :class:`Geoptschnet` allows to find a relaxed structure using
 a SchnetPack trained model
 """
 
-import os
 import numpy as np
 from copy import deepcopy
 from mybigdft import Posinp, Jobschnet
@@ -43,15 +42,20 @@ class Geoptschnet:
         """
         if posinp is None:
             raise ValueError("No initial positions were provided.")
-        self._posinp = posinp
-        self._forcemax = forcemax
-        self._step_size = step_size
-        self._max_iter = max_iter
-        self._final_posinp = None
+        self.posinp = posinp
+        self.forcemax = forcemax
+        self.step_size = step_size
+        self.max_iter = max_iter
+        self.final_posinp = None
 
         self._write_to_disk = write_to_disk
-        if out_name == "":
-            self._out_name = "final_posinp"
+        if self.write_to_disk:
+            if out_name == "":
+                self.out_name = "final_posinp"
+            else:
+                self.out_name = out_name
+        else:
+            self.out_name = None
 
     @property
     def posinp(self):
@@ -62,6 +66,10 @@ class Geoptschnet:
             Initial posinp of the geometry optimization procedure
         """
         return self._posinp
+
+    @posinp.setter
+    def posinp(self, posinp):
+        self._posinp = posinp
 
     @property
     def final_posinp(self):
@@ -74,6 +82,10 @@ class Geoptschnet:
         """
         return self._final_posinp
 
+    @final_posinp.setter
+    def final_posinp(self, final_posinp):
+        self._final_posinp = final_posinp
+
     @property
     def forcemax(self):
         r"""
@@ -83,6 +95,10 @@ class Geoptschnet:
             Stopping criterion on the forces (in eV/Angstrom)
         """
         return self._forcemax
+
+    @forcemax.setter
+    def forcemax(self, forcemax):
+        self._forcemax = forcemax
 
     @property
     def step_size(self):
@@ -94,6 +110,10 @@ class Geoptschnet:
         """
         return self._step_size
 
+    @step_size.setter
+    def step_size(self, step_size):
+        self._step_size = step_size
+
     @property
     def max_iter(self):
         r"""
@@ -103,6 +123,10 @@ class Geoptschnet:
             Maximum number of iterations
         """
         return self._max_iter
+
+    @max_iter.setter
+    def max_iter(self, max_iter):
+        self._max_iter = max_iter
 
     @property
     def write_to_disk(self):
@@ -114,18 +138,25 @@ class Geoptschnet:
         """
         return self._write_to_disk
 
+    @write_to_disk.setter
+    def write_to_disk(self, write_to_disk):
+        self._write_to_disk = write_to_disk
+
     @property
     def out_name(self):
         r"""
         Returns
         -------
-        str
-            Name of the output position file, only relevant if
-            write_to_disk is `True`.
+        str or None
+            Name of the output position file, None if write_to_disk is `False`.
         """
         return self._out_name
 
-    def run(self, model_dir=None, device="cpu", batch_size=128):
+    @out_name.setter
+    def out_name(self, out_name):
+        self._out_name = out_name
+
+    def run(self, model_dir=None, device="cpu", batch_size=128, recenter=False):
         r"""
         Parameters
         ----------
@@ -137,30 +168,28 @@ class Geoptschnet:
             Size of the mini-batches used in predictions
         """
 
-        try:
-            model_dir = os.environ["MODELDIR"] + model_dir
-        except KeyError:
-            pass
-        temp_posinp = deepcopy(self._posinp)
+        temp_posinp = deepcopy(self.posinp)
 
-        for i in range(1, self._max_iter + 1):
+        for i in range(1, self.max_iter + 1):
             job = Jobschnet(posinp=temp_posinp)
             job.run(
                 model_dir=model_dir, forces=True, device=device, batch_size=batch_size
             )
             for j in range(job.logfile.n_at[0]):
                 temp_posinp = temp_posinp.translate_atom(
-                    j, self._step_size * job.logfile.forces[0][j]
+                    j, self.step_size * job.logfile.forces[0][j]
                 )
-            if np.max(np.abs(job.logfile.forces[0])) < self._forcemax:
+            if np.max(np.abs(job.logfile.forces[0])) < self.forcemax:
                 print("Geometry optimization stopped at iteration {}.".format(i))
                 print("Max remaining force is {:6.4f}.".format(np.max(np.abs(job.logfile.forces[0]))))
-                self._final_posinp = temp_posinp
+                self.final_posinp = temp_posinp
                 break
-            if i == self._max_iter:
+            if i == self.max_iter:
                 print(
                     "Geometry optimization was not succesful at iteration {}.".format(i)
                 )
+        if recenter:
+            self.final_posinp = self.final_posinp.to_centroid()
 
-        if self._write_to_disk:
-            self._final_posinp.write(self._out_name + ".xyz")
+        if self.write_to_disk:
+            self.final_posinp.write(self.out_name + ".xyz")
