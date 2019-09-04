@@ -20,7 +20,7 @@ class Geoptschnet:
         self,
         posinp,
         forcemax=5e-3,
-        step_size=0.001,
+        step_size=0.002,
         max_iter=200,
         write_to_disk=False,
         out_name="",
@@ -154,12 +154,13 @@ class Geoptschnet:
                 )
             if np.max(np.abs(job.logfile.forces[0])) < self._forcemax:
                 print("Geometry optimization stopped at iteration {}.".format(i))
+                print("Max remaining force is {:6.4f}.".format(np.max(np.abs(job.logfile.forces[0]))))
+                self._final_posinp = temp_posinp
                 break
             if i == self._max_iter:
                 print(
                     "Geometry optimization was not succesful at iteration {}.".format(i)
                 )
 
-        self._final_posinp = deepcopy(temp_posinp)
         if self._write_to_disk:
             self._final_posinp.write(self._out_name + ".xyz")
