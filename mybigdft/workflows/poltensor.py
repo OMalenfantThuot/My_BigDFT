@@ -60,21 +60,25 @@ class PolTensor(AbstractWorkflow):
         """
         # Set a default value to ef_amplitudes
         if ef_amplitudes is None:
-            ef_amplitudes = [1e-4]*3
+            ef_amplitudes = [1e-4] * 3
         # Check the value of the order
         order = int(order)
         if order not in [1, 2]:
             raise NotImplementedError("Only first and second order available")
         # Check the ground state has no electric field
-        if 'dft' in ground_state.inputparams:
-            efield = ground_state.inputparams['dft'].get('elecfield')
+        if "dft" in ground_state.inputparams:
+            efield = ground_state.inputparams["dft"].get("elecfield")
             if efield is not None:
-                warnings.warn("The ground state input parameters define an "
-                              "electric field", UserWarning)
+                warnings.warn(
+                    "The ground state input parameters define an " "electric field",
+                    UserWarning,
+                )
         # Check the electric field amplitudes
         if not isinstance(ef_amplitudes, Sequence) or len(ef_amplitudes) != 3:
-            raise ValueError("You must provide three electric field "
-                             "amplitudes, one for each space coordinate.")
+            raise ValueError(
+                "You must provide three electric field "
+                "amplitudes, one for each space coordinate."
+            )
         # Initialize the attributes that are specific to this workflow
         self._ground_state = ground_state
         self._ef_amplitudes = ef_amplitudes
@@ -169,21 +173,28 @@ class PolTensor(AbstractWorkflow):
         # space coordinate)
         for key, efield in self.efields.items():
             inp = deepcopy(gs.inputparams)
-            if 'dft' in inp:
-                inp['dft']['elecfield'] = efield.vector
+            if "dft" in inp:
+                inp["dft"]["elecfield"] = efield.vector
             else:
-                inp['dft'] = {'elecfield': efield.vector}
+                inp["dft"] = {"elecfield": efield.vector}
             # Set the correct reference data directory
             default = DEFAULT_PARAMETERS["output"]["orbitals"]
-            write_orbitals = ("output" in gs.inputparams and
-                              gs.inputparams["output"] != default)
+            write_orbitals = (
+                "output" in gs.inputparams and gs.inputparams["output"] != default
+            )
             if self.order == 1 and write_orbitals:
                 ref_data_dir = gs.data_dir  # pragma: no cover
             else:
                 ref_data_dir = gs.ref_data_dir
             run_dir = os.path.join(gs.run_dir, "EF_along_{}".format(key))
-            job = Job(name=gs.name, inputparams=inp, posinp=gs.posinp,
-                      run_dir=run_dir, skip=gs.skip, ref_data_dir=ref_data_dir)
+            job = Job(
+                name=gs.name,
+                inputparams=inp,
+                posinp=gs.posinp,
+                run_dir=run_dir,
+                skip=gs.skip,
+                ref_data_dir=ref_data_dir,
+            )
             job.efield = efield
             queue.append(job)
         return queue
@@ -195,7 +206,7 @@ class PolTensor(AbstractWorkflow):
         """
         efields = OrderedDict()
         if self.order == 1:
-            signs = {"+": 1.}  # One electric field per coordinate
+            signs = {"+": 1.0}  # One electric field per coordinate
         elif self.order == 2:
             signs = SIGNS  # Two electric fields per coordinate
         for i, coord in enumerate(COORDS):
@@ -221,7 +232,7 @@ class PolTensor(AbstractWorkflow):
         elif self.order == 2:
             # Compute the second order tensor elements
             # for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))
-            for i, (job1, job2) in enumerate(zip(*[iter(self.queue)]*2)):
+            for i, (job1, job2) in enumerate(zip(*[iter(self.queue)] * 2)):
                 # Get the delta of dipoles
                 d1 = np.array(job1.logfile.dipole)
                 d2 = np.array(job2.logfile.dipole)
@@ -229,16 +240,16 @@ class PolTensor(AbstractWorkflow):
                 # Get the delta of electric field amplitude
                 amp1 = job1.efield.amplitude
                 amp2 = job2.efield.amplitude
-                assert amp1 == - amp2
+                assert amp1 == -amp2
                 delta_ef = amp1 - amp2
                 # Update the polarizability tensor
                 pol_tensor[:, i] = delta_dipoles / delta_ef
         # Set some attributes
         self._pol_tensor = pol_tensor  # atomic units
-        self._mean_polarizability = pol_tensor.trace()/3  # atomic units
+        self._mean_polarizability = pol_tensor.trace() / 3  # atomic units
 
 
-class ElectricField(namedtuple('ElectricField', ['i_coord', 'amplitude'])):
+class ElectricField(namedtuple("ElectricField", ["i_coord", "amplitude"])):
     r"""
     This class defines an electric field from the coordinate index and
     the amplitude of the electric field in that direction.

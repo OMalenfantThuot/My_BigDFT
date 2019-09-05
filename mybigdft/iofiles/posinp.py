@@ -86,19 +86,22 @@ class Posinp(Sequence):
             if len(cell) != 3:
                 raise ValueError(
                     "The cell size must be of length 3 (one value per "
-                    "space coordinate)")
+                    "space coordinate)"
+                )
         else:
             if boundary_conditions != "free":
                 raise ValueError(
-                    "You must give a cell size to use '{}' boundary conditions"
-                    .format(boundary_conditions))
+                    "You must give a cell size to use '{}' boundary conditions".format(
+                        boundary_conditions
+                    )
+                )
         if boundary_conditions == "periodic" and "inf" in cell:
             raise ValueError(
                 "Cannot use periodic boundary conditions with a cell meant "
-                "for a surface calculation.")
+                "for a surface calculation."
+            )
         elif boundary_conditions == "free" and units == "reduced":
-            raise ValueError(
-                "Cannot use reduced units with free boundary conditions")
+            raise ValueError("Cannot use reduced units with free boundary conditions")
 
     @classmethod
     def from_file(cls, filename):
@@ -187,7 +190,8 @@ class Posinp(Sequence):
         if n_at != len(lines):
             raise ValueError(
                 "The number of atoms received is different from the expected "
-                "number of atoms ({} != {})".format(len(lines), n_at))
+                "number of atoms ({} != {})".format(len(lines), n_at)
+            )
         # Decode the atoms
         atoms = []
         for line in lines:
@@ -332,8 +336,10 @@ class Posinp(Sequence):
     @cell.setter
     def cell(self, cell):
         if cell is not None:
-            cell = [abs(float(size)) if size not in [".inf", "inf"] else "inf"
-                    for size in cell]
+            cell = [
+                abs(float(size)) if size not in [".inf", "inf"] else "inf"
+                for size in cell
+            ]
         self._cell = cell
 
     @property
@@ -403,8 +409,12 @@ class Posinp(Sequence):
             same_cell = cell == other_cell
             # Check the other basic attributes
             same_BC = self.boundary_conditions == other.boundary_conditions
-            same_base = same_BC and len(self) == len(other) and \
-                self.units == other.units and same_cell
+            same_base = (
+                same_BC
+                and len(self) == len(other)
+                and self.units == other.units
+                and same_cell
+            )
             # Finally check the atoms only if the base is similar, as it
             # might be time-consuming for large systems
             if same_base:
@@ -445,8 +455,10 @@ class Posinp(Sequence):
         -------
             The string representation of a Posinp instance.
         """
-        return ("Posinp({0.atoms}, '{0.units}', '{0.boundary_conditions}', "
-                "cell={0.cell})".format(self))
+        return (
+            "Posinp({0.atoms}, '{0.units}', '{0.boundary_conditions}', "
+            "cell={0.cell})".format(self)
+        )
 
     def write(self, filename):
         r"""
@@ -483,7 +495,7 @@ class Posinp(Sequence):
         """
         pos_1 = self[i_at_1].position
         pos_2 = self[i_at_2].position
-        return np.sqrt(sum([(pos_1[i]-pos_2[i])**2 for i in range(3)]))
+        return np.sqrt(sum([(pos_1[i] - pos_2[i]) ** 2 for i in range(3)]))
 
     def translate_atom(self, i_at, vector):
         r"""
@@ -545,10 +557,16 @@ class Posinp(Sequence):
             those used by the posinp.
         """
         new_positions = self.positions + np.array(vector)
-        atoms = [Atom(atom.type, pos.tolist())
-                 for atom, pos in zip(self.atoms, new_positions)]
-        return Posinp(atoms, units=self.units, cell=self.cell,
-                      boundary_conditions=self.boundary_conditions)
+        atoms = [
+            Atom(atom.type, pos.tolist())
+            for atom, pos in zip(self.atoms, new_positions)
+        ]
+        return Posinp(
+            atoms,
+            units=self.units,
+            cell=self.cell,
+            boundary_conditions=self.boundary_conditions,
+        )
 
     def to_centroid(self):
         r"""
@@ -574,7 +592,7 @@ class Posinp(Sequence):
             of mass of the system.
         """
         m = self.masses
-        barycenter = np.sum(m*self.positions.T, axis=1) / np.sum(m)
+        barycenter = np.sum(m * self.positions.T, axis=1) / np.sum(m)
         return self.translate(-barycenter)
 
 
@@ -648,7 +666,7 @@ class Atom(object):
 
     @position.setter
     def position(self, position):
-        assert len(position)==3, "The position must have three components."
+        assert len(position) == 3, "The position must have three components."
         self._position = np.array(position, dtype=float)
 
     @property
@@ -697,8 +715,7 @@ class Atom(object):
             String representation of the atom, mainly used to create the
             string representation of a Posinp instance.
         """
-        return "{t}  {: .15}  {: .15}  {: .15}\n"\
-               .format(t=self.type, *self.position)
+        return "{t}  {: .15}  {: .15}  {: .15}\n".format(t=self.type, *self.position)
 
     def __repr__(self):
         r"""
@@ -734,7 +751,8 @@ class Atom(object):
         False
         """
         try:
-            return (np.allclose(self.position, other.position)
-                    and self.type == other.type)
+            return (
+                np.allclose(self.position, other.position) and self.type == other.type
+            )
         except AttributeError:
             return False

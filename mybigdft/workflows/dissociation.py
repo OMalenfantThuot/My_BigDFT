@@ -24,8 +24,9 @@ class Dissociation(AbstractWorkflow):
 
     POST_PROCESSING_ATTRIBUTES = ["energies", "minimum"]
 
-    def __init__(self, fragment1, fragment2, distances, inputparams=None,
-                 name="", run_dir=None):
+    def __init__(
+        self, fragment1, fragment2, distances, inputparams=None, name="", run_dir=None
+    ):
         r"""
         A queue of :class:`~mybigdft.job.Job` instances is initialized,
         one per distance between the fragments. For each job, the system
@@ -65,23 +66,24 @@ class Dissociation(AbstractWorkflow):
         """
         # Check that the fragments are not periodic
         for frag in [fragment1, fragment2]:
-            if frag.boundary_conditions == 'periodic':
+            if frag.boundary_conditions == "periodic":
                 raise ValueError(
                     "Cannot compute a dissociation curve with periodic "
-                    "boundary conditions:\n{}".format(frag))
+                    "boundary conditions:\n{}".format(frag)
+                )
         # Make sure both fragments use the same units (could actually be
         # implemented properly in the __add__ method of posinp)
         if fragment1.units != fragment2.units:
             raise NotImplementedError(
-                "Unit conversion of positions needed")  # pragma: no cover
+                "Unit conversion of positions needed"
+            )  # pragma: no cover
         # Set the base attributes that are specific to this workflow
         self.fragment1 = fragment1
         self.fragment2 = fragment2
         self.distances = distances
         # Define a fake job from the given arguments in order to
         # initialize properly the other base atributes
-        job = Job(name=name, inputparams=inputparams, posinp=fragment1,
-                  run_dir=run_dir)
+        job = Job(name=name, inputparams=inputparams, posinp=fragment1, run_dir=run_dir)
         self.inputparams = job.inputparams
         self.name = job.name
         self.run_dir = job.run_dir
@@ -128,8 +130,12 @@ class Dissociation(AbstractWorkflow):
             pos = deepcopy(self.fragment1)
             pos._atoms += new_frag2.atoms
             # Add a new job to the queue
-            job = Job(name=self.name, inputparams=self.inputparams, posinp=pos,
-                      run_dir=run_dir)
+            job = Job(
+                name=self.name,
+                inputparams=self.inputparams,
+                posinp=pos,
+                run_dir=run_dir,
+            )
             job.distance = y_0  # We add the distance attribute
             queue.append(job)
         return queue

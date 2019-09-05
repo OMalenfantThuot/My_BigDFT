@@ -15,6 +15,7 @@ import warnings
 from copy import deepcopy
 from collections import MutableMapping
 import yaml
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -141,8 +142,7 @@ class InputParams(MutableMapping):
     @posinp.setter
     def posinp(self, new):
         if new is not None and not isinstance(new, Posinp):
-            raise ValueError(
-                "Update the posinp attribute with a Posinp instance")
+            raise ValueError("Update the posinp attribute with a Posinp instance")
         else:
             self._posinp = new
 
@@ -228,11 +228,11 @@ def clean(params, keyword=None):
         checking that all the keys in `params` correspond to actual
         BigDFT parameters.
     """
-#    # Make sure to convert hgrids to a list beforehand
-#    if "dft" in params and "hgrids" in params["dft"]:
-#        hgrids = deepcopy(params["dft"]["hgrids"])
-#        if not isinstance(hgrids, list):
-#            params["dft"]["hgrids"] = [hgrids]*3
+    #    # Make sure to convert hgrids to a list beforehand
+    #    if "dft" in params and "hgrids" in params["dft"]:
+    #        hgrids = deepcopy(params["dft"]["hgrids"])
+    #        if not isinstance(hgrids, list):
+    #            params["dft"]["hgrids"] = [hgrids]*3
     # Use a copy of params to update the input parameters while looping
     # on params. This copy will be returned.
     real_params = deepcopy(params)
@@ -241,10 +241,13 @@ def clean(params, keyword=None):
     if keyword is not None:
         default = default[keyword]
     # Set real_params['output']['orbitals'] to 'None' when it is False
-    if 'output' in real_params and real_params['output'] is not None and \
-            'orbitals' in real_params['output'] and \
-            not real_params['output']['orbitals']:
-        real_params['output']['orbitals'] = 'None'
+    if (
+        "output" in real_params
+        and real_params["output"] is not None
+        and "orbitals" in real_params["output"]
+        and not real_params["output"]["orbitals"]
+    ):
+        real_params["output"]["orbitals"] = "None"
     # Check the validity of the given input parameters
     check(real_params, keyword=keyword)
     # Return the cleaned input parameters
@@ -262,15 +265,15 @@ def clean(params, keyword=None):
         if real_params[key] == {}:
             del real_params[key]
     # Clean the chess input variables as well
-    if 'chess' in real_params:
-        chess_params = clean(real_params['chess'], keyword='chess')
+    if "chess" in real_params:
+        chess_params = clean(real_params["chess"], keyword="chess")
         if chess_params != {}:
-            real_params['chess'] = chess_params
+            real_params["chess"] = chess_params
         else:
-            del real_params['chess']
+            del real_params["chess"]
     # Remove the cumbersome geopt key if ncount_cluster_x is the only
     # key (it happens when the input parameters are read from a Logfile)
-    dummy_value = {'ncount_cluster_x': 1}
+    dummy_value = {"ncount_cluster_x": 1}
     if "geopt" in real_params and real_params["geopt"] == dummy_value:
         del real_params["geopt"]
     return real_params
@@ -306,8 +309,7 @@ def check(params, keyword=None):
                 # Check the subkey
                 key_definition = parameters[key]
                 if subkey not in key_definition:
-                    raise KeyError(
-                        "Unknown key '{}' in '{}'".format(subkey, key))
+                    raise KeyError("Unknown key '{}' in '{}'".format(subkey, key))
                 # Check the subvalue:
                 check_value(subkey, subvalue, key, value, key_definition)
 
@@ -349,26 +351,31 @@ def check_value(subkey, subvalue, key, value, key_definition):
         possible_values = condition["WHEN"]
         if value[master_key] not in possible_values:
             raise ValueError(
-                "Condition '{} in {}' not met for '{}' in '{}' (got {})"
-                .format(master_key, possible_values, subkey, key, subvalue))
+                "Condition '{} in {}' not met for '{}' in '{}' (got {})".format(
+                    master_key, possible_values, subkey, key, subvalue
+                )
+            )
     # It must be in the exclusive values
     possible_values = subkey_definition.get("EXCLUSIVE")
     if possible_values and subvalue not in possible_values:
         raise ValueError(
-            "'{}' in '{}' not in the possible values (got {}, not in {})"
-            .format(subkey, subkey, subvalue, possible_values))
+            "'{}' in '{}' not in the possible values (got {}, not in {})".format(
+                subkey, subkey, subvalue, possible_values
+            )
+        )
     # It must be in the correct range
     valid_range = subkey_definition.get("RANGE")
     if valid_range:
         if isinstance(subvalue, list):
-            value_in_range = all([in_range(val, valid_range)
-                                  for val in subvalue])
+            value_in_range = all([in_range(val, valid_range) for val in subvalue])
         else:
             value_in_range = in_range(subvalue, valid_range)
         if not value_in_range:
             raise ValueError(
-                "'{}' in '{}' not in valid range (got {}, not in {})"
-                .format(subkey, key, subvalue, valid_range))
+                "'{}' in '{}' not in valid range (got {}, not in {})".format(
+                    subkey, key, subvalue, valid_range
+                )
+            )
 
 
 def in_range(value, valid_range):

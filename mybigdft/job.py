@@ -320,7 +320,7 @@ class Job(object):
             Base command to run the bigdft-tool executable.
         """
         return self._bigdft_tool_cmd
-    
+
     @bigdft_tool_cmd.setter
     def bigdft_tool_cmd(self, bigdft_tool_cmd):
         self._bigdft_tool_cmd = bigdft_tool_cmd

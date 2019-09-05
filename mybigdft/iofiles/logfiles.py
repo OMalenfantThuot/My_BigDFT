@@ -20,6 +20,7 @@ import warnings
 from collections import Sequence, Mapping
 from copy import deepcopy
 import yaml
+
 try:
     from yaml import CLoader as Loader, CDumper as Dumper
 except ImportError:  # pragma: no cover
@@ -37,7 +38,9 @@ PATHS = "paths"
 DOC = "doc"
 LAST_GROUND_STATE_OPTIMIZATION = ["Ground State Optimization", -1]
 LAST_SUBSPACE_OPTIMIZATION = LAST_GROUND_STATE_OPTIMIZATION + [
-    "Hamiltonian Optimization", -1, "Subspace Optimization"
+    "Hamiltonian Optimization",
+    -1,
+    "Subspace Optimization",
 ]
 
 
@@ -54,104 +57,86 @@ def _get_value_from_last_optimization(key):
 ATTRIBUTES = {
     "n_at": {
         PATHS: [["Atomic System Properties", "Number of atoms"]],
-        DOC: "Number of Atoms"
+        DOC: "Number of Atoms",
     },
     "boundary_conditions": {
         PATHS: [["Atomic System Properties", "Boundary Conditions"]],
-        DOC: "Boundary Conditions"
+        DOC: "Boundary Conditions",
     },
-    "cell": {
-        PATHS: [["Atomic System Properties", "Box Sizes (AU)"]],
-        DOC: "Cell size"
-    },
+    "cell": {PATHS: [["Atomic System Properties", "Box Sizes (AU)"]], DOC: "Cell size"},
     "symmetry": {
         PATHS: [["Atomic System Properties", "Space group"]],
-        DOC: "Symmetry group"
+        DOC: "Symmetry group",
     },
     "atom_types": {
         PATHS: [["Atomic System Properties", "Types of atoms"]],
-        DOC: "List of the atomic types present in the posinp"
+        DOC: "List of the atomic types present in the posinp",
     },
     "energy": {
-        PATHS: [["Last Iteration", "FKS"], ["Last Iteration", "EKS"],
-                ["Energy (Hartree)"]],
-        DOC: "Energy (Hartree)"
+        PATHS: [
+            ["Last Iteration", "FKS"],
+            ["Last Iteration", "EKS"],
+            ["Energy (Hartree)"],
+        ],
+        DOC: "Energy (Hartree)",
     },
-    "astruct": {
-        PATHS: [["Atomic structure"]],
-        DOC: "Atomic structure"
-    },
+    "astruct": {PATHS: [["Atomic structure"]], DOC: "Atomic structure"},
     "evals": {
-        PATHS: [["Complete list of energy eigenvalues"]] +
-        _get_value_from_last_optimization("Orbitals"),
-        DOC: "Orbital energies and occupations"
+        PATHS: [["Complete list of energy eigenvalues"]]
+        + _get_value_from_last_optimization("Orbitals"),
+        DOC: "Orbital energies and occupations",
     },
     "fermi_level": {
         PATHS: _get_value_from_last_optimization("Fermi Energy"),
-        DOC: "Fermi level"
+        DOC: "Fermi level",
     },
     "magnetization": {
         PATHS: _get_value_from_last_optimization("Total magnetization"),
-        DOC: "Total magnetization of the system"
+        DOC: "Total magnetization of the system",
     },
-    "kpt_mesh": {
-        PATHS: [["kpt", "ngkpt"]],
-        DOC: "No. of Monkhorst-Pack grid points"
-    },
-    "kpts": {
-        PATHS: [["K points"]],
-        DOC: "Grid of k-points"
-    },
+    "kpt_mesh": {PATHS: [["kpt", "ngkpt"]], DOC: "No. of Monkhorst-Pack grid points"},
+    "kpts": {PATHS: [["K points"]], DOC: "Grid of k-points"},
     "gnrm_cv": {
         PATHS: [["dft", "gnrm_cv"]],
-        DOC: "Convergence criterion on wavefunction residue"
+        DOC: "Convergence criterion on wavefunction residue",
     },
     "forcemax_cv": {
         PATHS: [["geopt", "forcemax"]],
         DOC: "Convergence criterion on forces",
     },
     "forcemax": {
-        PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "maxval"],
-                ["Clean forces norm (Ha/Bohr)", "maxval"]],
-        DOC: "Maximum value of forces"
+        PATHS: [
+            ["Geometry", "FORCES norm(Ha/Bohr)", "maxval"],
+            ["Clean forces norm (Ha/Bohr)", "maxval"],
+        ],
+        DOC: "Maximum value of forces",
     },
-    "pressure": {
-        PATHS: [["Pressure", "GPa"]],
-        DOC: "Pressure (GPa)"
-    },
+    "pressure": {PATHS: [["Pressure", "GPa"]], DOC: "Pressure (GPa)"},
     "dipole": {
         PATHS: [["Electric Dipole Moment (AU)", "P vector"]],
-        DOC: "Electric Dipole Moment (AU)"
+        DOC: "Electric Dipole Moment (AU)",
     },
-    "forces": {
-        PATHS: [["Atomic Forces (Ha/Bohr)"]],
-        DOC: "Atomic Forces (Ha/Bohr)"
-    },
+    "forces": {PATHS: [["Atomic Forces (Ha/Bohr)"]], DOC: "Atomic Forces (Ha/Bohr)"},
     "force_fluct": {
         PATHS: [["Geometry", "FORCES norm(Ha/Bohr)", "fluct"]],
-        DOC: "Threshold fluctuation of Forces"
+        DOC: "Threshold fluctuation of Forces",
     },
     "support_functions": {
-        PATHS: [["Gross support functions moments", "Multipole coefficients",
-                 "values"]],
-        DOC: "Support functions"
+        PATHS: [
+            ["Gross support functions moments", "Multipole coefficients", "values"]
+        ],
+        DOC: "Support functions",
     },
     "electrostatic_multipoles": {
         PATHS: [["Multipole coefficients", "values"]],
-        DOC: "Electrostatic multipoles"
+        DOC: "Electrostatic multipoles",
     },
-    "sdos": {
-        PATHS: [["SDos files"]],
-        DOC: "SDos files"
-    },
+    "sdos": {PATHS: [["SDos files"]], DOC: "SDos files"},
     "walltime": {
         PATHS: [["Walltime since initialization"]],
-        DOC: "Walltime since initialization"
+        DOC: "Walltime since initialization",
     },
-    "WARNINGS": {
-        PATHS: [["WARNINGS"]],
-        DOC: "Warnings raised during the BigDFT run"
-    },
+    "WARNINGS": {PATHS: [["WARNINGS"]], DOC: "Warnings raised during the BigDFT run"},
 }
 
 
@@ -181,17 +166,22 @@ class Logfile(Mapping):
         # is not repreated in the subsequent logs. It's a workaround
         # which might prove edgy in the future.
         if "geopt" not in self.log:
-            avoidable_warning = ("The norm of the residue is too large, need "
-                                 "to recalculate input wavefunctions")
+            avoidable_warning = (
+                "The norm of the residue is too large, need "
+                "to recalculate input wavefunctions"
+            )
             warnings = log.get("WARNINGS")
-            acceptable_though_incomplete = (warnings is not None and
-                                            avoidable_warning in warnings)
+            acceptable_though_incomplete = (
+                warnings is not None and avoidable_warning in warnings
+            )
         else:
             acceptable_though_incomplete = False
         # Check if the logfile is incomplete
-        if self.log != {} and not acceptable_though_incomplete and (
-                self.energy is None and self.forces is None and
-                self.walltime is None):
+        if (
+            self.log != {}
+            and not acceptable_though_incomplete
+            and (self.energy is None and self.forces is None and self.walltime is None)
+        ):
             raise ValueError("The logfile is incomplete!")
         params = {key: log.get(key) for key in INPUT_PARAMETERS_DEFINITIONS}
         params = clean(params)
@@ -237,15 +227,18 @@ class Logfile(Mapping):
                     # A value was found: no need to look for other paths
                     break
             # Set the value to the underscored attribute
-            setattr(self, "_"+name, value)
+            setattr(self, "_" + name, value)
             # Set the attribute as a property
-            setattr(self.__class__, name,
-                    property(self._init_getter(name),
-                             doc=description.get(DOC, "")))
+            setattr(
+                self.__class__,
+                name,
+                property(self._init_getter(name), doc=description.get(DOC, "")),
+            )
 
     def _init_getter(self, name):
         def getter(self):
-            return getattr(self, "_"+name)
+            return getattr(self, "_" + name)
+
         return getter
 
     def _clean_attributes(self):
@@ -303,8 +296,11 @@ class Logfile(Mapping):
                 if psp_ixc != inp_ixc:
                     warnings.warn(
                         "The XC of pseudo potentials ({}) is different from "
-                        "the input XC ({}) for the '{}' atoms"
-                        .format(psp_ixc, inp_ixc, atom_type), UserWarning)
+                        "the input XC ({}) for the '{}' atoms".format(
+                            psp_ixc, inp_ixc, atom_type
+                        ),
+                        UserWarning,
+                    )
 
     @classmethod
     def from_file(cls, filename):
@@ -362,8 +358,9 @@ class Logfile(Mapping):
                 # return a GeoptLogfile instance
                 return GeoptLogfile(logs)
             else:
-                warnings.warn("More than one document found in the logfile!",
-                              UserWarning)
+                warnings.warn(
+                    "More than one document found in the logfile!", UserWarning
+                )
                 # In other cases, just return a MultipleLogfile instance
                 return MultipleLogfile(logs)
 
@@ -394,16 +391,28 @@ class Logfile(Mapping):
         except AttributeError:  # pragma: no cover
             base_dir = dir(super(Logfile, self))  # Python2
             # Add the missing stuff
-            base_dir += ["write", "log", "from_file", "from_stream",
-                         "posinp", "values", "keys", "get", "items",
-                         "inputparams", "_check_psppar", "_check_warnings",
-                         "_clean_attributes", "_set_builtin_attributes",
-                         "_init_getter"]
+            base_dir += [
+                "write",
+                "log",
+                "from_file",
+                "from_stream",
+                "posinp",
+                "values",
+                "keys",
+                "get",
+                "items",
+                "inputparams",
+                "_check_psppar",
+                "_check_warnings",
+                "_clean_attributes",
+                "_set_builtin_attributes",
+                "_init_getter",
+            ]
             base_dir += hidden_attributes
         # Always remove the underscored attributes (so that there are less
         # elements in the returned list)
         for name in hidden_attributes:
-            base_dir.remove("_"+name)
+            base_dir.remove("_" + name)
         return base_dir
 
     def __getitem__(self, key):
@@ -495,8 +504,7 @@ class MultipleLogfile(Sequence):
         """
         logs = [log.log for log in self.logs]
         with open(filename, "w") as stream:
-            yaml.dump_all(
-                logs, stream=stream, Dumper=Dumper, explicit_start=True)
+            yaml.dump_all(logs, stream=stream, Dumper=Dumper, explicit_start=True)
 
 
 class GeoptLogfile(MultipleLogfile):
@@ -517,7 +525,7 @@ class GeoptLogfile(MultipleLogfile):
         # Update the input parameters and positions of the documents
         for log in self.logs[1:]:
             log._inputparams = self.inputparams
-            log._posinp = Posinp.from_dict(log['Atomic structure'])
+            log._posinp = Posinp.from_dict(log["Atomic structure"])
         self._posinps = [log.posinp for log in self.logs]
 
     @property

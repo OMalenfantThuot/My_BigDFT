@@ -19,8 +19,16 @@ class Geopt(AbstractWorkflow):
 
     POST_PROCESSING_ATTRIBUTES = ["final_posinp"]
 
-    def __init__(self, base_job, method="SQNM", forcemax=1e-6, frac_fluct=0.0,
-                 betax=1, ncount_cluster_x=200, **kwargs):
+    def __init__(
+        self,
+        base_job,
+        method="SQNM",
+        forcemax=1e-6,
+        frac_fluct=0.0,
+        betax=1,
+        ncount_cluster_x=200,
+        **kwargs
+    ):
         r"""
         The base job has a given set of input parameters, and default
         values for the main parameters of the "geopt" key are
@@ -49,8 +57,12 @@ class Geopt(AbstractWorkflow):
         # with updated "geopt" input parameters
         base_job = deepcopy(base_job)
         attributes = {
-            "method": method, "forcemax": forcemax, "frac_fluct": frac_fluct,
-            "betax": betax, "ncount_cluster_x": ncount_cluster_x}
+            "method": method,
+            "forcemax": forcemax,
+            "frac_fluct": frac_fluct,
+            "betax": betax,
+            "ncount_cluster_x": ncount_cluster_x,
+        }
         for key, val in kwargs.items():
             attributes[key] = val
         base_job.inputparams["geopt"] = attributes
