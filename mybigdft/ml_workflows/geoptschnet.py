@@ -181,13 +181,17 @@ class Geoptschnet:
                 )
             if np.max(np.abs(job.logfile.forces[0])) < self.forcemax:
                 print("Geometry optimization stopped at iteration {}.".format(i))
-                print("Max remaining force is {:6.4f}.".format(np.max(np.abs(job.logfile.forces[0]))))
-                self.final_posinp = temp_posinp
                 break
             if i == self.max_iter:
                 print(
                     "Geometry optimization was not succesful at iteration {}.".format(i)
                 )
+        print(
+            "Max remaining force is {:6.4f}.".format(
+                np.max(np.abs(job.logfile.forces[0]))
+            )
+        )
+        self.final_posinp = temp_posinp
         if recenter:
             self.final_posinp = self.final_posinp.to_centroid()
 
