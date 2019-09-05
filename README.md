@@ -41,11 +41,15 @@ element atomic symbol.
 
 ### To use SchnetPack models (optional)
 
-To be able to use [SchnetPack](https://github.com/OMalenfantThuot/schnetpack) models in calculations,
-the following line must be added to the `~/.bashrc` file:
+To use [SchnetPack](https://github.com/OMalenfantThuot/schnetpack) models in calculations,
+the following line may be added to the `~/.bashrc` file:
 
 `export MODELDIR="/path/to/the/directory/for/trained/models/"`
 
+The paths of models can then be expressed as relative paths to `MODELDIR`instead of absolute paths.
+
+Note: To use the machine learning related classes of this package, the linked fork
+of SchnetPack must be installed. The [original repository](https://github.com/atomistic-machine-learning/schnetpack) will not work.
 
 ### Extra steps you might need to follow
 
