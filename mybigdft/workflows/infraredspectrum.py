@@ -101,8 +101,7 @@ class InfraredSpectrum(AbstractWorkflow):
         """
         return self._Zbvs
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
-             timeout):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to plot the
@@ -127,10 +126,16 @@ class InfraredSpectrum(AbstractWorkflow):
             Number of minutes after which each job must be stopped.
         """
         self.phonons.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
+            nmpi=nmpi,
+            nomp=nomp,
+            force_run=force_run,
+            dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete,
+            timeout=timeout,
+        )
         super(InfraredSpectrum, self)._run(
-            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout
+        )
 
     def post_proc(self):
         r"""
@@ -141,9 +146,10 @@ class InfraredSpectrum(AbstractWorkflow):
         """
         self._Z = self._compute_Z_matrix()
         nms = self.phonons.normal_modes.T
-        self._Zbvs = [self.Z*nm for nm in nms]
-        self._intensities = np.array([np.sum(np.sum(Zbv, axis=1)**2)
-                                      for Zbv in self.Zbvs])
+        self._Zbvs = [self.Z * nm for nm in nms]
+        self._intensities = np.array(
+            [np.sum(np.sum(Zbv, axis=1) ** 2) for Zbv in self.Zbvs]
+        )
 
     def _compute_Z_matrix(self):
         r"""
@@ -157,8 +163,8 @@ class InfraredSpectrum(AbstractWorkflow):
         n_at = len(posinp)
         # Compute the derivatives of the dipole with respect to the atomic
         # displacement
-        ZT = np.zeros((3*n_at, 3))  # transpose of the wanted Z matrix
-        for i, (job1, job2) in enumerate(zip(*[iter(self.phonons.queue)]*2)):
+        ZT = np.zeros((3 * n_at, 3))  # transpose of the wanted Z matrix
+        for i, (job1, job2) in enumerate(zip(*[iter(self.phonons.queue)] * 2)):
             # Compute the delta dipole (in atomic units)
             d1 = np.array(job1.logfile.dipole)
             d2 = np.array(job2.logfile.dipole)
@@ -166,12 +172,12 @@ class InfraredSpectrum(AbstractWorkflow):
             # Compute the delta displacement (in atomic units or bohr)
             amp1 = job1.displacement.amplitude
             amp2 = job2.displacement.amplitude
-            delta_u = amp1-amp2
+            delta_u = amp1 - amp2
             if job1.posinp.units == "angstroem":
                 delta_u *= ANG_TO_B
             # Set the new line of the transpose of the Z matrix
-            ZT[i] = (delta_dipoles*AU_TO_DEBYE) / (delta_u*B_TO_ANG)
+            ZT[i] = (delta_dipoles * AU_TO_DEBYE) / (delta_u * B_TO_ANG)
         # Normalize by the square root of the masses of the displaced atom
-        mass_norm = np.array([[mass]*9 for mass in posinp.masses])
-        mass_norm = mass_norm.reshape((3*n_at, 3))
+        mass_norm = np.array([[mass] * 9 for mass in posinp.masses])
+        mass_norm = mass_norm.reshape((3 * n_at, 3))
         return (ZT / np.sqrt(mass_norm)).T

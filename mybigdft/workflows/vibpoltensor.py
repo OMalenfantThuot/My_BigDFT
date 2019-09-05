@@ -108,8 +108,7 @@ class VibPolTensor(AbstractWorkflow):
         """
         return self._mean_polarizability
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
-             timeout):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related infrared intensities in order to be able to compute
@@ -135,10 +134,16 @@ class VibPolTensor(AbstractWorkflow):
             Number of minutes after which each job must be stopped.
         """
         self.infrared.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
+            nmpi=nmpi,
+            nomp=nomp,
+            force_run=force_run,
+            dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete,
+            timeout=timeout,
+        )
         super(VibPolTensor, self)._run(
-            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout
+        )
 
     def post_proc(self):
         r"""
@@ -151,6 +156,6 @@ class VibPolTensor(AbstractWorkflow):
         # Convert intensities to km.mol^-1 and filter them
         intensities = self.infrared.intensities * 42.255
         i_f = intensities[np.where(e > self.e_cut)]
-        conversion = 1.4891465E-37/1.1126501E-40*ANG_TO_B**3
-        self._mean_polarizability = np.sum(i_f/e_f**2) * conversion  # atomic
+        conversion = 1.4891465e-37 / 1.1126501e-40 * ANG_TO_B ** 3
+        self._mean_polarizability = np.sum(i_f / e_f ** 2) * conversion  # atomic
         # self.mean_polarizability = np.sum(i_f/e_f**2) * 1.4891465E-37  # SI

@@ -124,8 +124,7 @@ class RamanSpectrum(AbstractWorkflow):
         """
         return self._poltensor_workflows
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
-             timeout):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout):
         r"""
         Run the calculations allowing to compute the phonon energies and
         the related Raman intensities in order to be able to plot the
@@ -150,14 +149,25 @@ class RamanSpectrum(AbstractWorkflow):
             Number of minutes after which each job must be stopped.
         """
         self.phonons.run(
-            nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-            restart_if_incomplete=restart_if_incomplete, timeout=timeout)
+            nmpi=nmpi,
+            nomp=nomp,
+            force_run=force_run,
+            dry_run=dry_run,
+            restart_if_incomplete=restart_if_incomplete,
+            timeout=timeout,
+        )
         for pt in self.poltensor_workflows:
             pt.run(
-                nmpi=nmpi, nomp=nomp, force_run=force_run, dry_run=dry_run,
-                timeout=timeout, restart_if_incomplete=restart_if_incomplete)
+                nmpi=nmpi,
+                nomp=nomp,
+                force_run=force_run,
+                dry_run=dry_run,
+                timeout=timeout,
+                restart_if_incomplete=restart_if_incomplete,
+            )
         super(RamanSpectrum, self)._run(
-            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout)
+            nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout
+        )
 
     def post_proc(self):
         r"""
@@ -175,11 +185,13 @@ class RamanSpectrum(AbstractWorkflow):
         alphas = []
         betas_sq = []
         for pt in deriv_pol_tensors.dot(self.phonons.normal_modes).T:
-            alphas.append(pt.trace() / 3.)
+            alphas.append(pt.trace() / 3.0)
             evals = np.linalg.eigvals(pt)
-            beta_sq = ((evals[0]-evals[1])**2 +
-                       (evals[1]-evals[2])**2 +
-                       (evals[2]-evals[0])**2) / 2.
+            beta_sq = (
+                (evals[0] - evals[1]) ** 2
+                + (evals[1] - evals[2]) ** 2
+                + (evals[2] - evals[0]) ** 2
+            ) / 2.0
             betas_sq.append(beta_sq)
             # beta_sq = 1./2. * ((pt[0][0]-pt[1][1])**2 +
             #                    (pt[0][0]-pt[2][2])**2 +
@@ -192,11 +204,11 @@ class RamanSpectrum(AbstractWorkflow):
         # compute the intensity (converted from atomic units
         # to Ang^4.amu^-1) and the depolarization ratio
         # of the normal mode.
-        conversion = B_TO_ANG**4 / EMU_TO_AMU
-        self._intensities = \
-            (45*self._alphas**2 + 7*self._betas_sq) * conversion
-        self._depolarization_ratios = \
-            3*self._betas_sq / (45*self._alphas**2 + 4*self._betas_sq)
+        conversion = B_TO_ANG ** 4 / EMU_TO_AMU
+        self._intensities = (45 * self._alphas ** 2 + 7 * self._betas_sq) * conversion
+        self._depolarization_ratios = (
+            3 * self._betas_sq / (45 * self._alphas ** 2 + 4 * self._betas_sq)
+        )
 
     def _compute_deriv_pol_tensors(self):
         r"""
@@ -219,11 +231,11 @@ class RamanSpectrum(AbstractWorkflow):
             Derivatives of the polarizability tensor.
         """
         n_at = len(self.phonons.ground_state.posinp)
-        deriv_pts = np.zeros((3*n_at, 3, 3))
+        deriv_pts = np.zeros((3 * n_at, 3, 3))
         pt_wfs = self.poltensor_workflows
         if self.phonons.order == 1:
             ref_pt = pt_wfs.pop(0)
-            pol_tensors = (pt_wfs, [ref_pt]*len(pt_wfs))
+            pol_tensors = (pt_wfs, [ref_pt] * len(pt_wfs))
         elif self.phonons.order == 2:
             pol_tensors = (pt_wfs[::2], pt_wfs[1::2])
         else:
@@ -236,7 +248,7 @@ class RamanSpectrum(AbstractWorkflow):
                 delta_x = amp
             elif self.phonons.order == 2:
                 delta_x = 2 * amp
-            if gs1.posinp.units == 'angstroem':
+            if gs1.posinp.units == "angstroem":
                 delta_x *= ANG_TO_B
             # Get the value of the delta of poltensors
             i_at = gs1.moved_atom

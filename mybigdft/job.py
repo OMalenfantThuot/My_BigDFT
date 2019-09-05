@@ -143,16 +143,16 @@ class Job(object):
             raise ValueError("inputparams and posinp do not define the same posinp.")
 
         # Set the base attributes
-        inputparams._params = clean(inputparams.params)
-        self._inputparams = deepcopy(inputparams)
-        self._posinp = posinp
-        self._logfile = Logfile()
-        self._ref_data_dir = ref_data_dir
-        self._name = str(name)
-        self._skip = bool(skip)
-        self._is_completed = False
-        self._pseudos = pseudos
-        if self._pseudos:
+        inputparams.params = clean(inputparams.params)
+        self.inputparams = inputparams
+        self.posinp = posinp
+        self.logfile = Logfile()
+        self.ref_data_dir = ref_data_dir
+        self.name = name
+        self.skip = skip
+        self.is_completed = False
+        self.pseudos = pseudos
+        if self.pseudos:
             try:
                 self.inputparams["dft"]["ixc"] = -101130
             except KeyError:
@@ -174,6 +174,10 @@ class Job(object):
         """
         return self._name
 
+    @name.setter
+    def name(self, name):
+        self._name = str(name)
+
     @property
     def inputparams(self):
         r"""
@@ -184,6 +188,10 @@ class Job(object):
         """
         return self._inputparams
 
+    @inputparams.setter
+    def inputparams(self, inputparams):
+        self._inputparams = deepcopy(inputparams)
+
     @property
     def posinp(self):
         r"""
@@ -193,6 +201,10 @@ class Job(object):
             Initial positions of the calculation.
         """
         return self._posinp
+
+    @posinp.setter
+    def posinp(self, posinp):
+        self._posinp = posinp
 
     @property
     def logfile(self):
@@ -205,6 +217,10 @@ class Job(object):
         """
         return self._logfile
 
+    @logfile.setter
+    def logfile(self, logfile):
+        self._logfile = logfile
+
     @property
     def ref_data_dir(self):
         r"""
@@ -216,16 +232,24 @@ class Job(object):
         """
         return self._ref_data_dir
 
+    @ref_data_dir.setter
+    def ref_data_dir(self, ref_data_dir):
+        self._ref_data_dir = ref_data_dir
+
     @property
     def pseudos(self):
         r"""
         Returns
-        _______
+        -------
         bool
             if `True`, the calculation uses the pseudopotential files
             in $PSEUDODIR (environment variable).
         """
         return self._pseudos
+
+    @pseudos.setter
+    def pseudos(self, pseudos):
+        self._pseudos = pseudos
 
     @property
     def skip(self):
@@ -240,6 +264,10 @@ class Job(object):
         """
         return self._skip
 
+    @skip.setter
+    def skip(self, skip):
+        self._skip = bool(skip)
+
     @property
     def init_dir(self):
         r"""
@@ -251,6 +279,10 @@ class Job(object):
         """
         return self._init_dir
 
+    @init_dir.setter
+    def init_dir(self, init_dir):
+        self._init_dir = init_dir
+
     @property
     def run_dir(self):
         r"""
@@ -260,6 +292,10 @@ class Job(object):
             Absolute path to the directory where the calculation is run.
         """
         return self._run_dir
+
+    @run_dir.setter
+    def run_dir(self, run_dir):
+        self._run_dir = run_dir
 
     @property
     def data_dir(self):
@@ -271,6 +307,10 @@ class Job(object):
         """
         return self._data_dir
 
+    @data_dir.setter
+    def data_dir(self, data_dir):
+        self._data_dir = data_dir
+
     @property
     def bigdft_tool_cmd(self):
         r"""
@@ -280,6 +320,10 @@ class Job(object):
             Base command to run the bigdft-tool executable.
         """
         return self._bigdft_tool_cmd
+
+    @bigdft_tool_cmd.setter
+    def bigdft_tool_cmd(self, bigdft_tool_cmd):
+        self._bigdft_tool_cmd = bigdft_tool_cmd
 
     @property
     def bigdft_cmd(self):
@@ -291,6 +335,10 @@ class Job(object):
         """
         return self._bigdft_cmd
 
+    @bigdft_cmd.setter
+    def bigdft_cmd(self, bigdft_cmd):
+        self._bigdft_cmd = bigdft_cmd
+
     @property
     def input_name(self):
         r"""
@@ -300,6 +348,10 @@ class Job(object):
             Name of the input parameters file.
         """
         return self._input_name
+
+    @input_name.setter
+    def input_name(self, input_name):
+        self._input_name = input_name
 
     @property
     def posinp_name(self):
@@ -311,6 +363,10 @@ class Job(object):
         """
         return self._posinp_name
 
+    @posinp_name.setter
+    def posinp_name(self, posinp_name):
+        self._posinp_name = posinp_name
+
     @property
     def logfile_name(self):
         r"""
@@ -321,6 +377,10 @@ class Job(object):
         """
         return self._logfile_name
 
+    @logfile_name.setter
+    def logfile_name(self, logfile_name):
+        self._logfile_name = logfile_name
+
     @property
     def is_completed(self):
         r"""
@@ -330,6 +390,10 @@ class Job(object):
             `True` if the job has already run successfully.
         """
         return self._is_completed
+
+    @is_completed.setter
+    def is_completed(self, is_completed):
+        self._is_completed = is_completed
 
     def _set_directory_attributes(self, run_dir):
         r"""
@@ -355,10 +419,10 @@ class Job(object):
             Folder where to run the calculation.
         """
         # Set the initial directory
-        self._init_dir = os.getcwd()
+        self.init_dir = os.getcwd()
         # Set the directory where the calculation will be run
         if run_dir is None:
-            self._run_dir = self.init_dir
+            self.run_dir = self.init_dir
         else:
             # A run directory was given, find the common prefix with the
             # current working directory
@@ -368,15 +432,15 @@ class Job(object):
                 # is already well defined, and the absolute directory is
                 # the concatenation of the current working directory and
                 # the run directory
-                self._run_dir = os.path.join(self.init_dir, run_dir)
+                self.run_dir = os.path.join(self.init_dir, run_dir)
             else:
                 # Else, find the relative path with the common prefix to
                 # define run_dir, and use run_dir to define the
                 # absolute directory. The initial directory is changed to the
                 # common prefix.
-                self._init_dir = basename
+                self.init_dir = basename
                 new_run_dir = os.path.relpath(run_dir, start=basename)
-                self._run_dir = os.path.join(self.init_dir, new_run_dir)
+                self.run_dir = os.path.join(self.init_dir, new_run_dir)
                 # print("run_dir switched from {} to {}"
                 #       .format(run_dir, new_run_dir))
 
@@ -388,24 +452,24 @@ class Job(object):
         data_dir = "data"  # base name for the BigDFT data directory
         if self.name != "":
             data_dir += "-" + self.name
-        self._data_dir = os.path.join(self.run_dir, data_dir)
+        self.data_dir = os.path.join(self.run_dir, data_dir)
 
     def _set_cmd_attributes(self):
         r"""
         Set the base commands to run bigdft or bigdft-tool.
         """
         # The base bigdft-tool command is always the same
-        self._bigdft_tool_cmd = [BIGDFT_TOOL_PATH]
+        self.bigdft_tool_cmd = [BIGDFT_TOOL_PATH]
         if self.name:
-            self._bigdft_tool_cmd += ["--name", self.name]
+            self.bigdft_tool_cmd += ["--name", self.name]
         # The base bigdft command depends on name and on skip
         skip_option = []
         if self.skip:
             skip_option += ["-s", "Yes"]
         if self.name != "":
-            self._bigdft_cmd = [BIGDFT_PATH, self.name] + skip_option
+            self.bigdft_cmd = [BIGDFT_PATH, self.name] + skip_option
         else:
-            self._bigdft_cmd = [BIGDFT_PATH] + skip_option
+            self.bigdft_cmd = [BIGDFT_PATH] + skip_option
 
     def _set_filename_attributes(self):
         r"""
@@ -413,13 +477,13 @@ class Job(object):
         files.
         """
         if self.name != "":
-            self._input_name = self.name + ".yaml"  # input file name
-            self._posinp_name = self.name + ".xyz"  # posinp file name
-            self._logfile_name = "log-" + self.input_name  # output file name
+            self.input_name = self.name + ".yaml"  # input file name
+            self.posinp_name = self.name + ".xyz"  # posinp file name
+            self.logfile_name = "log-" + self.input_name  # output file name
         else:
-            self._input_name = "input.yaml"  # input file name
-            self._posinp_name = "posinp.xyz"  # posinp file name
-            self._logfile_name = "log.yaml"  # output file name
+            self.input_name = "input.yaml"  # input file name
+            self.posinp_name = "posinp.xyz"  # posinp file name
+            self.logfile_name = "log.yaml"  # output file name
 
     def __enter__(self):
         r"""
@@ -506,7 +570,7 @@ class Job(object):
                 output_msg = output_msg.decode("unicode_escape")
                 print(output_msg)
             try:
-                self._logfile = Logfile.from_file(self.logfile_name)
+                self.logfile = Logfile.from_file(self.logfile_name)
             except ValueError as e:
                 if str(e) == "The logfile is incomplete!":
                     raise RuntimeError("Timeout exceded ({} minutes)".format(timeout))
@@ -518,7 +582,7 @@ class Job(object):
             # correspond to the ones used to initialize the current job.
             print("Logfile {} already exists!\n".format(self.logfile_name))
             try:
-                self._logfile = Logfile.from_file(self.logfile_name)
+                self.logfile = Logfile.from_file(self.logfile_name)
             except ValueError as e:
                 incomplete_log = str(e) == "The logfile is incomplete!"
                 if incomplete_log and restart_if_incomplete:
@@ -538,7 +602,7 @@ class Job(object):
             else:
                 self._check_logfile_posinp()
                 self._check_logfile_inputparams()
-        self._is_completed = True
+        self.is_completed = True
 
     def _copy_reference_data_dir(self):
         r"""
@@ -632,7 +696,7 @@ class Job(object):
         self.inputparams.write(self.input_name)
         if self.posinp is not None:
             self.posinp.write(self.posinp_name)
-        if self._pseudos:
+        if self.pseudos:
             elements = set([atom.type for atom in self.posinp])
             for element in elements:
                 shutil.copyfile(

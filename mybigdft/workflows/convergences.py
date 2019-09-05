@@ -23,7 +23,7 @@ from mybigdft.workflows.workflow import AbstractWorkflow
 if sys.version_info >= (3, 4):  # pragma: no cover
     ABC = abc.ABC
 else:  # pragma: no cover
-    ABC = abc.ABCMeta(str('ABC'), (), {})
+    ABC = abc.ABCMeta(str("ABC"), (), {})
 
 
 __all__ = ["HgridsConvergence", "RmultConvergence"]
@@ -47,8 +47,9 @@ class AbstractConvergence(AbstractWorkflow, ABC):
 
     POST_PROCESSING_ATTRIBUTES = ["converged"]
 
-    def __init__(self, base_job, reference, delta, n_jobs=10,
-                 precision_per_atom=0.01*EV_TO_HA):
+    def __init__(
+        self, base_job, reference, delta, n_jobs=10, precision_per_atom=0.01 * EV_TO_HA
+    ):
         r"""
         One must provide a base `Job` instance defining the system
         considered and possibly non-default input parameters. Then, one
@@ -133,19 +134,20 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         other_labels = ["precision_per_atom (Ha)", "is_converged"]
         other_lengths = [len(label) + shift for label in other_labels]
         # Print the desired precision per atom
-        print("Requested precision per atom: {:.2e} (Ha)"
-              .format(self.precision_per_atom))
+        print(
+            "Requested precision per atom: {:.2e} (Ha)".format(self.precision_per_atom)
+        )
         if first_column_values != []:
             # Print the header of the table
             first_column_length = len(first_column_values[0]) + shift
             first_column = first_column_label.center(first_column_length)
             other_columns = ""
             for label in other_labels:
-                other_columns += label.center(len(label)+shift)
+                other_columns += label.center(len(label) + shift)
             header = first_column + other_columns
-            print("-"*len(header))
+            print("-" * len(header))
             print(header)
-            print("-"*len(header))
+            print("-" * len(header))
             # Print each line of the table
             for i, value in enumerate(first_column_values):
                 first_column = value.center(first_column_length)
@@ -153,8 +155,9 @@ class AbstractConvergence(AbstractWorkflow, ABC):
                 values = [job.precision_per_atom, job.is_converged]
                 other_columns = ""
                 for i, value in enumerate(values):
-                    other_columns += unformatted[i]\
-                                     .format(value).center(other_lengths[i])
+                    other_columns += (
+                        unformatted[i].format(value).center(other_lengths[i])
+                    )
                 print(first_column + other_columns)
 
     @staticmethod
@@ -197,8 +200,7 @@ class AbstractConvergence(AbstractWorkflow, ABC):
             Queue of jobs to be run.
         """
         # Define the parameters to be used during this workflow
-        param_variations = self._initialize_param_variations(
-            reference, delta, n_jobs)
+        param_variations = self._initialize_param_variations(reference, delta, n_jobs)
         # Set the queue of jobs according to the hgrids defined
         pos = self.base_job.posinp
         name = self.base_job.name
@@ -208,8 +210,7 @@ class AbstractConvergence(AbstractWorkflow, ABC):
             # are updated given the value of the parameter
             new_inp = self._new_inputparams(param)
             new_run_dir = self._new_run_dir(param)
-            job = Job(posinp=pos, inputparams=new_inp, name=name,
-                      run_dir=new_run_dir)
+            job = Job(posinp=pos, inputparams=new_inp, name=name, run_dir=new_run_dir)
             job.param = param
             queue.append(job)
         return queue
@@ -273,8 +274,7 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         """
         raise NotImplementedError
 
-    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete,
-             timeout):
+    def _run(self, nmpi, nomp, force_run, dry_run, restart_if_incomplete, timeout):
         r"""
         This method runs the jobs until the hgrids are too high to
         stop giving results in the desired precision range.
@@ -305,9 +305,14 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         """
         # Run the first job of the queue and get the reference energy
         with self.queue[0] as ref_job:
-            ref_job.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                        dry_run=dry_run, timeout=timeout,
-                        restart_if_incomplete=restart_if_incomplete)
+            ref_job.run(
+                nmpi=nmpi,
+                nomp=nomp,
+                force_run=force_run,
+                dry_run=dry_run,
+                timeout=timeout,
+                restart_if_incomplete=restart_if_incomplete,
+            )
         ref_job.is_converged = True
         ref_job.precision_per_atom = 0.0
         self._converged = True
@@ -322,24 +327,29 @@ class AbstractConvergence(AbstractWorkflow, ABC):
                 job.is_converged = False
             else:
                 with job as j:
-                    j.run(nmpi=nmpi, nomp=nomp, force_run=force_run,
-                          dry_run=dry_run, timeout=timeout,
-                          restart_if_incomplete=restart_if_incomplete)
+                    j.run(
+                        nmpi=nmpi,
+                        nomp=nomp,
+                        force_run=force_run,
+                        dry_run=dry_run,
+                        timeout=timeout,
+                        restart_if_incomplete=restart_if_incomplete,
+                    )
                 # Warn a UserWarning if the current job gives a lower
                 # energy than the reference one
                 en = job.logfile.energy
                 if en <= min_en:
                     warnings.warn(self._too_low_energy_msg, UserWarning)
                 # Assess if the job is converged or not
-                job.precision_per_atom = (en-min_en) / n_at
-                job.is_converged = \
-                    job.precision_per_atom <= self.precision_per_atom
+                job.precision_per_atom = (en - min_en) / n_at
+                job.is_converged = job.precision_per_atom <= self.precision_per_atom
                 if job.is_converged:
                     self._converged = job
         if not dry_run:
             self.post_proc()
-            assert self.is_completed, ("You must define all post-processing "
-                                       "attributes in post_proc.")
+            assert self.is_completed, (
+                "You must define all post-processing " "attributes in post_proc."
+            )
 
     @property
     @abc.abstractmethod
@@ -415,10 +425,12 @@ class HgridsConvergence(AbstractConvergence):
         Print a summary of the results of the hgrids convergence
         workflow.
         """
-        first_column_values = ["[{:.2f}, {:.2f}, {:.2f}]".format(*job.param)
-                               for job in self.queue if job.is_completed]
-        super(HgridsConvergence, self).summary("hgrids",
-                                               first_column_values)
+        first_column_values = [
+            "[{:.2f}, {:.2f}, {:.2f}]".format(*job.param)
+            for job in self.queue
+            if job.is_completed
+        ]
+        super(HgridsConvergence, self).summary("hgrids", first_column_values)
 
     @staticmethod
     def _clean_initial_parameters(reference, delta):
@@ -432,9 +444,9 @@ class HgridsConvergence(AbstractConvergence):
         """
         # Make sure all the received hgrids are lists of length 3
         if not isinstance(delta, list):
-            delta = [float(delta)]*3
+            delta = [float(delta)] * 3
         if not isinstance(reference, list):
-            reference = [float(reference)]*3
+            reference = [float(reference)] * 3
         for hgrids in [reference, delta]:
             assert len(hgrids) == 3, "{} not of length 3".format(hgrids)
         # Make sure the signs in delta are positive
@@ -460,8 +472,9 @@ class HgridsConvergence(AbstractConvergence):
         list
             Values of hgrids for all the jobs.
         """
-        return [(reference + i*delta).round(decimals=2).tolist()
-                for i in range(n_jobs)]
+        return [
+            (reference + i * delta).round(decimals=2).tolist() for i in range(n_jobs)
+        ]
 
     def _new_inputparams(self, param):
         r"""
@@ -501,8 +514,7 @@ class HgridsConvergence(AbstractConvergence):
             Value of the new run_dir
         """
         base_run_dir = self.base_job.run_dir
-        return os.path.join(base_run_dir,
-                            "{:.2f}_{:.2f}_{:.2f}".format(*param))
+        return os.path.join(base_run_dir, "{:.2f}_{:.2f}_{:.2f}".format(*param))
 
     @property
     def _too_low_energy_msg(self):  # pragma: no cover
@@ -515,9 +527,11 @@ class HgridsConvergence(AbstractConvergence):
             a lower quality calculation gave a lower energy than the
             reference calculation.
         """
-        return ("The job with minimal energy does not correspond to the job "
-                "with minimal hgrids. Consider increasing rmult or the "
-                "reference hgrids.")
+        return (
+            "The job with minimal energy does not correspond to the job "
+            "with minimal hgrids. Consider increasing rmult or the "
+            "reference hgrids."
+        )
 
     @property
     def _all_converged_msg(self):  # pragma: no cover
@@ -528,9 +542,11 @@ class HgridsConvergence(AbstractConvergence):
             Message warning the user he is being too conservative with
             this set of varied input parameters.
         """
-        return ("You may want to test higher hgrids as there is still room "
-                "to increase hgrids while staying below the requested "
-                "precision per atom.")
+        return (
+            "You may want to test higher hgrids as there is still room "
+            "to increase hgrids while staying below the requested "
+            "precision per atom."
+        )
 
     @property
     def _only_reference_converged_msg(self):  # pragma: no cover
@@ -541,8 +557,10 @@ class HgridsConvergence(AbstractConvergence):
             Message warning the user he should probably increase the
             quality of the calculations.
         """
-        return ("You may want to consider smaller values of hgrids to make "
-                "sure convergence was achieved.")
+        return (
+            "You may want to consider smaller values of hgrids to make "
+            "sure convergence was achieved."
+        )
 
 
 class RmultConvergence(AbstractConvergence):
@@ -564,10 +582,12 @@ class RmultConvergence(AbstractConvergence):
         Print a summary of the results of the rmult convergence
         workflow.
         """
-        first_column_values = ["[{:.1f}, {:.1f}]".format(*job.param)
-                               for job in self.queue if job.is_completed]
-        super(RmultConvergence, self).summary("rmult",
-                                              first_column_values)
+        first_column_values = [
+            "[{:.1f}, {:.1f}]".format(*job.param)
+            for job in self.queue
+            if job.is_completed
+        ]
+        super(RmultConvergence, self).summary("rmult", first_column_values)
 
     @staticmethod
     def _clean_initial_parameters(reference, delta):
@@ -605,8 +625,9 @@ class RmultConvergence(AbstractConvergence):
         list
             Values of rmults for all the jobs.
         """
-        return [(reference + i*delta).round(decimals=1).tolist()
-                for i in range(n_jobs)]
+        return [
+            (reference + i * delta).round(decimals=1).tolist() for i in range(n_jobs)
+        ]
 
     def _new_inputparams(self, param):
         r"""
@@ -659,9 +680,11 @@ class RmultConvergence(AbstractConvergence):
             a lower quality calculation gave a lower energy than the
             reference calculation.
         """
-        return ("The job with minimal energy does not correspond to the job "
-                "with maximal rmult. Consider decreasing hgrids or the "
-                "reference rmult.")
+        return (
+            "The job with minimal energy does not correspond to the job "
+            "with maximal rmult. Consider decreasing hgrids or the "
+            "reference rmult."
+        )
 
     @property
     def _all_converged_msg(self):
@@ -672,9 +695,11 @@ class RmultConvergence(AbstractConvergence):
             Message warning the user he is being too conservative with
             this set of varied input parameters.
         """
-        return ("You may want to test lower rmult as there is still room to "
-                "decrease rmult while staying below the requested precision "
-                "per atom.")
+        return (
+            "You may want to test lower rmult as there is still room to "
+            "decrease rmult while staying below the requested precision "
+            "per atom."
+        )
 
     @property
     def _only_reference_converged_msg(self):
@@ -685,5 +710,7 @@ class RmultConvergence(AbstractConvergence):
             Message warning the user he should probably increase the
             quality of the calculations.
         """
-        return ("You may want to consider larger values of rmult to make sure "
-                "convergence was achieved.")
+        return (
+            "You may want to consider larger values of rmult to make sure "
+            "convergence was achieved."
+        )
