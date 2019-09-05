@@ -258,8 +258,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span>
 
-    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
-             <span class="n">timeout</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run the calculations allowing to compute the phonon energies and</span>
 <span class="sd">        the related infrared intensities in order to be able to compute</span>
@@ -285,10 +284,16 @@
 <span class="sd">            Number of minutes after which each job must be stopped.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">infrared</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
-            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span>
+            <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span>
+            <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+            <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">VibPolTensor</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span>
-            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="VibPolTensor.post_proc"><a class="viewcode-back" href="../../../vibpoltensor.html#mybigdft.workflows.vibpoltensor.VibPolTensor.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -301,8 +306,8 @@
         <span class="c1"># Convert intensities to km.mol^-1 and filter them</span>
         <span class="n">intensities</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">infrared</span><span class="o">.</span><span class="n">intensities</span> <span class="o">*</span> <span class="mf">42.255</span>
         <span class="n">i_f</span> <span class="o">=</span> <span class="n">intensities</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">where</span><span class="p">(</span><span class="n">e</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">e_cut</span><span class="p">)]</span>
-        <span class="n">conversion</span> <span class="o">=</span> <span class="mf">1.4891465E-37</span><span class="o">/</span><span class="mf">1.1126501E-40</span><span class="o">*</span><span class="n">ANG_TO_B</span><span class="o">**</span><span class="mi">3</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">i_f</span><span class="o">/</span><span class="n">e_f</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">conversion</span>  <span class="c1"># atomic</span></div></div>
+        <span class="n">conversion</span> <span class="o">=</span> <span class="mf">1.4891465e-37</span> <span class="o">/</span> <span class="mf">1.1126501e-40</span> <span class="o">*</span> <span class="n">ANG_TO_B</span> <span class="o">**</span> <span class="mi">3</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">i_f</span> <span class="o">/</span> <span class="n">e_f</span> <span class="o">**</span> <span class="mi">2</span><span class="p">)</span> <span class="o">*</span> <span class="n">conversion</span>  <span class="c1"># atomic</span></div></div>
         <span class="c1"># self.mean_polarizability = np.sum(i_f/e_f**2) * 1.4891465E-37  # SI</span>
 </pre></div>
 

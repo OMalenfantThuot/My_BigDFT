@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Logfileschnet &mdash; My_BigDFT  documentation</title>
+  <title>Geoptschnet &mdash; My_BigDFT  documentation</title>
   
 
   
@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Workflows Using Machine Learned Models" href="mlworkflows.html" />
-    <link rel="prev" title="Jobschnet" href="jobschnet.html" /> 
+    <link rel="next" title="MyBigDFT tutorials" href="tutorials.html" />
+    <link rel="prev" title="Workflows Using Machine Learned Models" href="mlworkflows.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,8 +90,11 @@
 <li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
 <li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
-<li class="toctree-l3 current"><a class="current reference internal" href="#">Logfileschnet</a></li>
-<li class="toctree-l3"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a></li>
+<li class="toctree-l3"><a class="reference internal" href="logfileschnet.html">Logfileschnet</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a><ul class="current">
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Geoptschnet</a></li>
+</ul>
+</li>
 </ul>
 </li>
 </ul>
@@ -147,13 +150,15 @@
         
           <li><a href="mlobjects.html">Machine Learning Related Classes</a> &raquo;</li>
         
-      <li>Logfileschnet</li>
+          <li><a href="mlworkflows.html">Workflows Using Machine Learned Models</a> &raquo;</li>
+        
+      <li>Geoptschnet</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/logfileschnet.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/geoptschnet.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -190,118 +195,129 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="logfileschnet">
-<h1>Logfileschnet<a class="headerlink" href="#logfileschnet" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="geoptschnet">
+<h1>Geoptschnet<a class="headerlink" href="#geoptschnet" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
-<dt id="mybigdft.jobschnet.Logfileschnet">
-<em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Logfileschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Logfileschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.ml_workflows.</code><code class="sig-name descname">Geoptschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em>, <em class="sig-param">forcemax=0.005</em>, <em class="sig-param">step_size=0.002</em>, <em class="sig-param">max_iter=200</em>, <em class="sig-param">write_to_disk=False</em>, <em class="sig-param">out_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/geoptschnet.html#Geoptschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
-<p>Container class to emulate the Logfile object used in BigDFT calculations</p>
+<p>This class allows to relax the input geometry of a given system in
+order to find the structure that minimizes the forces. The final
+result obtained depends on the trained SchnetPack model used.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>posinp</strong> (<em>mybigdft.Posinp</em>) – Starting configuration to relax</p></li>
+<li><p><strong>forcemax</strong> (<em>float</em>) – Stopping criterion on the forces (in eV/Angstrom)</p></li>
+<li><p><strong>step_size</strong> (<em>float</em>) – Step size for each relaxation step</p></li>
+<li><p><strong>max_iter</strong> (<em>int</em>) – Maximum number of iterations</p></li>
+<li><p><strong>write_to_disk</strong> (<em>bool</em>) – If <cite>True</cite>, the final positions will be written on disk.</p></li>
+<li><p><strong>out_name</strong> (<em>str</em>) – Name of the output file. Default is “final_posinp”</p></li>
+</ul>
+</dd>
+</dl>
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.posinp">
-<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.posinp" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.posinp" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the base Posinp objects for the predictions.</p>
+<dd class="field-odd"><p>Initial posinp of the geometry optimization procedure</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of Posinps</p>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a></p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.n_at">
-<em class="property">property </em><code class="sig-name descname">n_at</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.n_at" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.final_posinp">
+<em class="property">property </em><code class="sig-name descname">final_posinp</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.final_posinp" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the number of atoms of each structure.</p>
+<dd class="field-odd"><p>Final posinp of the geometry optimization or None if
+the the optimization has not been completed</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of ints</p>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a> or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.atom_types">
-<em class="property">property </em><code class="sig-name descname">atom_types</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.atom_types" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.forcemax">
+<em class="property">property </em><code class="sig-name descname">forcemax</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.forcemax" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing sets of the elements present in each structure.</p>
+<dd class="field-odd"><p>Stopping criterion on the forces (in eV/Angstrom)</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of sets</p>
+<dd class="field-even"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.boundary_conditions">
-<em class="property">property </em><code class="sig-name descname">boundary_conditions</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.boundary_conditions" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.step_size">
+<em class="property">property </em><code class="sig-name descname">step_size</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.step_size" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the boundary conditions, either <cite>free</cite>,
-<cite>surface</cite> or <cite>periodic</cite>, of each structure.</p>
+<dd class="field-odd"><p>Step size for each relaxation step</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of strings</p>
+<dd class="field-even"><p>float</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.cell">
-<em class="property">property </em><code class="sig-name descname">cell</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.cell" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.max_iter">
+<em class="property">property </em><code class="sig-name descname">max_iter</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.max_iter" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing cell dimensions of each structure,
-None for free boundary conditions.</p>
+<dd class="field-odd"><p>Maximum number of iterations</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of lists of floats</p>
+<dd class="field-even"><p>int</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.energy">
-<em class="property">property </em><code class="sig-name descname">energy</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.energy" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.write_to_disk">
+<em class="property">property </em><code class="sig-name descname">write_to_disk</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.write_to_disk" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the energy value for each structure.
-If None, the energies have not been calculated yet.</p>
+<dd class="field-odd"><p>If <cite>True</cite>, the obtained structure will be written on disk.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of floats or None</p>
+<dd class="field-even"><p>bool</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.forces">
-<em class="property">property </em><code class="sig-name descname">forces</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.forces" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.out_name">
+<em class="property">property </em><code class="sig-name descname">out_name</code><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.out_name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the forces values for each structure.
-If None, the forces have not been calculated yet.</p>
+<dd class="field-odd"><p>Name of the output position file, None if write_to_disk is <cite>False</cite>.</p>
 </dd>
 <dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of arrays of floats or None</p>
+<dd class="field-even"><p>str or None</p>
 </dd>
 </dl>
 </dd></dl>
 
 <dl class="method">
-<dt id="mybigdft.jobschnet.Logfileschnet.dipole">
-<em class="property">property </em><code class="sig-name descname">dipole</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.dipole" title="Permalink to this definition">¶</a></dt>
+<dt id="mybigdft.ml_workflows.Geoptschnet.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">model_dir=None</em>, <em class="sig-param">device='cpu'</em>, <em class="sig-param">batch_size=128</em>, <em class="sig-param">recenter=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/geoptschnet.html#Geoptschnet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet.run" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>List containing the dipole values for each structure.
-If None, the dipoles have not been calculated yet.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p>list of arrays of floats or None</p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> (<em>str</em>) – Absolute path to the SchnetPack model to use in calculation</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Either ‘cpu’ or ‘cuda’ to run on cpu or gpu</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Size of the mini-batches used in predictions</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -318,10 +334,10 @@ If None, the dipoles have not been calculated yet.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="mlworkflows.html" class="btn btn-neutral float-right" title="Workflows Using Machine Learned Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="tutorials.html" class="btn btn-neutral float-right" title="MyBigDFT tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="jobschnet.html" class="btn btn-neutral float-left" title="Jobschnet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="mlworkflows.html" class="btn btn-neutral float-left" title="Workflows Using Machine Learned Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

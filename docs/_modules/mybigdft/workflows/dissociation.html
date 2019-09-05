@@ -174,8 +174,9 @@
 
     <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;energies&quot;</span><span class="p">,</span> <span class="s2">&quot;minimum&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">fragment1</span><span class="p">,</span> <span class="n">fragment2</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                 <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">fragment1</span><span class="p">,</span> <span class="n">fragment2</span><span class="p">,</span> <span class="n">distances</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="kc">None</span>
+    <span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        A queue of :class:`~mybigdft.job.Job` instances is initialized,</span>
 <span class="sd">        one per distance between the fragments. For each job, the system</span>
@@ -215,23 +216,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Check that the fragments are not periodic</span>
         <span class="k">for</span> <span class="n">frag</span> <span class="ow">in</span> <span class="p">[</span><span class="n">fragment1</span><span class="p">,</span> <span class="n">fragment2</span><span class="p">]:</span>
-            <span class="k">if</span> <span class="n">frag</span><span class="o">.</span><span class="n">boundary_conditions</span> <span class="o">==</span> <span class="s1">&#39;periodic&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">frag</span><span class="o">.</span><span class="n">boundary_conditions</span> <span class="o">==</span> <span class="s2">&quot;periodic&quot;</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
                     <span class="s2">&quot;Cannot compute a dissociation curve with periodic &quot;</span>
-                    <span class="s2">&quot;boundary conditions:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frag</span><span class="p">))</span>
+                    <span class="s2">&quot;boundary conditions:</span><span class="se">\n</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">frag</span><span class="p">)</span>
+                <span class="p">)</span>
         <span class="c1"># Make sure both fragments use the same units (could actually be</span>
         <span class="c1"># implemented properly in the __add__ method of posinp)</span>
         <span class="k">if</span> <span class="n">fragment1</span><span class="o">.</span><span class="n">units</span> <span class="o">!=</span> <span class="n">fragment2</span><span class="o">.</span><span class="n">units</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span>
-                <span class="s2">&quot;Unit conversion of positions needed&quot;</span><span class="p">)</span>  <span class="c1"># pragma: no cover</span>
+                <span class="s2">&quot;Unit conversion of positions needed&quot;</span>
+            <span class="p">)</span>  <span class="c1"># pragma: no cover</span>
         <span class="c1"># Set the base attributes that are specific to this workflow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fragment1</span> <span class="o">=</span> <span class="n">fragment1</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">fragment2</span> <span class="o">=</span> <span class="n">fragment2</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">distances</span> <span class="o">=</span> <span class="n">distances</span>
         <span class="c1"># Define a fake job from the given arguments in order to</span>
         <span class="c1"># initialize properly the other base atributes</span>
-        <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="n">inputparams</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">fragment1</span><span class="p">,</span>
-                  <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">)</span>
+        <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="n">inputparams</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">fragment1</span><span class="p">,</span> <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">inputparams</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span> <span class="o">=</span> <span class="n">job</span><span class="o">.</span><span class="n">run_dir</span>
@@ -278,8 +280,12 @@
             <span class="n">pos</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">fragment1</span><span class="p">)</span>
             <span class="n">pos</span><span class="o">.</span><span class="n">_atoms</span> <span class="o">+=</span> <span class="n">new_frag2</span><span class="o">.</span><span class="n">atoms</span>
             <span class="c1"># Add a new job to the queue</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
-                      <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">inputparams</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">,</span>
+                <span class="n">posinp</span><span class="o">=</span><span class="n">pos</span><span class="p">,</span>
+                <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">job</span><span class="o">.</span><span class="n">distance</span> <span class="o">=</span> <span class="n">y_0</span>  <span class="c1"># We add the distance attribute</span>
             <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">queue</span>

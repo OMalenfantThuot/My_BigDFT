@@ -165,6 +165,7 @@
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">MutableMapping</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">CLoader</span> <span class="k">as</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">CDumper</span> <span class="k">as</span> <span class="n">Dumper</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -222,7 +223,7 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;posinp&quot;</span><span class="p">))</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
 
 <div class="viewcode-block" id="InputParams.from_file"><a class="viewcode-back" href="../../../inputparams.html#mybigdft.iofiles.inputparams.InputParams.from_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
@@ -274,6 +275,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_params</span>
 
+    <span class="nd">@params</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">params</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">params</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -287,8 +292,7 @@
     <span class="nd">@posinp</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">new</span><span class="p">):</span>
         <span class="k">if</span> <span class="n">new</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">new</span><span class="p">,</span> <span class="n">Posinp</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Update the posinp attribute with a Posinp instance&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Update the posinp attribute with a Posinp instance&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">new</span>
 
@@ -353,7 +357,7 @@
 <span class="sd">            Name of the input file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>  <span class="c1"># Make sure it is valid</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>  <span class="c1"># Make sure it is valid</span>
             <span class="n">yaml</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">)</span></div></div>
 
 
@@ -374,11 +378,11 @@
 <span class="sd">        checking that all the keys in `params` correspond to actual</span>
 <span class="sd">        BigDFT parameters.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-<span class="c1">#    # Make sure to convert hgrids to a list beforehand</span>
-<span class="c1">#    if &quot;dft&quot; in params and &quot;hgrids&quot; in params[&quot;dft&quot;]:</span>
-<span class="c1">#        hgrids = deepcopy(params[&quot;dft&quot;][&quot;hgrids&quot;])</span>
-<span class="c1">#        if not isinstance(hgrids, list):</span>
-<span class="c1">#            params[&quot;dft&quot;][&quot;hgrids&quot;] = [hgrids]*3</span>
+    <span class="c1">#    # Make sure to convert hgrids to a list beforehand</span>
+    <span class="c1">#    if &quot;dft&quot; in params and &quot;hgrids&quot; in params[&quot;dft&quot;]:</span>
+    <span class="c1">#        hgrids = deepcopy(params[&quot;dft&quot;][&quot;hgrids&quot;])</span>
+    <span class="c1">#        if not isinstance(hgrids, list):</span>
+    <span class="c1">#            params[&quot;dft&quot;][&quot;hgrids&quot;] = [hgrids]*3</span>
     <span class="c1"># Use a copy of params to update the input parameters while looping</span>
     <span class="c1"># on params. This copy will be returned.</span>
     <span class="n">real_params</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -387,10 +391,13 @@
     <span class="k">if</span> <span class="n">keyword</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="n">default</span> <span class="o">=</span> <span class="n">default</span><span class="p">[</span><span class="n">keyword</span><span class="p">]</span>
     <span class="c1"># Set real_params[&#39;output&#39;][&#39;orbitals&#39;] to &#39;None&#39; when it is False</span>
-    <span class="k">if</span> <span class="s1">&#39;output&#39;</span> <span class="ow">in</span> <span class="n">real_params</span> <span class="ow">and</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> \
-            <span class="s1">&#39;orbitals&#39;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">]</span> <span class="ow">and</span> \
-            <span class="ow">not</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;orbitals&#39;</span><span class="p">]:</span>
-        <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;output&#39;</span><span class="p">][</span><span class="s1">&#39;orbitals&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;None&#39;</span>
+    <span class="k">if</span> <span class="p">(</span>
+        <span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">real_params</span>
+        <span class="ow">and</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="ow">and</span> <span class="s2">&quot;orbitals&quot;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span>
+        <span class="ow">and</span> <span class="ow">not</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span>
+    <span class="p">):</span>
+        <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;None&quot;</span>
     <span class="c1"># Check the validity of the given input parameters</span>
     <span class="n">check</span><span class="p">(</span><span class="n">real_params</span><span class="p">,</span> <span class="n">keyword</span><span class="o">=</span><span class="n">keyword</span><span class="p">)</span>
     <span class="c1"># Return the cleaned input parameters</span>
@@ -408,15 +415,15 @@
         <span class="k">if</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">==</span> <span class="p">{}:</span>
             <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
     <span class="c1"># Clean the chess input variables as well</span>
-    <span class="k">if</span> <span class="s1">&#39;chess&#39;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">:</span>
-        <span class="n">chess_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">],</span> <span class="n">keyword</span><span class="o">=</span><span class="s1">&#39;chess&#39;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;chess&quot;</span> <span class="ow">in</span> <span class="n">real_params</span><span class="p">:</span>
+        <span class="n">chess_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;chess&quot;</span><span class="p">],</span> <span class="n">keyword</span><span class="o">=</span><span class="s2">&quot;chess&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">chess_params</span> <span class="o">!=</span> <span class="p">{}:</span>
-            <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chess_params</span>
+            <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;chess&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">chess_params</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="s1">&#39;chess&#39;</span><span class="p">]</span>
+            <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;chess&quot;</span><span class="p">]</span>
     <span class="c1"># Remove the cumbersome geopt key if ncount_cluster_x is the only</span>
     <span class="c1"># key (it happens when the input parameters are read from a Logfile)</span>
-    <span class="n">dummy_value</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;ncount_cluster_x&#39;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
+    <span class="n">dummy_value</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;ncount_cluster_x&quot;</span><span class="p">:</span> <span class="mi">1</span><span class="p">}</span>
     <span class="k">if</span> <span class="s2">&quot;geopt&quot;</span> <span class="ow">in</span> <span class="n">real_params</span> <span class="ow">and</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dummy_value</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">real_params</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span>
     <span class="k">return</span> <span class="n">real_params</span></div>
@@ -452,8 +459,7 @@
                 <span class="c1"># Check the subkey</span>
                 <span class="n">key_definition</span> <span class="o">=</span> <span class="n">parameters</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">subkey</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">key_definition</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span>
-                        <span class="s2">&quot;Unknown key &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
+                    <span class="k">raise</span> <span class="ne">KeyError</span><span class="p">(</span><span class="s2">&quot;Unknown key &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39;&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">))</span>
                 <span class="c1"># Check the subvalue:</span>
                 <span class="n">check_value</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">,</span> <span class="n">key_definition</span><span class="p">)</span></div>
 
@@ -495,26 +501,31 @@
         <span class="n">possible_values</span> <span class="o">=</span> <span class="n">condition</span><span class="p">[</span><span class="s2">&quot;WHEN&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">value</span><span class="p">[</span><span class="n">master_key</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_values</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Condition &#39;</span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="s2">&#39; not met for &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; (got </span><span class="si">{}</span><span class="s2">)&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">master_key</span><span class="p">,</span> <span class="n">possible_values</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">))</span>
+                <span class="s2">&quot;Condition &#39;</span><span class="si">{}</span><span class="s2"> in </span><span class="si">{}</span><span class="s2">&#39; not met for &#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; (got </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">master_key</span><span class="p">,</span> <span class="n">possible_values</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
     <span class="c1"># It must be in the exclusive values</span>
     <span class="n">possible_values</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;EXCLUSIVE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">possible_values</span> <span class="ow">and</span> <span class="n">subvalue</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">possible_values</span><span class="p">:</span>
         <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-            <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in the possible values (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span>
-            <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">possible_values</span><span class="p">))</span>
+            <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in the possible values (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">subkey</span><span class="p">,</span> <span class="n">subkey</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">possible_values</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
     <span class="c1"># It must be in the correct range</span>
     <span class="n">valid_range</span> <span class="o">=</span> <span class="n">subkey_definition</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;RANGE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">valid_range</span><span class="p">:</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">subvalue</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">value_in_range</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">in_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">)</span>
-                                  <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">subvalue</span><span class="p">])</span>
+            <span class="n">value_in_range</span> <span class="o">=</span> <span class="nb">all</span><span class="p">([</span><span class="n">in_range</span><span class="p">(</span><span class="n">val</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">)</span> <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">subvalue</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">value_in_range</span> <span class="o">=</span> <span class="n">in_range</span><span class="p">(</span><span class="n">subvalue</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">)</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">value_in_range</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in valid range (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span>
-                <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">))</span>
+                <span class="s2">&quot;&#39;</span><span class="si">{}</span><span class="s2">&#39; in &#39;</span><span class="si">{}</span><span class="s2">&#39; not in valid range (got </span><span class="si">{}</span><span class="s2">, not in </span><span class="si">{}</span><span class="s2">)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                    <span class="n">subkey</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">subvalue</span><span class="p">,</span> <span class="n">valid_range</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">in_range</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">valid_range</span><span class="p">):</span>

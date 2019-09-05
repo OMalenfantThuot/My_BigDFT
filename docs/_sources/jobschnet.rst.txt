@@ -1,5 +1,4 @@
 Jobschnet
 ---------
 
-.. automodule:: mybigdft.jobschnet
-    :special-members: __enter__, __exit__
+.. automodule:: mybigdft.Jobschnet

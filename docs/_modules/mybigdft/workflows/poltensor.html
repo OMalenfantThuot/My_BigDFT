@@ -210,21 +210,25 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Set a default value to ef_amplitudes</span>
         <span class="k">if</span> <span class="n">ef_amplitudes</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">ef_amplitudes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-4</span><span class="p">]</span><span class="o">*</span><span class="mi">3</span>
+            <span class="n">ef_amplitudes</span> <span class="o">=</span> <span class="p">[</span><span class="mf">1e-4</span><span class="p">]</span> <span class="o">*</span> <span class="mi">3</span>
         <span class="c1"># Check the value of the order</span>
         <span class="n">order</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">order</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">order</span> <span class="ow">not</span> <span class="ow">in</span> <span class="p">[</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">]:</span>
             <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;Only first and second order available&quot;</span><span class="p">)</span>
         <span class="c1"># Check the ground state has no electric field</span>
-        <span class="k">if</span> <span class="s1">&#39;dft&#39;</span> <span class="ow">in</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">:</span>
-            <span class="n">efield</span> <span class="o">=</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;elecfield&#39;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">:</span>
+            <span class="n">efield</span> <span class="o">=</span> <span class="n">ground_state</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;elecfield&quot;</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">efield</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;The ground state input parameters define an &quot;</span>
-                              <span class="s2">&quot;electric field&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;The ground state input parameters define an &quot;</span> <span class="s2">&quot;electric field&quot;</span><span class="p">,</span>
+                    <span class="ne">UserWarning</span><span class="p">,</span>
+                <span class="p">)</span>
         <span class="c1"># Check the electric field amplitudes</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">ef_amplitudes</span><span class="p">,</span> <span class="n">Sequence</span><span class="p">)</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">ef_amplitudes</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">3</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;You must provide three electric field &quot;</span>
-                             <span class="s2">&quot;amplitudes, one for each space coordinate.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="s2">&quot;You must provide three electric field &quot;</span>
+                <span class="s2">&quot;amplitudes, one for each space coordinate.&quot;</span>
+            <span class="p">)</span>
         <span class="c1"># Initialize the attributes that are specific to this workflow</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ground_state</span> <span class="o">=</span> <span class="n">ground_state</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_ef_amplitudes</span> <span class="o">=</span> <span class="n">ef_amplitudes</span>
@@ -319,21 +323,28 @@
         <span class="c1"># space coordinate)</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">efield</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">efields</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">inp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">)</span>
-            <span class="k">if</span> <span class="s1">&#39;dft&#39;</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">:</span>
-                <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">][</span><span class="s1">&#39;elecfield&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span>
+            <span class="k">if</span> <span class="s2">&quot;dft&quot;</span> <span class="ow">in</span> <span class="n">inp</span><span class="p">:</span>
+                <span class="n">inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;elecfield&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">inp</span><span class="p">[</span><span class="s1">&#39;dft&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s1">&#39;elecfield&#39;</span><span class="p">:</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span><span class="p">}</span>
+                <span class="n">inp</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;elecfield&quot;</span><span class="p">:</span> <span class="n">efield</span><span class="o">.</span><span class="n">vector</span><span class="p">}</span>
             <span class="c1"># Set the correct reference data directory</span>
             <span class="n">default</span> <span class="o">=</span> <span class="n">DEFAULT_PARAMETERS</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">][</span><span class="s2">&quot;orbitals&quot;</span><span class="p">]</span>
-            <span class="n">write_orbitals</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span> <span class="ow">and</span>
-                              <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">default</span><span class="p">)</span>
+            <span class="n">write_orbitals</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;output&quot;</span> <span class="ow">in</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span> <span class="ow">and</span> <span class="n">gs</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">!=</span> <span class="n">default</span>
+            <span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="n">write_orbitals</span><span class="p">:</span>
                 <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">data_dir</span>  <span class="c1"># pragma: no cover</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">gs</span><span class="o">.</span><span class="n">ref_data_dir</span>
             <span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">gs</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="s2">&quot;EF_along_</span><span class="si">{}</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
-            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">inputparams</span><span class="o">=</span><span class="n">inp</span><span class="p">,</span> <span class="n">posinp</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">posinp</span><span class="p">,</span>
-                      <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">skip</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">skip</span><span class="p">,</span> <span class="n">ref_data_dir</span><span class="o">=</span><span class="n">ref_data_dir</span><span class="p">)</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Job</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
+                <span class="n">inputparams</span><span class="o">=</span><span class="n">inp</span><span class="p">,</span>
+                <span class="n">posinp</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">posinp</span><span class="p">,</span>
+                <span class="n">run_dir</span><span class="o">=</span><span class="n">run_dir</span><span class="p">,</span>
+                <span class="n">skip</span><span class="o">=</span><span class="n">gs</span><span class="o">.</span><span class="n">skip</span><span class="p">,</span>
+                <span class="n">ref_data_dir</span><span class="o">=</span><span class="n">ref_data_dir</span><span class="p">,</span>
+            <span class="p">)</span>
             <span class="n">job</span><span class="o">.</span><span class="n">efield</span> <span class="o">=</span> <span class="n">efield</span>
             <span class="n">queue</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">job</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">queue</span>
@@ -345,7 +356,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">efields</span> <span class="o">=</span> <span class="n">OrderedDict</span><span class="p">()</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="n">signs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="mf">1.</span><span class="p">}</span>  <span class="c1"># One electric field per coordinate</span>
+            <span class="n">signs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;+&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">}</span>  <span class="c1"># One electric field per coordinate</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">signs</span> <span class="o">=</span> <span class="n">SIGNS</span>  <span class="c1"># Two electric fields per coordinate</span>
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">coord</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">COORDS</span><span class="p">):</span>
@@ -371,7 +382,7 @@
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="c1"># Compute the second order tensor elements</span>
             <span class="c1"># for i, job1, job2 in enue(zip(self.queue[::2], self.queue[1::2]))</span>
-            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">job1</span><span class="p">,</span> <span class="n">job2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)]</span><span class="o">*</span><span class="mi">2</span><span class="p">)):</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">job1</span><span class="p">,</span> <span class="n">job2</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="p">[</span><span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">queue</span><span class="p">)]</span> <span class="o">*</span> <span class="mi">2</span><span class="p">)):</span>
                 <span class="c1"># Get the delta of dipoles</span>
                 <span class="n">d1</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job1</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
                 <span class="n">d2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">job2</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">dipole</span><span class="p">)</span>
@@ -379,16 +390,16 @@
                 <span class="c1"># Get the delta of electric field amplitude</span>
                 <span class="n">amp1</span> <span class="o">=</span> <span class="n">job1</span><span class="o">.</span><span class="n">efield</span><span class="o">.</span><span class="n">amplitude</span>
                 <span class="n">amp2</span> <span class="o">=</span> <span class="n">job2</span><span class="o">.</span><span class="n">efield</span><span class="o">.</span><span class="n">amplitude</span>
-                <span class="k">assert</span> <span class="n">amp1</span> <span class="o">==</span> <span class="o">-</span> <span class="n">amp2</span>
+                <span class="k">assert</span> <span class="n">amp1</span> <span class="o">==</span> <span class="o">-</span><span class="n">amp2</span>
                 <span class="n">delta_ef</span> <span class="o">=</span> <span class="n">amp1</span> <span class="o">-</span> <span class="n">amp2</span>
                 <span class="c1"># Update the polarizability tensor</span>
                 <span class="n">pol_tensor</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">delta_dipoles</span> <span class="o">/</span> <span class="n">delta_ef</span>
         <span class="c1"># Set some attributes</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_pol_tensor</span> <span class="o">=</span> <span class="n">pol_tensor</span>  <span class="c1"># atomic units</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span> <span class="o">=</span> <span class="n">pol_tensor</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span><span class="o">/</span><span class="mi">3</span>  <span class="c1"># atomic units</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_mean_polarizability</span> <span class="o">=</span> <span class="n">pol_tensor</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="mi">3</span>  <span class="c1"># atomic units</span></div></div>
 
 
-<div class="viewcode-block" id="ElectricField"><a class="viewcode-back" href="../../../elecpoltensor.html#mybigdft.workflows.poltensor.ElectricField">[docs]</a><span class="k">class</span> <span class="nc">ElectricField</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s1">&#39;ElectricField&#39;</span><span class="p">,</span> <span class="p">[</span><span class="s1">&#39;i_coord&#39;</span><span class="p">,</span> <span class="s1">&#39;amplitude&#39;</span><span class="p">])):</span>
+<div class="viewcode-block" id="ElectricField"><a class="viewcode-back" href="../../../elecpoltensor.html#mybigdft.workflows.poltensor.ElectricField">[docs]</a><span class="k">class</span> <span class="nc">ElectricField</span><span class="p">(</span><span class="n">namedtuple</span><span class="p">(</span><span class="s2">&quot;ElectricField&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;i_coord&quot;</span><span class="p">,</span> <span class="s2">&quot;amplitude&quot;</span><span class="p">])):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class defines an electric field from the coordinate index and</span>
 <span class="sd">    the amplitude of the electric field in that direction.</span>

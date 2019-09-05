@@ -170,6 +170,7 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="k">import</span> <span class="n">Sequence</span><span class="p">,</span> <span class="n">Mapping</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
 <span class="kn">import</span> <span class="nn">yaml</span>
+
 <span class="k">try</span><span class="p">:</span>
     <span class="kn">from</span> <span class="nn">yaml</span> <span class="k">import</span> <span class="n">CLoader</span> <span class="k">as</span> <span class="n">Loader</span><span class="p">,</span> <span class="n">CDumper</span> <span class="k">as</span> <span class="n">Dumper</span>
 <span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
@@ -187,7 +188,9 @@
 <span class="n">DOC</span> <span class="o">=</span> <span class="s2">&quot;doc&quot;</span>
 <span class="n">LAST_GROUND_STATE_OPTIMIZATION</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;Ground State Optimization&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">]</span>
 <span class="n">LAST_SUBSPACE_OPTIMIZATION</span> <span class="o">=</span> <span class="n">LAST_GROUND_STATE_OPTIMIZATION</span> <span class="o">+</span> <span class="p">[</span>
-    <span class="s2">&quot;Hamiltonian Optimization&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">,</span> <span class="s2">&quot;Subspace Optimization&quot;</span>
+    <span class="s2">&quot;Hamiltonian Optimization&quot;</span><span class="p">,</span>
+    <span class="o">-</span><span class="mi">1</span><span class="p">,</span>
+    <span class="s2">&quot;Subspace Optimization&quot;</span><span class="p">,</span>
 <span class="p">]</span>
 
 
@@ -204,104 +207,86 @@
 <span class="n">ATTRIBUTES</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;n_at&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Number of atoms&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Number of Atoms&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Number of Atoms&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;boundary_conditions&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Boundary Conditions&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Boundary Conditions&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Boundary Conditions&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;cell&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Box Sizes (AU)&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Cell size&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;cell&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Box Sizes (AU)&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Cell size&quot;</span><span class="p">},</span>
     <span class="s2">&quot;symmetry&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Space group&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Symmetry group&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Symmetry group&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;atom_types&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic System Properties&quot;</span><span class="p">,</span> <span class="s2">&quot;Types of atoms&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;List of the atomic types present in the posinp&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;List of the atomic types present in the posinp&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;energy&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;FKS&quot;</span><span class="p">],</span> <span class="p">[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;EKS&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;Energy (Hartree)&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Energy (Hartree)&quot;</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;FKS&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Last Iteration&quot;</span><span class="p">,</span> <span class="s2">&quot;EKS&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Energy (Hartree)&quot;</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Energy (Hartree)&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;astruct&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic structure&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic structure&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;astruct&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic structure&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic structure&quot;</span><span class="p">},</span>
     <span class="s2">&quot;evals&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Complete list of energy eigenvalues&quot;</span><span class="p">]]</span> <span class="o">+</span>
-        <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Orbitals&quot;</span><span class="p">),</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Orbital energies and occupations&quot;</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Complete list of energy eigenvalues&quot;</span><span class="p">]]</span>
+        <span class="o">+</span> <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Orbitals&quot;</span><span class="p">),</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Orbital energies and occupations&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;fermi_level&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Fermi Energy&quot;</span><span class="p">),</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Fermi level&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Fermi level&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;magnetization&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="n">_get_value_from_last_optimization</span><span class="p">(</span><span class="s2">&quot;Total magnetization&quot;</span><span class="p">),</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Total magnetization of the system&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Total magnetization of the system&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;kpt_mesh&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;kpt&quot;</span><span class="p">,</span> <span class="s2">&quot;ngkpt&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;No. of Monkhorst-Pack grid points&quot;</span>
-    <span class="p">},</span>
-    <span class="s2">&quot;kpts&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;K points&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Grid of k-points&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;kpt_mesh&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;kpt&quot;</span><span class="p">,</span> <span class="s2">&quot;ngkpt&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;No. of Monkhorst-Pack grid points&quot;</span><span class="p">},</span>
+    <span class="s2">&quot;kpts&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;K points&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Grid of k-points&quot;</span><span class="p">},</span>
     <span class="s2">&quot;gnrm_cv&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;dft&quot;</span><span class="p">,</span> <span class="s2">&quot;gnrm_cv&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Convergence criterion on wavefunction residue&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Convergence criterion on wavefunction residue&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;forcemax_cv&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;geopt&quot;</span><span class="p">,</span> <span class="s2">&quot;forcemax&quot;</span><span class="p">]],</span>
         <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Convergence criterion on forces&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;forcemax&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;FORCES norm(Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">],</span>
-                <span class="p">[</span><span class="s2">&quot;Clean forces norm (Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Maximum value of forces&quot;</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;Geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;FORCES norm(Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">],</span>
+            <span class="p">[</span><span class="s2">&quot;Clean forces norm (Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;maxval&quot;</span><span class="p">],</span>
+        <span class="p">],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Maximum value of forces&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;GPa&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Pressure (GPa)&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;pressure&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Pressure&quot;</span><span class="p">,</span> <span class="s2">&quot;GPa&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Pressure (GPa)&quot;</span><span class="p">},</span>
     <span class="s2">&quot;dipole&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Electric Dipole Moment (AU)&quot;</span><span class="p">,</span> <span class="s2">&quot;P vector&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electric Dipole Moment (AU)&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electric Dipole Moment (AU)&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;forces&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;forces&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Atomic Forces (Ha/Bohr)&quot;</span><span class="p">},</span>
     <span class="s2">&quot;force_fluct&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Geometry&quot;</span><span class="p">,</span> <span class="s2">&quot;FORCES norm(Ha/Bohr)&quot;</span><span class="p">,</span> <span class="s2">&quot;fluct&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Threshold fluctuation of Forces&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Threshold fluctuation of Forces&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;support_functions&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Gross support functions moments&quot;</span><span class="p">,</span> <span class="s2">&quot;Multipole coefficients&quot;</span><span class="p">,</span>
-                 <span class="s2">&quot;values&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Support functions&quot;</span>
+        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[</span>
+            <span class="p">[</span><span class="s2">&quot;Gross support functions moments&quot;</span><span class="p">,</span> <span class="s2">&quot;Multipole coefficients&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">]</span>
+        <span class="p">],</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Support functions&quot;</span><span class="p">,</span>
     <span class="p">},</span>
     <span class="s2">&quot;electrostatic_multipoles&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Multipole coefficients&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electrostatic multipoles&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Electrostatic multipoles&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;sdos&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;SDos files&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;SDos files&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;sdos&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;SDos files&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;SDos files&quot;</span><span class="p">},</span>
     <span class="s2">&quot;walltime&quot;</span><span class="p">:</span> <span class="p">{</span>
         <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;Walltime since initialization&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Walltime since initialization&quot;</span>
+        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Walltime since initialization&quot;</span><span class="p">,</span>
     <span class="p">},</span>
-    <span class="s2">&quot;WARNINGS&quot;</span><span class="p">:</span> <span class="p">{</span>
-        <span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;WARNINGS&quot;</span><span class="p">]],</span>
-        <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Warnings raised during the BigDFT run&quot;</span>
-    <span class="p">},</span>
+    <span class="s2">&quot;WARNINGS&quot;</span><span class="p">:</span> <span class="p">{</span><span class="n">PATHS</span><span class="p">:</span> <span class="p">[[</span><span class="s2">&quot;WARNINGS&quot;</span><span class="p">]],</span> <span class="n">DOC</span><span class="p">:</span> <span class="s2">&quot;Warnings raised during the BigDFT run&quot;</span><span class="p">},</span>
 <span class="p">}</span>
 
 
@@ -331,17 +316,22 @@
         <span class="c1"># is not repreated in the subsequent logs. It&#39;s a workaround</span>
         <span class="c1"># which might prove edgy in the future.</span>
         <span class="k">if</span> <span class="s2">&quot;geopt&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span><span class="p">:</span>
-            <span class="n">avoidable_warning</span> <span class="o">=</span> <span class="p">(</span><span class="s2">&quot;The norm of the residue is too large, need &quot;</span>
-                                 <span class="s2">&quot;to recalculate input wavefunctions&quot;</span><span class="p">)</span>
+            <span class="n">avoidable_warning</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="s2">&quot;The norm of the residue is too large, need &quot;</span>
+                <span class="s2">&quot;to recalculate input wavefunctions&quot;</span>
+            <span class="p">)</span>
             <span class="n">warnings</span> <span class="o">=</span> <span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;WARNINGS&quot;</span><span class="p">)</span>
-            <span class="n">acceptable_though_incomplete</span> <span class="o">=</span> <span class="p">(</span><span class="n">warnings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span>
-                                            <span class="n">avoidable_warning</span> <span class="ow">in</span> <span class="n">warnings</span><span class="p">)</span>
+            <span class="n">acceptable_though_incomplete</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">warnings</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">avoidable_warning</span> <span class="ow">in</span> <span class="n">warnings</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">acceptable_though_incomplete</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="c1"># Check if the logfile is incomplete</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">!=</span> <span class="p">{}</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">acceptable_though_incomplete</span> <span class="ow">and</span> <span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">walltime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">log</span> <span class="o">!=</span> <span class="p">{}</span>
+            <span class="ow">and</span> <span class="ow">not</span> <span class="n">acceptable_though_incomplete</span>
+            <span class="ow">and</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">energy</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">forces</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">walltime</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span>
+        <span class="p">):</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;The logfile is incomplete!&quot;</span><span class="p">)</span>
         <span class="n">params</span> <span class="o">=</span> <span class="p">{</span><span class="n">key</span><span class="p">:</span> <span class="n">log</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">key</span><span class="p">)</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">INPUT_PARAMETERS_DEFINITIONS</span><span class="p">}</span>
         <span class="n">params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">params</span><span class="p">)</span>
@@ -387,15 +377,18 @@
                     <span class="c1"># A value was found: no need to look for other paths</span>
                     <span class="k">break</span>
             <span class="c1"># Set the value to the underscored attribute</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
+            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">,</span> <span class="n">value</span><span class="p">)</span>
             <span class="c1"># Set the attribute as a property</span>
-            <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span> <span class="n">name</span><span class="p">,</span>
-                    <span class="nb">property</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_getter</span><span class="p">(</span><span class="n">name</span><span class="p">),</span>
-                             <span class="n">doc</span><span class="o">=</span><span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOC</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)))</span>
+            <span class="nb">setattr</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="p">,</span>
+                <span class="n">name</span><span class="p">,</span>
+                <span class="nb">property</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_getter</span><span class="p">(</span><span class="n">name</span><span class="p">),</span> <span class="n">doc</span><span class="o">=</span><span class="n">description</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">DOC</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)),</span>
+            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_init_getter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
         <span class="k">def</span> <span class="nf">getter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span> <span class="nb">getattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
+
         <span class="k">return</span> <span class="n">getter</span>
 
     <span class="k">def</span> <span class="nf">_clean_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -453,8 +446,11 @@
                 <span class="k">if</span> <span class="n">psp_ixc</span> <span class="o">!=</span> <span class="n">inp_ixc</span><span class="p">:</span>
                     <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                         <span class="s2">&quot;The XC of pseudo potentials (</span><span class="si">{}</span><span class="s2">) is different from &quot;</span>
-                        <span class="s2">&quot;the input XC (</span><span class="si">{}</span><span class="s2">) for the &#39;</span><span class="si">{}</span><span class="s2">&#39; atoms&quot;</span>
-                        <span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">psp_ixc</span><span class="p">,</span> <span class="n">inp_ixc</span><span class="p">,</span> <span class="n">atom_type</span><span class="p">),</span> <span class="ne">UserWarning</span><span class="p">)</span>
+                        <span class="s2">&quot;the input XC (</span><span class="si">{}</span><span class="s2">) for the &#39;</span><span class="si">{}</span><span class="s2">&#39; atoms&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                            <span class="n">psp_ixc</span><span class="p">,</span> <span class="n">inp_ixc</span><span class="p">,</span> <span class="n">atom_type</span>
+                        <span class="p">),</span>
+                        <span class="ne">UserWarning</span><span class="p">,</span>
+                    <span class="p">)</span>
 
 <div class="viewcode-block" id="Logfile.from_file"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.Logfile.from_file">[docs]</a>    <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">filename</span><span class="p">):</span>
@@ -512,8 +508,9 @@
                 <span class="c1"># return a GeoptLogfile instance</span>
                 <span class="k">return</span> <span class="n">GeoptLogfile</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;More than one document found in the logfile!&quot;</span><span class="p">,</span>
-                              <span class="ne">UserWarning</span><span class="p">)</span>
+                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                    <span class="s2">&quot;More than one document found in the logfile!&quot;</span><span class="p">,</span> <span class="ne">UserWarning</span>
+                <span class="p">)</span>
                 <span class="c1"># In other cases, just return a MultipleLogfile instance</span>
                 <span class="k">return</span> <span class="n">MultipleLogfile</span><span class="p">(</span><span class="n">logs</span><span class="p">)</span></div>
 
@@ -544,16 +541,28 @@
         <span class="k">except</span> <span class="ne">AttributeError</span><span class="p">:</span>  <span class="c1"># pragma: no cover</span>
             <span class="n">base_dir</span> <span class="o">=</span> <span class="nb">dir</span><span class="p">(</span><span class="nb">super</span><span class="p">(</span><span class="n">Logfile</span><span class="p">,</span> <span class="bp">self</span><span class="p">))</span>  <span class="c1"># Python2</span>
             <span class="c1"># Add the missing stuff</span>
-            <span class="n">base_dir</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;write&quot;</span><span class="p">,</span> <span class="s2">&quot;log&quot;</span><span class="p">,</span> <span class="s2">&quot;from_file&quot;</span><span class="p">,</span> <span class="s2">&quot;from_stream&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;posinp&quot;</span><span class="p">,</span> <span class="s2">&quot;values&quot;</span><span class="p">,</span> <span class="s2">&quot;keys&quot;</span><span class="p">,</span> <span class="s2">&quot;get&quot;</span><span class="p">,</span> <span class="s2">&quot;items&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;inputparams&quot;</span><span class="p">,</span> <span class="s2">&quot;_check_psppar&quot;</span><span class="p">,</span> <span class="s2">&quot;_check_warnings&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;_clean_attributes&quot;</span><span class="p">,</span> <span class="s2">&quot;_set_builtin_attributes&quot;</span><span class="p">,</span>
-                         <span class="s2">&quot;_init_getter&quot;</span><span class="p">]</span>
+            <span class="n">base_dir</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="s2">&quot;write&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;log&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;from_file&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;from_stream&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;posinp&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;values&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;keys&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;get&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;items&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;inputparams&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_check_psppar&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_check_warnings&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_clean_attributes&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_set_builtin_attributes&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;_init_getter&quot;</span><span class="p">,</span>
+            <span class="p">]</span>
             <span class="n">base_dir</span> <span class="o">+=</span> <span class="n">hidden_attributes</span>
         <span class="c1"># Always remove the underscored attributes (so that there are less</span>
         <span class="c1"># elements in the returned list)</span>
         <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">hidden_attributes</span><span class="p">:</span>
-            <span class="n">base_dir</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;_&quot;</span><span class="o">+</span><span class="n">name</span><span class="p">)</span>
+            <span class="n">base_dir</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;_&quot;</span> <span class="o">+</span> <span class="n">name</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">base_dir</span></div>
 
     <span class="k">def</span> <span class="nf">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
@@ -645,8 +654,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">logs</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="o">.</span><span class="n">log</span> <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">]</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">filename</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">stream</span><span class="p">:</span>
-            <span class="n">yaml</span><span class="o">.</span><span class="n">dump_all</span><span class="p">(</span>
-                <span class="n">logs</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">,</span> <span class="n">explicit_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
+            <span class="n">yaml</span><span class="o">.</span><span class="n">dump_all</span><span class="p">(</span><span class="n">logs</span><span class="p">,</span> <span class="n">stream</span><span class="o">=</span><span class="n">stream</span><span class="p">,</span> <span class="n">Dumper</span><span class="o">=</span><span class="n">Dumper</span><span class="p">,</span> <span class="n">explicit_start</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="GeoptLogfile"><a class="viewcode-back" href="../../../logfile.html#mybigdft.iofiles.logfiles.GeoptLogfile">[docs]</a><span class="k">class</span> <span class="nc">GeoptLogfile</span><span class="p">(</span><span class="n">MultipleLogfile</span><span class="p">):</span>
@@ -667,7 +675,7 @@
         <span class="c1"># Update the input parameters and positions of the documents</span>
         <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
             <span class="n">log</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span>
-            <span class="n">log</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s1">&#39;Atomic structure&#39;</span><span class="p">])</span>
+            <span class="n">log</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">Posinp</span><span class="o">.</span><span class="n">from_dict</span><span class="p">(</span><span class="n">log</span><span class="p">[</span><span class="s2">&quot;Atomic structure&quot;</span><span class="p">])</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_posinps</span> <span class="o">=</span> <span class="p">[</span><span class="n">log</span><span class="o">.</span><span class="n">posinp</span> <span class="k">for</span> <span class="n">log</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">logs</span><span class="p">]</span>
 
     <span class="nd">@property</span>

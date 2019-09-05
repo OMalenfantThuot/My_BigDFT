@@ -1,0 +1,391 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>mybigdft.ml_workflows.geoptschnet &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="../../../_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script type="text/javascript" src="../../../_static/jquery.js"></script>
+        <script type="text/javascript" src="../../../_static/underscore.js"></script>
+        <script type="text/javascript" src="../../../_static/doctools.js"></script>
+        <script type="text/javascript" src="../../../_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>mybigdft.ml_workflows.geoptschnet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for mybigdft.ml_workflows.geoptschnet</h1><div class="highlight"><pre>
+<span></span><span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">The :class:`Geoptschnet` allows to find a relaxed structure using</span>
+<span class="sd">a SchnetPack trained model</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">copy</span> <span class="k">import</span> <span class="n">deepcopy</span>
+<span class="kn">from</span> <span class="nn">mybigdft</span> <span class="k">import</span> <span class="n">Posinp</span><span class="p">,</span> <span class="n">Jobschnet</span>
+
+
+<div class="viewcode-block" id="Geoptschnet"><a class="viewcode-back" href="../../../geoptschnet.html#mybigdft.ml_workflows.Geoptschnet">[docs]</a><span class="k">class</span> <span class="nc">Geoptschnet</span><span class="p">:</span>
+    <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    This class allows to relax the input geometry of a given system in</span>
+<span class="sd">    order to find the structure that minimizes the forces. The final</span>
+<span class="sd">    result obtained depends on the trained SchnetPack model used.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">posinp</span><span class="p">,</span>
+        <span class="n">forcemax</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">out_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        posinp : mybigdft.Posinp</span>
+<span class="sd">            Starting configuration to relax</span>
+<span class="sd">        forcemax : float</span>
+<span class="sd">            Stopping criterion on the forces (in eV/Angstrom)</span>
+<span class="sd">        step_size : float</span>
+<span class="sd">            Step size for each relaxation step</span>
+<span class="sd">        max_iter : int</span>
+<span class="sd">            Maximum number of iterations</span>
+<span class="sd">        write_to_disk : bool</span>
+<span class="sd">            If `True`, the final positions will be written on disk.</span>
+<span class="sd">        out_name : str</span>
+<span class="sd">            Name of the output file. Default is &quot;final_posinp&quot;</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">posinp</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No initial positions were provided.&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">posinp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">forcemax</span> <span class="o">=</span> <span class="n">forcemax</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_posinp</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_disk</span> <span class="o">=</span> <span class="n">write_to_disk</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_to_disk</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">out_name</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_name</span> <span class="o">=</span> <span class="s2">&quot;final_posinp&quot;</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">out_name</span> <span class="o">=</span> <span class="n">out_name</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">out_name</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Posinp</span>
+<span class="sd">            Initial posinp of the geometry optimization procedure</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span>
+
+    <span class="nd">@posinp</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posinp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">posinp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">final_posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Posinp or None</span>
+<span class="sd">            Final posinp of the geometry optimization or None if</span>
+<span class="sd">            the the optimization has not been completed</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_final_posinp</span>
+
+    <span class="nd">@final_posinp</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">final_posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">final_posinp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_final_posinp</span> <span class="o">=</span> <span class="n">final_posinp</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">forcemax</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Stopping criterion on the forces (in eV/Angstrom)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_forcemax</span>
+
+    <span class="nd">@forcemax</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">forcemax</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">forcemax</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_forcemax</span> <span class="o">=</span> <span class="n">forcemax</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Step size for each relaxation step</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span>
+
+    <span class="nd">@step_size</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">step_size</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">step_size</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_step_size</span> <span class="o">=</span> <span class="n">step_size</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">max_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        int</span>
+<span class="sd">            Maximum number of iterations</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_max_iter</span>
+
+    <span class="nd">@max_iter</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">max_iter</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">max_iter</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_max_iter</span> <span class="o">=</span> <span class="n">max_iter</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">write_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        bool</span>
+<span class="sd">            If `True`, the obtained structure will be written on disk.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_disk</span>
+
+    <span class="nd">@write_to_disk</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">write_to_disk</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">write_to_disk</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_write_to_disk</span> <span class="o">=</span> <span class="n">write_to_disk</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">out_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        str or None</span>
+<span class="sd">            Name of the output position file, None if write_to_disk is `False`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_out_name</span>
+
+    <span class="nd">@out_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">out_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">out_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_out_name</span> <span class="o">=</span> <span class="n">out_name</span>
+
+<div class="viewcode-block" id="Geoptschnet.run"><a class="viewcode-back" href="../../../geoptschnet.html#mybigdft.ml_workflows.Geoptschnet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">model_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">128</span><span class="p">,</span> <span class="n">recenter</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+        <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        model_dir : str</span>
+<span class="sd">            Absolute path to the SchnetPack model to use in calculation</span>
+<span class="sd">        device : str</span>
+<span class="sd">            Either &#39;cpu&#39; or &#39;cuda&#39; to run on cpu or gpu</span>
+<span class="sd">        batch_size : int</span>
+<span class="sd">            Size of the mini-batches used in predictions</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">temp_posinp</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="n">job</span> <span class="o">=</span> <span class="n">Jobschnet</span><span class="p">(</span><span class="n">posinp</span><span class="o">=</span><span class="n">temp_posinp</span><span class="p">)</span>
+            <span class="n">job</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
+                <span class="n">model_dir</span><span class="o">=</span><span class="n">model_dir</span><span class="p">,</span> <span class="n">forces</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">n_at</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+                <span class="n">temp_posinp</span> <span class="o">=</span> <span class="n">temp_posinp</span><span class="o">.</span><span class="n">translate_atom</span><span class="p">(</span>
+                    <span class="n">j</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">*</span> <span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="n">j</span><span class="p">]</span>
+                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">forcemax</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Geometry optimization stopped at iteration </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+                <span class="k">break</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="s2">&quot;Geometry optimization was not succesful at iteration </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+                <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span>
+            <span class="s2">&quot;Max remaining force is </span><span class="si">{:6.4f}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span>
+                <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">final_posinp</span> <span class="o">=</span> <span class="n">temp_posinp</span>
+        <span class="k">if</span> <span class="n">recenter</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_posinp</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">final_posinp</span><span class="o">.</span><span class="n">to_centroid</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">write_to_disk</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">final_posinp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">out_name</span> <span class="o">+</span> <span class="s2">&quot;.xyz&quot;</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Maxime Moriniere, Olivier Malenfant-Thuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

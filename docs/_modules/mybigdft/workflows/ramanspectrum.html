@@ -274,8 +274,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_poltensor_workflows</span>
 
-    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span>
-             <span class="n">timeout</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Run the calculations allowing to compute the phonon energies and</span>
 <span class="sd">        the related Raman intensities in order to be able to plot the</span>
@@ -300,14 +299,25 @@
 <span class="sd">            Number of minutes after which each job must be stopped.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
-            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span>
+            <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span>
+            <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+            <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+            <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span>
         <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">poltensor_workflows</span><span class="p">:</span>
             <span class="n">pt</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>
-                <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
-                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">)</span>
+                <span class="n">nmpi</span><span class="o">=</span><span class="n">nmpi</span><span class="p">,</span>
+                <span class="n">nomp</span><span class="o">=</span><span class="n">nomp</span><span class="p">,</span>
+                <span class="n">force_run</span><span class="o">=</span><span class="n">force_run</span><span class="p">,</span>
+                <span class="n">dry_run</span><span class="o">=</span><span class="n">dry_run</span><span class="p">,</span>
+                <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">restart_if_incomplete</span><span class="o">=</span><span class="n">restart_if_incomplete</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="nb">super</span><span class="p">(</span><span class="n">RamanSpectrum</span><span class="p">,</span> <span class="bp">self</span><span class="p">)</span><span class="o">.</span><span class="n">_run</span><span class="p">(</span>
-            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+            <span class="n">nmpi</span><span class="p">,</span> <span class="n">nomp</span><span class="p">,</span> <span class="n">force_run</span><span class="p">,</span> <span class="n">dry_run</span><span class="p">,</span> <span class="n">restart_if_incomplete</span><span class="p">,</span> <span class="n">timeout</span>
+        <span class="p">)</span>
 
 <div class="viewcode-block" id="RamanSpectrum.post_proc"><a class="viewcode-back" href="../../../raman.html#mybigdft.workflows.ramanspectrum.RamanSpectrum.post_proc">[docs]</a>    <span class="k">def</span> <span class="nf">post_proc</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -325,11 +335,13 @@
         <span class="n">alphas</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">betas_sq</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">pt</span> <span class="ow">in</span> <span class="n">deriv_pol_tensors</span><span class="o">.</span><span class="n">dot</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">normal_modes</span><span class="p">)</span><span class="o">.</span><span class="n">T</span><span class="p">:</span>
-            <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="mf">3.</span><span class="p">)</span>
+            <span class="n">alphas</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">pt</span><span class="o">.</span><span class="n">trace</span><span class="p">()</span> <span class="o">/</span> <span class="mf">3.0</span><span class="p">)</span>
             <span class="n">evals</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">eigvals</span><span class="p">(</span><span class="n">pt</span><span class="p">)</span>
-            <span class="n">beta_sq</span> <span class="o">=</span> <span class="p">((</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
-                       <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span>
-                       <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span><span class="o">-</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span><span class="o">**</span><span class="mi">2</span><span class="p">)</span> <span class="o">/</span> <span class="mf">2.</span>
+            <span class="n">beta_sq</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">-</span> <span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+                <span class="o">+</span> <span class="p">(</span><span class="n">evals</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">evals</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">**</span> <span class="mi">2</span>
+            <span class="p">)</span> <span class="o">/</span> <span class="mf">2.0</span>
             <span class="n">betas_sq</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">beta_sq</span><span class="p">)</span>
             <span class="c1"># beta_sq = 1./2. * ((pt[0][0]-pt[1][1])**2 +</span>
             <span class="c1">#                    (pt[0][0]-pt[2][2])**2 +</span>
@@ -342,11 +354,11 @@
         <span class="c1"># compute the intensity (converted from atomic units</span>
         <span class="c1"># to Ang^4.amu^-1) and the depolarization ratio</span>
         <span class="c1"># of the normal mode.</span>
-        <span class="n">conversion</span> <span class="o">=</span> <span class="n">B_TO_ANG</span><span class="o">**</span><span class="mi">4</span> <span class="o">/</span> <span class="n">EMU_TO_AMU</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span> <span class="o">=</span> \
-            <span class="p">(</span><span class="mi">45</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span> <span class="o">*</span> <span class="n">conversion</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_depolarization_ratios</span> <span class="o">=</span> \
-            <span class="mi">3</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span> <span class="o">/</span> <span class="p">(</span><span class="mi">45</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span><span class="o">**</span><span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span><span class="o">*</span><span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span></div>
+        <span class="n">conversion</span> <span class="o">=</span> <span class="n">B_TO_ANG</span> <span class="o">**</span> <span class="mi">4</span> <span class="o">/</span> <span class="n">EMU_TO_AMU</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_intensities</span> <span class="o">=</span> <span class="p">(</span><span class="mi">45</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">7</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span> <span class="o">*</span> <span class="n">conversion</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_depolarization_ratios</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="mi">3</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span> <span class="o">/</span> <span class="p">(</span><span class="mi">45</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_alphas</span> <span class="o">**</span> <span class="mi">2</span> <span class="o">+</span> <span class="mi">4</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_betas_sq</span><span class="p">)</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_compute_deriv_pol_tensors</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -369,11 +381,11 @@
 <span class="sd">            Derivatives of the polarizability tensor.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">n_at</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">ground_state</span><span class="o">.</span><span class="n">posinp</span><span class="p">)</span>
-        <span class="n">deriv_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span><span class="o">*</span><span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
+        <span class="n">deriv_pts</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="mi">3</span> <span class="o">*</span> <span class="n">n_at</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">3</span><span class="p">))</span>
         <span class="n">pt_wfs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">poltensor_workflows</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
             <span class="n">ref_pt</span> <span class="o">=</span> <span class="n">pt_wfs</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">pol_tensors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt_wfs</span><span class="p">,</span> <span class="p">[</span><span class="n">ref_pt</span><span class="p">]</span><span class="o">*</span><span class="nb">len</span><span class="p">(</span><span class="n">pt_wfs</span><span class="p">))</span>
+            <span class="n">pol_tensors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt_wfs</span><span class="p">,</span> <span class="p">[</span><span class="n">ref_pt</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">pt_wfs</span><span class="p">))</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
             <span class="n">pol_tensors</span> <span class="o">=</span> <span class="p">(</span><span class="n">pt_wfs</span><span class="p">[::</span><span class="mi">2</span><span class="p">],</span> <span class="n">pt_wfs</span><span class="p">[</span><span class="mi">1</span><span class="p">::</span><span class="mi">2</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -386,7 +398,7 @@
                 <span class="n">delta_x</span> <span class="o">=</span> <span class="n">amp</span>
             <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">phonons</span><span class="o">.</span><span class="n">order</span> <span class="o">==</span> <span class="mi">2</span><span class="p">:</span>
                 <span class="n">delta_x</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">*</span> <span class="n">amp</span>
-            <span class="k">if</span> <span class="n">gs1</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s1">&#39;angstroem&#39;</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">gs1</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">units</span> <span class="o">==</span> <span class="s2">&quot;angstroem&quot;</span><span class="p">:</span>
                 <span class="n">delta_x</span> <span class="o">*=</span> <span class="n">ANG_TO_B</span>
             <span class="c1"># Get the value of the delta of poltensors</span>
             <span class="n">i_at</span> <span class="o">=</span> <span class="n">gs1</span><span class="o">.</span><span class="n">moved_atom</span>

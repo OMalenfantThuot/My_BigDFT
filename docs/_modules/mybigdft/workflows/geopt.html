@@ -169,8 +169,16 @@
 
     <span class="n">POST_PROCESSING_ATTRIBUTES</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;final_posinp&quot;</span><span class="p">]</span>
 
-    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">base_job</span><span class="p">,</span> <span class="n">method</span><span class="o">=</span><span class="s2">&quot;SQNM&quot;</span><span class="p">,</span> <span class="n">forcemax</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span> <span class="n">frac_fluct</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
-                 <span class="n">betax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">ncount_cluster_x</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">base_job</span><span class="p">,</span>
+        <span class="n">method</span><span class="o">=</span><span class="s2">&quot;SQNM&quot;</span><span class="p">,</span>
+        <span class="n">forcemax</span><span class="o">=</span><span class="mf">1e-6</span><span class="p">,</span>
+        <span class="n">frac_fluct</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span>
+        <span class="n">betax</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">ncount_cluster_x</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span>
+    <span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        The base job has a given set of input parameters, and default</span>
 <span class="sd">        values for the main parameters of the &quot;geopt&quot; key are</span>
@@ -199,8 +207,12 @@
         <span class="c1"># with updated &quot;geopt&quot; input parameters</span>
         <span class="n">base_job</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">base_job</span><span class="p">)</span>
         <span class="n">attributes</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span> <span class="s2">&quot;forcemax&quot;</span><span class="p">:</span> <span class="n">forcemax</span><span class="p">,</span> <span class="s2">&quot;frac_fluct&quot;</span><span class="p">:</span> <span class="n">frac_fluct</span><span class="p">,</span>
-            <span class="s2">&quot;betax&quot;</span><span class="p">:</span> <span class="n">betax</span><span class="p">,</span> <span class="s2">&quot;ncount_cluster_x&quot;</span><span class="p">:</span> <span class="n">ncount_cluster_x</span><span class="p">}</span>
+            <span class="s2">&quot;method&quot;</span><span class="p">:</span> <span class="n">method</span><span class="p">,</span>
+            <span class="s2">&quot;forcemax&quot;</span><span class="p">:</span> <span class="n">forcemax</span><span class="p">,</span>
+            <span class="s2">&quot;frac_fluct&quot;</span><span class="p">:</span> <span class="n">frac_fluct</span><span class="p">,</span>
+            <span class="s2">&quot;betax&quot;</span><span class="p">:</span> <span class="n">betax</span><span class="p">,</span>
+            <span class="s2">&quot;ncount_cluster_x&quot;</span><span class="p">:</span> <span class="n">ncount_cluster_x</span><span class="p">,</span>
+        <span class="p">}</span>
         <span class="k">for</span> <span class="n">key</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
             <span class="n">attributes</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">val</span>
         <span class="n">base_job</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;geopt&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">attributes</span>

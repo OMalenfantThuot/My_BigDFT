@@ -293,16 +293,16 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;inputparams and posinp do not define the same posinp.&quot;</span><span class="p">)</span>
 
         <span class="c1"># Set the base attributes</span>
-        <span class="n">inputparams</span><span class="o">.</span><span class="n">_params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">inputparams</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">inputparams</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">posinp</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_data_dir</span> <span class="o">=</span> <span class="n">ref_data_dir</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_skip</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span> <span class="o">=</span> <span class="n">pseudos</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span><span class="p">:</span>
+        <span class="n">inputparams</span><span class="o">.</span><span class="n">params</span> <span class="o">=</span> <span class="n">clean</span><span class="p">(</span><span class="n">inputparams</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span> <span class="o">=</span> <span class="n">inputparams</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="o">=</span> <span class="n">posinp</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">ref_data_dir</span> <span class="o">=</span> <span class="n">ref_data_dir</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">skip</span> <span class="o">=</span> <span class="n">skip</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_completed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">pseudos</span> <span class="o">=</span> <span class="n">pseudos</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudos</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="p">[</span><span class="s2">&quot;dft&quot;</span><span class="p">][</span><span class="s2">&quot;ixc&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="mi">101130</span>
             <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
@@ -324,6 +324,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
 
+    <span class="nd">@name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -334,6 +338,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span>
 
+    <span class="nd">@inputparams</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">inputparams</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputparams</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_inputparams</span> <span class="o">=</span> <span class="n">deepcopy</span><span class="p">(</span><span class="n">inputparams</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -343,6 +351,10 @@
 <span class="sd">            Initial positions of the calculation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span>
+
+    <span class="nd">@posinp</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">posinp</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posinp</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp</span> <span class="o">=</span> <span class="n">posinp</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -355,6 +367,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span>
 
+    <span class="nd">@logfile</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">logfile</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logfile</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">logfile</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">ref_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -366,16 +382,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_ref_data_dir</span>
 
+    <span class="nd">@ref_data_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">ref_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">ref_data_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_ref_data_dir</span> <span class="o">=</span> <span class="n">ref_data_dir</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">pseudos</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Returns</span>
-<span class="sd">        _______</span>
+<span class="sd">        -------</span>
 <span class="sd">        bool</span>
 <span class="sd">            if `True`, the calculation uses the pseudopotential files</span>
 <span class="sd">            in $PSEUDODIR (environment variable).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span>
+
+    <span class="nd">@pseudos</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">pseudos</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">pseudos</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span> <span class="o">=</span> <span class="n">pseudos</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -390,6 +414,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_skip</span>
 
+    <span class="nd">@skip</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">skip</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">skip</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_skip</span> <span class="o">=</span> <span class="nb">bool</span><span class="p">(</span><span class="n">skip</span><span class="p">)</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">init_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -401,6 +429,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span>
 
+    <span class="nd">@init_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">init_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">init_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span> <span class="o">=</span> <span class="n">init_dir</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -410,6 +442,10 @@
 <span class="sd">            Absolute path to the directory where the calculation is run.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span>
+
+    <span class="nd">@run_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">run_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="n">run_dir</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -421,6 +457,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span>
 
+    <span class="nd">@data_dir</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="n">data_dir</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bigdft_tool_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -430,6 +470,10 @@
 <span class="sd">            Base command to run the bigdft-tool executable.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span>
+
+    <span class="nd">@bigdft_tool_cmd</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bigdft_tool_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bigdft_tool_cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span> <span class="o">=</span> <span class="n">bigdft_tool_cmd</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">bigdft_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -441,6 +485,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span>
 
+    <span class="nd">@bigdft_cmd</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">bigdft_cmd</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">bigdft_cmd</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span> <span class="o">=</span> <span class="n">bigdft_cmd</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">input_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -450,6 +498,10 @@
 <span class="sd">            Name of the input parameters file.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span>
+
+    <span class="nd">@input_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">input_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">input_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span> <span class="o">=</span> <span class="n">input_name</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">posinp_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -461,6 +513,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span>
 
+    <span class="nd">@posinp_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">posinp_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">posinp_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span> <span class="o">=</span> <span class="n">posinp_name</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">logfile_name</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -471,6 +527,10 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span>
 
+    <span class="nd">@logfile_name</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">logfile_name</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">logfile_name</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span> <span class="o">=</span> <span class="n">logfile_name</span>
+
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">is_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -480,6 +540,10 @@
 <span class="sd">            `True` if the job has already run successfully.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span>
+
+    <span class="nd">@is_completed</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">is_completed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">is_completed</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span> <span class="o">=</span> <span class="n">is_completed</span>
 
     <span class="k">def</span> <span class="nf">_set_directory_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -505,10 +569,10 @@
 <span class="sd">            Folder where to run the calculation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Set the initial directory</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">getcwd</span><span class="p">()</span>
         <span class="c1"># Set the directory where the calculation will be run</span>
         <span class="k">if</span> <span class="n">run_dir</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># A run directory was given, find the common prefix with the</span>
             <span class="c1"># current working directory</span>
@@ -518,15 +582,15 @@
                 <span class="c1"># is already well defined, and the absolute directory is</span>
                 <span class="c1"># the concatenation of the current working directory and</span>
                 <span class="c1"># the run directory</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">run_dir</span><span class="p">)</span>
             <span class="k">else</span><span class="p">:</span>
                 <span class="c1"># Else, find the relative path with the common prefix to</span>
                 <span class="c1"># define run_dir, and use run_dir to define the</span>
                 <span class="c1"># absolute directory. The initial directory is changed to the</span>
                 <span class="c1"># common prefix.</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_init_dir</span> <span class="o">=</span> <span class="n">basename</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span> <span class="o">=</span> <span class="n">basename</span>
                 <span class="n">new_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">relpath</span><span class="p">(</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="n">basename</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">new_run_dir</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">init_dir</span><span class="p">,</span> <span class="n">new_run_dir</span><span class="p">)</span>
                 <span class="c1"># print(&quot;run_dir switched from {} to {}&quot;</span>
                 <span class="c1">#       .format(run_dir, new_run_dir))</span>
 
@@ -538,24 +602,24 @@
         <span class="n">data_dir</span> <span class="o">=</span> <span class="s2">&quot;data&quot;</span>  <span class="c1"># base name for the BigDFT data directory</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
             <span class="n">data_dir</span> <span class="o">+=</span> <span class="s2">&quot;-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">data_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">run_dir</span><span class="p">,</span> <span class="n">data_dir</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_set_cmd_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Set the base commands to run bigdft or bigdft-tool.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># The base bigdft-tool command is always the same</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_TOOL_PATH</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_tool_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_TOOL_PATH</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_tool_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;--name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_tool_cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;--name&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
         <span class="c1"># The base bigdft command depends on name and on skip</span>
         <span class="n">skip_option</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">skip</span><span class="p">:</span>
             <span class="n">skip_option</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-s&quot;</span><span class="p">,</span> <span class="s2">&quot;Yes&quot;</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">bigdft_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">BIGDFT_PATH</span><span class="p">]</span> <span class="o">+</span> <span class="n">skip_option</span>
 
     <span class="k">def</span> <span class="nf">_set_filename_attributes</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -563,13 +627,13 @@
 <span class="sd">        files.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">!=</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span>  <span class="c1"># input file name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.xyz&quot;</span>  <span class="c1"># posinp file name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span>  <span class="c1"># output file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.yaml&quot;</span>  <span class="c1"># input file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">+</span> <span class="s2">&quot;.xyz&quot;</span>  <span class="c1"># posinp file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log-&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span>  <span class="c1"># output file name</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_input_name</span> <span class="o">=</span> <span class="s2">&quot;input.yaml&quot;</span>  <span class="c1"># input file name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_posinp_name</span> <span class="o">=</span> <span class="s2">&quot;posinp.xyz&quot;</span>  <span class="c1"># posinp file name</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log.yaml&quot;</span>  <span class="c1"># output file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">input_name</span> <span class="o">=</span> <span class="s2">&quot;input.yaml&quot;</span>  <span class="c1"># input file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span> <span class="o">=</span> <span class="s2">&quot;posinp.xyz&quot;</span>  <span class="c1"># posinp file name</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span> <span class="o">=</span> <span class="s2">&quot;log.yaml&quot;</span>  <span class="c1"># output file name</span>
 
 <div class="viewcode-block" id="Job.__enter__"><a class="viewcode-back" href="../../job.html#mybigdft.job.Job.__enter__">[docs]</a>    <span class="k">def</span> <span class="nf">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -656,7 +720,7 @@
                 <span class="n">output_msg</span> <span class="o">=</span> <span class="n">output_msg</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;unicode_escape&quot;</span><span class="p">)</span>
                 <span class="nb">print</span><span class="p">(</span><span class="n">output_msg</span><span class="p">)</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The logfile is incomplete!&quot;</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="ne">RuntimeError</span><span class="p">(</span><span class="s2">&quot;Timeout exceded (</span><span class="si">{}</span><span class="s2"> minutes)&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">timeout</span><span class="p">))</span>
@@ -668,7 +732,7 @@
             <span class="c1"># correspond to the ones used to initialize the current job.</span>
             <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Logfile </span><span class="si">{}</span><span class="s2"> already exists!</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">))</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span> <span class="o">=</span> <span class="n">Logfile</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile_name</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">incomplete_log</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;The logfile is incomplete!&quot;</span>
                 <span class="k">if</span> <span class="n">incomplete_log</span> <span class="ow">and</span> <span class="n">restart_if_incomplete</span><span class="p">:</span>
@@ -688,7 +752,7 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_check_logfile_posinp</span><span class="p">()</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_check_logfile_inputparams</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_is_completed</span> <span class="o">=</span> <span class="kc">True</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">is_completed</span> <span class="o">=</span> <span class="kc">True</span></div>
 
     <span class="k">def</span> <span class="nf">_copy_reference_data_dir</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
@@ -782,7 +846,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inputparams</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">input_name</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">posinp_name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_pseudos</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">pseudos</span><span class="p">:</span>
             <span class="n">elements</span> <span class="o">=</span> <span class="nb">set</span><span class="p">([</span><span class="n">atom</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">atom</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">posinp</span><span class="p">])</span>
             <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">elements</span><span class="p">:</span>
                 <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
