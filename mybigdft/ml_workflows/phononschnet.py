@@ -129,7 +129,7 @@ class Phononschnet:
     @translation_amplitudes.setter
     def translation_amplitudes(self, translation_amplitudes):
         if translation_amplitudes == None:
-            self._translation_amplitudes = [0.45 / 100] * 3
+            self._translation_amplitudes = [0.01] * 3
         else:
             assert (
                 len(translation_amplitudes) == 3
@@ -216,7 +216,7 @@ class Phononschnet:
     def normal_modes(self, normal_modes):
         self._normal_modes = normal_modes
 
-    def run(self, model_dir, device="cpu", **kwargs):
+    def run(self, model_dir, device="cpu", batch_size=128, recenter=False, **kwargs):
         r"""
         Parameters
         ----------
@@ -231,7 +231,63 @@ class Phononschnet:
         """
         if self.relax:
             geopt = Geoptschnet(posinp=self.init_state, write_to_disk=False, **kwargs)
-            geopt.run(model_dir=model_dir, device=device, **kwargs)
+            geopt.run(
+                model_dir=model_dir,
+                device=device,
+                batch_size=batch_size,
+                recenter=recenter,
+            )
             self.ground_state = deepcopy(geopt.final_posinp)
         else:
             self.ground_state = deepcopy(self.init_state)
+        job = Jobschnet(posinp=self._create_displacements())
+        job.run(
+            model_dir=model_dir,
+            forces=2,
+            device=device,
+            write_to_disk=False,
+            batch_size=batch_size,
+            overwrite=False,
+        )
+        print(job.logfile.energy)
+        print(job.logfile.forces)
+
+    def _create_displacements(self):
+        r"""
+        Set the displacements each atom must undergo from the amplitudes
+        of displacement in each direction.
+        """
+        structs = []
+        # First order phonon calculation
+        if self.order == 1:
+            structs.append(deepcopy(self.ground_state))
+            for i, atom in enumerate(self.ground_state):
+                for j, dim in zip(
+                    range(3),
+                    [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
+                ):
+                    structs.append(
+                        self.ground_state.translate_atom(
+                            i, self.translation_amplitudes[j] * dim
+                        )
+                    )
+        # Second order phonon calculation
+        elif self.order == 2:
+            for i, atom in enumerate(self.ground_state):
+                for j, dim in zip(
+                    [0, 0, 1, 1, 2, 2],
+                    [
+                        np.array([1, 0, 0]),
+                        np.array([-1, 0, 0]),
+                        np.array([0, 1, 0]),
+                        np.array([0, -1, 0]),
+                        np.array([0, 0, 1]),
+                        np.array([0, 0, -1]),
+                    ],
+                ):
+                    structs.append(
+                        self.ground_state.translate_atom(
+                            i, self.translation_amplitudes[j] * dim
+                        )
+                    )
+        return structs
