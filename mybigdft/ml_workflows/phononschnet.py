@@ -7,6 +7,7 @@ from __future__ import print_function, absolute_import
 import numpy as np
 from mybigdft import Jobschnet, Posinp
 from mybigdft.ml_workflows import Geoptschnet
+from copy import deepcopy
 
 
 class Phononschnet:
@@ -215,7 +216,7 @@ class Phononschnet:
     def normal_modes(self, normal_modes):
         self._normal_modes = normal_modes
 
-    def run(model_dir, device="cpu", **kwargs):
+    def run(self, model_dir, device="cpu", **kwargs):
         r"""
         Parameters
         ----------
@@ -229,5 +230,8 @@ class Phononschnet:
             Only useful if the relaxation is unstable.
         """
         if self.relax:
-            geopt = Geoptschnet(posinp=init_state, write_to_disk=False, **kwargs)
+            geopt = Geoptschnet(posinp=self.init_state, write_to_disk=False, **kwargs)
             geopt.run(model_dir=model_dir, device=device, **kwargs)
+            self.ground_state = deepcopy(geopt.final_posinp)
+        else:
+            self.ground_state = deepcopy(self.init_state)
