@@ -3,11 +3,12 @@ The :class:`Phononschnet` class allows to compute the normal vibration
 modes of a system using SchetPack trained models.
 """
 
-from __future__ import print_function, absolute_import
+from __future__ import absolute_import
 import numpy as np
 from mybigdft import Jobschnet, Posinp
 from mybigdft.ml_workflows import Geoptschnet
 from copy import deepcopy
+from mybigdft.globals import ANG_TO_B, B_TO_ANG, EV_TO_HA, HA_TO_CMM1, AMU_TO_EMU
 
 
 class Phononschnet:
@@ -249,8 +250,7 @@ class Phononschnet:
             batch_size=batch_size,
             overwrite=False,
         )
-        print(job.logfile.energy)
-        print(job.logfile.forces)
+        self._post_proc(job)
 
     def _create_displacements(self):
         r"""
@@ -291,3 +291,50 @@ class Phononschnet:
                         )
                     )
         return structs
+
+    def _post_proc(self, job):
+        r"""
+        """
+        self.dyn_mat = self._compute_dyn_mat(job)
+        self.energies, self.normal_modes = self._solve_dyn_mat()
+        self.energies *= HA_TO_CMM1
+
+    def _compute_dyn_mat(self, job):
+        r"""
+        """
+        hessian = self._compute_hessian(job)
+        masses = self._compute_masses()
+        return hessian / masses
+
+    def _compute_masses(self):
+        r"""
+        """
+        to_mesh = [atom.mass for atom in self.ground_state for _ in range(3)]
+        m_i, m_j = np.meshgrid(to_mesh, to_mesh)
+        return np.sqrt(m_i * m_j) * AMU_TO_EMU
+
+    def _compute_hessian(self, job):
+        r"""
+        """
+        pos = self.ground_state
+        n_at = len(pos)
+        hessian = np.zeros((3 * n_at, 3 * n_at))
+        forces = np.array(job.logfile.forces) * EV_TO_HA * B_TO_ANG
+        if self.order == 1:
+            for i in range(3 * n_at):
+                hessian[i, :] = (forces[i + 1].flatten() - forces[0].flatten()) / (
+                    self.translation_amplitudes[i % 3] * ANG_TO_B
+                )
+        elif self.order == 2:
+            for i in range(3 * n_at):
+                hessian[i, :] = (
+                    forces[2 * i].flatten() - forces[2 * i + 1].flatten()
+                ) / (self.translation_amplitudes[i % 3] * ANG_TO_B)
+        return -(hessian + hessian.T) / 2.0
+
+    def _solve_dyn_mat(self):
+        r"""
+        """
+        eigs, vecs = np.linalg.eig(self.dyn_mat)
+        eigs = np.sign(eigs) * np.sqrt(np.where(eigs < 0, -eigs, eigs))
+        return eigs, vecs
