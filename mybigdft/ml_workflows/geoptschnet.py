@@ -18,9 +18,9 @@ class Geoptschnet:
     def __init__(
         self,
         posinp,
-        forcemax=5e-3,
-        step_size=0.002,
-        max_iter=200,
+        forcemax=0.01,
+        step_size=0.003,
+        max_iter=300,
         write_to_disk=False,
         out_name="",
     ):
@@ -182,6 +182,8 @@ class Geoptschnet:
             if np.max(np.abs(job.logfile.forces[0])) < self.forcemax:
                 print("Geometry optimization stopped at iteration {}.".format(i))
                 break
+            if i % 100 == 0:
+                self.step_size = self.step_size * 0.9
             if i == self.max_iter:
                 print(
                     "Geometry optimization was not succesful at iteration {}.".format(i)
