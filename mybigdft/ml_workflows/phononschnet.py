@@ -38,7 +38,7 @@ class Phononschnet:
     state anymore).
     """
 
-    def __init__(self, init_state, relax=True, translation_amplitudes=None, order=2):
+    def __init__(self, init_state, relax=True, translation_amplitudes=None, order=3):
         r"""
         From a ground state calculation, which must correspond to the
         equilibrium calculation geometry, the :math:`3 n_{at}+1` or
@@ -130,7 +130,7 @@ class Phononschnet:
     @translation_amplitudes.setter
     def translation_amplitudes(self, translation_amplitudes):
         if translation_amplitudes == None:
-            self._translation_amplitudes = [0.01] * 3
+            self._translation_amplitudes = [0.015] * 3
         else:
             assert (
                 len(translation_amplitudes) == 3
@@ -153,7 +153,7 @@ class Phononschnet:
     @order.setter
     def order(self, order):
         order = int(order)
-        if order not in [1, 2]:
+        if order not in [1, 2, 3]:
             raise NotImplementedError("Only first and second order available.")
         self._order = order
 
@@ -275,21 +275,28 @@ class Phononschnet:
         elif self.order == 2:
             for i, atom in enumerate(self.ground_state):
                 for j, dim in zip(
-                    [0, 0, 1, 1, 2, 2],
-                    [
-                        np.array([1, 0, 0]),
-                        np.array([-1, 0, 0]),
-                        np.array([0, 1, 0]),
-                        np.array([0, -1, 0]),
-                        np.array([0, 0, 1]),
-                        np.array([0, 0, -1]),
-                    ],
+                    [0, 1, 2],
+                    [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
                 ):
-                    structs.append(
-                        self.ground_state.translate_atom(
-                            i, self.translation_amplitudes[j] * dim
+                    for factor in [1, -1]:
+                        structs.append(
+                            self.ground_state.translate_atom(
+                                i, self.translation_amplitudes[j] * dim * factor
+                            )
                         )
-                    )
+        # Third order phonon calculation
+        elif self.order == 3:
+            for i in range(len(self.ground_state)):
+                for j, dim in zip(
+                    [0, 1, 2],
+                    [np.array([1, 0, 0]), np.array([0, 1, 0]), np.array([0, 0, 1])],
+                ):
+                    for factor in [2, 1, -1, -2]:
+                        structs.append(
+                            self.ground_state.translate_atom(
+                                i, self.translation_amplitudes[j] * dim * factor
+                            )
+                        )
         return structs
 
     def _post_proc(self, job):
@@ -329,7 +336,15 @@ class Phononschnet:
             for i in range(3 * n_at):
                 hessian[i, :] = (
                     forces[2 * i].flatten() - forces[2 * i + 1].flatten()
-                ) / (self.translation_amplitudes[i % 3] * ANG_TO_B)
+                ) / (2 * self.translation_amplitudes[i % 3] * ANG_TO_B)
+        elif self.order == 3:
+            for i in range(3 * n_at):
+                hessian[i, :] = (
+                    -forces[2 * i].flatten()
+                    + 8 * forces[2 * i + 1].flatten()
+                    - 8 * forces[2 * i + 2].flatten()
+                    + forces[2 * i + 3].flatten()
+                ) / (12 * self.translation_amplitudes[i % 3] * ANG_TO_B)
         return -(hessian + hessian.T) / 2.0
 
     def _solve_dyn_mat(self):

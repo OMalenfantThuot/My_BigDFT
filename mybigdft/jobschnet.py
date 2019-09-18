@@ -259,7 +259,7 @@ class Jobschnet(object):
                     np.savetxt(out, self.logfile.forces[idx])
                     out.write("\n")
 
-    def _create_additional_structures(self, order, deriv_length=0.02):
+    def _create_additional_structures(self, order, deriv_length=0.015):
         r"""
         Creates the additional structures needed to do a numeric
         derivation of the energy to calculate the forces.
