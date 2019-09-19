@@ -202,6 +202,7 @@ class Jobschnet(object):
         # Determine available properties
         if "energy_U0" in list(raw_predictions.keys()):
             raw_predictions["energy"] = raw_predictions.pop("energy_U0")
+        raw_predictions["energy"] = raw_predictions["energy"].astype(np.float64)
         available_properties = list(raw_predictions.keys())
         available_properties.remove("idx")
 
@@ -342,7 +343,7 @@ class Jobschnet(object):
                     predictions[np.arange((i + 9) * nat, (i + 10) * nat, 1)],
                 )
                 forces[:, i] = -(
-                    (-ener1 + 8 * ener2 - 8 * ener3 + ener4).reshape(nat)
+                    (-ener1 + 8 * (ener2 - ener3) + ener4).reshape(nat)
                     / (12 * self._deriv_length)
                 )
         else:
