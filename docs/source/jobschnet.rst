@@ -1,4 +1,4 @@
 Jobschnet
 ---------
 
-.. automodule:: mybigdft.Jobschnet
+.. automodule:: mybigdft.jobschnet

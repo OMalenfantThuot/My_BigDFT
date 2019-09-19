@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Logfileschnet" href="logfileschnet.html" />
-    <link rel="prev" title="Machine Learning Related Classes" href="mlobjects.html" /> 
+    <link rel="next" title="Workflows Using Machine Learned Models" href="mlworkflows.html" />
+    <link rel="prev" title="Machine Learning Classes" href="mlobjects.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -86,18 +86,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dft.html">DFT Classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a><ul class="current">
 <li class="toctree-l3 current"><a class="current reference internal" href="#">Jobschnet</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logfileschnet.html">Logfileschnet</a></li>
 <li class="toctree-l3"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -145,7 +142,7 @@
         
           <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
         
-          <li><a href="mlobjects.html">Machine Learning Related Classes</a> &raquo;</li>
+          <li><a href="mlobjects.html">Machine Learning Classes</a> &raquo;</li>
         
       <li>Jobschnet</li>
     
@@ -190,26 +187,26 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="module-mybigdft.Jobschnet">
-<span id="jobschnet"></span><h1>Jobschnet<a class="headerlink" href="#module-mybigdft.Jobschnet" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="module-mybigdft.jobschnet">
+<span id="jobschnet"></span><h1>Jobschnet<a class="headerlink" href="#module-mybigdft.jobschnet" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="#mybigdft.jobschnet.Jobschnet" title="mybigdft.jobschnet.Jobschnet"><code class="xref py py-class docutils literal notranslate"><span class="pre">Jobschnet</span></code></a> class is the base class defining a SchnetPack calculation.</p>
+<dl class="class">
+<dt id="mybigdft.jobschnet.Jobschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Jobschnet</code><span class="sig-paren">(</span><em class="sig-param">name=''</em>, <em class="sig-param">posinp=None</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class defines a SchnetPack calculation similarly
 to the Job class for BigDFT.</p>
-<dl class="attribute">
-<dt id="mybigdft.Jobschnet.logfile">
-<code class="sig-prename descclassname">mybigdft.Jobschnet.</code><code class="sig-name descname">logfile</code><a class="headerlink" href="#mybigdft.Jobschnet.logfile" title="Permalink to this definition">¶</a></dt>
-<dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Object empty or containing the results of the calculation.</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="logfileschnet.html#mybigdft.jobschnet.Logfileschnet" title="mybigdft.jobschnet.Logfileschnet">Logfileschnet</a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>name</strong> (<em>str</em>) – Name of the job. Will be used to name the created files.</p></li>
+<li><p><strong>posinp</strong> (<a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp"><em>Posinp</em></a>) – Base atomic positions for the job</p></li>
+</ul>
 </dd>
 </dl>
-</dd></dl>
-
-<dl class="attribute">
-<dt id="mybigdft.Jobschnet.name">
-<code class="sig-prename descclassname">mybigdft.Jobschnet.</code><code class="sig-name descname">name</code><a class="headerlink" href="#mybigdft.Jobschnet.name" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.name">
+<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Base name of the calculation used to set the names of
@@ -221,9 +218,22 @@ files and directories.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="mybigdft.Jobschnet.number_of_structures">
-<code class="sig-prename descclassname">mybigdft.Jobschnet.</code><code class="sig-name descname">number_of_structures</code><a class="headerlink" href="#mybigdft.Jobschnet.number_of_structures" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Initial positions of the calculation</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.number_of_structures">
+<em class="property">property </em><code class="sig-name descname">number_of_structures</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.number_of_structures" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Number of different structures when the job is declared</p>
@@ -234,9 +244,22 @@ files and directories.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="mybigdft.Jobschnet.outfile_name">
-<code class="sig-prename descclassname">mybigdft.Jobschnet.</code><code class="sig-name descname">outfile_name</code><a class="headerlink" href="#mybigdft.Jobschnet.outfile_name" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.logfile">
+<em class="property">property </em><code class="sig-name descname">logfile</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.logfile" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Object empty or containing the results of the calculation.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p><a class="reference internal" href="#mybigdft.jobschnet.Logfileschnet" title="mybigdft.jobschnet.Logfileschnet">Logfileschnet</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.outfile_name">
+<em class="property">property </em><code class="sig-name descname">outfile_name</code><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.outfile_name" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
 <dd class="field-odd"><p>Name of the output file</p>
@@ -247,17 +270,143 @@ files and directories.</p>
 </dl>
 </dd></dl>
 
-<dl class="attribute">
-<dt id="mybigdft.Jobschnet.posinp">
-<code class="sig-prename descclassname">mybigdft.Jobschnet.</code><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.Jobschnet.posinp" title="Permalink to this definition">¶</a></dt>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Jobschnet.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">model_dir=None</em>, <em class="sig-param">forces=False</em>, <em class="sig-param">device='cpu'</em>, <em class="sig-param">write_to_disk=False</em>, <em class="sig-param">batch_size=128</em>, <em class="sig-param">overwrite=False</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Jobschnet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Jobschnet.run" title="Permalink to this definition">¶</a></dt>
 <dd><dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>Initial positions of the calculation</p>
-</dd>
-<dt class="field-even">Return type</dt>
-<dd class="field-even"><p><a class="reference internal" href="posinp.html#mybigdft.iofiles.posinp.Posinp" title="mybigdft.iofiles.posinp.Posinp">Posinp</a></p>
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> (<em>str</em>) – Absolute path to the SchnetPack model to use in calculation</p></li>
+<li><p><strong>forces</strong> (<em>int</em><em> or </em><em>bool</em>) – Order of the force calculations (0, 1 or 2)
+If 0 (or <cite>False</cite>), forces are not evaluated.
+If 1, forces are evaluated on first-order (6N calculations)
+If 2 (or <cite>True</cite>), forces are evaluated on second-order (12N calculations)</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Either ‘cpu’ or ‘cuda’ to run on cpu or gpu</p></li>
+<li><p><strong>write_to_disk</strong> (<em>bool</em>) – If <cite>True</cite>, an outfile will be written after the calculation.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Size of the mini-batches used in predictions</p></li>
+<li><p><strong>overwrite</strong> (<em>bool</em>) – If <cite>True</cite>, all .db files are removed from the directory before
+the calculation is done.</p></li>
+</ul>
 </dd>
 </dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="class">
+<dt id="mybigdft.jobschnet.Logfileschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.jobschnet.</code><code class="sig-name descname">Logfileschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/jobschnet.html#Logfileschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>Container class to emulate the Logfile object used in BigDFT calculations</p>
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.posinp">
+<em class="property">property </em><code class="sig-name descname">posinp</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.posinp" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the base Posinp objects for the predictions.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of Posinps</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.n_at">
+<em class="property">property </em><code class="sig-name descname">n_at</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.n_at" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the number of atoms of each structure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of ints</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.atom_types">
+<em class="property">property </em><code class="sig-name descname">atom_types</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.atom_types" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing sets of the elements present in each structure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of sets</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.boundary_conditions">
+<em class="property">property </em><code class="sig-name descname">boundary_conditions</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.boundary_conditions" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the boundary conditions, either <cite>free</cite>,
+<cite>surface</cite> or <cite>periodic</cite>, of each structure.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of strings</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.cell">
+<em class="property">property </em><code class="sig-name descname">cell</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.cell" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing cell dimensions of each structure,
+None for free boundary conditions.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of lists of floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.energy">
+<em class="property">property </em><code class="sig-name descname">energy</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.energy" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the energy value for each structure.
+If None, the energies have not been calculated yet.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of floats or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.forces">
+<em class="property">property </em><code class="sig-name descname">forces</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.forces" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the forces values for each structure.
+If None, the forces have not been calculated yet.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of arrays of floats or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.jobschnet.Logfileschnet.dipole">
+<em class="property">property </em><code class="sig-name descname">dipole</code><a class="headerlink" href="#mybigdft.jobschnet.Logfileschnet.dipole" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>List containing the dipole values for each structure.
+If None, the dipoles have not been calculated yet.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of arrays of floats or None</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -270,10 +419,10 @@ files and directories.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="logfileschnet.html" class="btn btn-neutral float-right" title="Logfileschnet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="mlworkflows.html" class="btn btn-neutral float-right" title="Workflows Using Machine Learned Models" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="mlobjects.html" class="btn btn-neutral float-left" title="Machine Learning Related Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="mlobjects.html" class="btn btn-neutral float-left" title="Machine Learning Classes" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

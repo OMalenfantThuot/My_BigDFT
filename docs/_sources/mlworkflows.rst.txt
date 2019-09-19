@@ -7,3 +7,4 @@ Calculations workflows performed with models trained using the SchnetPack machin
 .. toctree::
     
     geoptschnet
+    phononschnet

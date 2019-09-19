@@ -6,8 +6,7 @@ Welcome to My_BigDFT's documentation!
    :caption: Contents:
 
    code_doc
-   tutorials
-   exercises
+   dft_tutorials
 
 .. mdinclude:: ../../README.md
 

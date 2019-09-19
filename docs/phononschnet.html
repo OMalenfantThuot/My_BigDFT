@@ -1,0 +1,419 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Phononschnet &mdash; My_BigDFT  documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+        <script async="async" type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script type="text/x-mathjax-config">MathJax.Hub.Config({"tex2jax": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true, "ignoreClass": "document", "processClass": "math|output_area"}})</script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="DFT Tutorials" href="dft_tutorials.html" />
+    <link rel="prev" title="Geoptschnet" href="geoptschnet.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> My_BigDFT
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dft.html">DFT Classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="geoptschnet.html">Geoptschnet</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">Phononschnet</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a></li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">My_BigDFT</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+          <li><a href="mlobjects.html">Machine Learning Classes</a> &raquo;</li>
+        
+          <li><a href="mlworkflows.html">Workflows Using Machine Learned Models</a> &raquo;</li>
+        
+      <li>Phononschnet</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/phononschnet.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  
+<style>
+/* CSS overrides for sphinx_rtd_theme */
+
+/* 24px margin */
+.nbinput.nblast,
+.nboutput.nblast {
+    margin-bottom: 19px;  /* padding has already 5px */
+}
+
+/* ... except between code cells! */
+.nblast + .nbinput {
+    margin-top: -19px;
+}
+
+.admonition > p:before {
+    margin-right: 4px;  /* make room for the exclamation icon */
+}
+
+/* Fix math alignment, see https://github.com/rtfd/sphinx_rtd_theme/pull/686 */
+.math {
+    text-align: unset;
+}
+</style>
+<div class="section" id="phononschnet">
+<h1>Phononschnet<a class="headerlink" href="#phononschnet" title="Permalink to this headline">¶</a></h1>
+<dl class="class">
+<dt id="mybigdft.ml_workflows.Phononschnet">
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.ml_workflows.</code><code class="sig-name descname">Phononschnet</code><span class="sig-paren">(</span><em class="sig-param">init_state</em>, <em class="sig-param">relax=True</em>, <em class="sig-param">translation_amplitudes=None</em>, <em class="sig-param">order=3</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/phononschnet.html#Phononschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet" title="Permalink to this definition">¶</a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
+<p>This class allows to run all the calculations enabling the
+computation of the phonon energies of a given system, using
+machine learning models obtained with the SchnetPack package.</p>
+<p>To get the phonon energies of the system, one needs to find the
+eigenvalues of the dynamical matrix, that is closely related to the
+Hessian. To build these matrices, one must find the derivatives of
+the forces when each coordinate of each atom is translated by a
+small amount around the equilibrium positions.</p>
+<p>The initial position fo the atoms are taken from the <cite>init_state</cite>
+Posinp instance. If they are not part of a relaxed geometry, the
+relax parameter should stay at <cite>True</cite>.
+WARNING: Relaxed geometries are dependent on the model used in the
+<cite>run()</cite> method. In doubt, <cite>relax</cite> parameter should be ignored.</p>
+<p>The distance of the displacement in each direction is controlled
+by <cite>translation_amplitudes</cite> (one amplitude per space coordinate
+must be given). The order of the numerical differenciation is
+determined by the <cite>order</cite> parameter.</p>
+<p>Phonon energies and normal modes are calculated using the <cite>run()`method.
+This method creates the additional structures needed, passes them to a
+`Jobschnet</cite> instance, then post-processes the obtained forces
+to obtain them.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>init_state</strong> (<em>mybigdft.Posinp</em>) – Initial positions of the system under consideration.</p></li>
+<li><p><strong>relax</strong> (<em>bool</em>) – Wether the initial positions need to be relaxed or not.
+Default is <cite>True</cite>.</p></li>
+<li><p><strong>translation_amplitudes</strong> (<em>list of length 3</em>) – Amplitudes of the translations to be applied to each atom
+along each of the three space coordinates (in angstroms).</p></li>
+<li><p><strong>order</strong> (<em>int</em>) – Order of the numerical differentiation used to compute the
+dynamical matrix. Can be either 1, 2 or 3.</p></li>
+</ul>
+</dd>
+</dl>
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.init_state">
+<em class="property">property </em><code class="sig-name descname">init_state</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.init_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>init_state</strong> – Initial positions of the system for which phonon properties
+will be calculated.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>mybigdft.Posinp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.ground_state">
+<em class="property">property </em><code class="sig-name descname">ground_state</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.ground_state" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>ground_state</strong> – Relaxed positions of the system for which phonon properties
+will be calculated. If <cite>relax`is `False</cite>, will be the same
+as init_state.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>mybigdft.Posinp</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.translation_amplitudes">
+<em class="property">property </em><code class="sig-name descname">translation_amplitudes</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.translation_amplitudes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>translation_amplitudes</strong> – Displacements of atoms in all three dimensions to calculate
+the phonon properties</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>list of 3 floats</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.order">
+<em class="property">property </em><code class="sig-name descname">order</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.order" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>order</strong> – Order of the numerical differentiation used to compute the
+dynamical matrix. If second order (resp. first), then six
+(resp. three) calculations per atom are to be performed.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.relax">
+<em class="property">property </em><code class="sig-name descname">relax</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.relax" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><strong>relax</strong> – If <cite>True</cite>, which is default, the initial positions are relaxed
+before the phonon properties are calculated. Recommended,
+especially if more than one model is used.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>bool</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.energies">
+<em class="property">property </em><code class="sig-name descname">energies</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.energies" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Phonon energies of the system (units: cm^-1).</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.dyn_mat">
+<em class="property">property </em><code class="sig-name descname">dyn_mat</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.dyn_mat" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Dynamical matrix deduced from the calculations.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.normal_modes">
+<em class="property">property </em><code class="sig-name descname">normal_modes</code><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.normal_modes" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>Normal modes of the system found as eigenvectors of the
+dynamical matrix.</p>
+</dd>
+<dt class="field-even">Return type</dt>
+<dd class="field-even"><p>numpy.array or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="method">
+<dt id="mybigdft.ml_workflows.Phononschnet.run">
+<code class="sig-name descname">run</code><span class="sig-paren">(</span><em class="sig-param">model_dir</em>, <em class="sig-param">device='cpu'</em>, <em class="sig-param">batch_size=128</em>, <em class="sig-param">**kwargs</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/phononschnet.html#Phononschnet.run"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Phononschnet.run" title="Permalink to this definition">¶</a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model_dir</strong> (<em>str</em>) – Path to the model used for calculations relative to <cite>$MODELDIR</cite>
+(absolute path if not defined).</p></li>
+<li><p><strong>device</strong> (<em>str</em>) – Either “cpu” or “cuda” to run on cpu or gpu.</p></li>
+<li><p><strong>batch_size</strong> (<em>int</em>) – Batch size used when passing the structures to the model</p></li>
+<li><p><strong>**kwargs</strong> – Optional arguments for the geometry optimization.
+Only useful if the relaxation is unstable.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="dft_tutorials.html" class="btn btn-neutral float-right" title="DFT Tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="geoptschnet.html" class="btn btn-neutral float-left" title="Geoptschnet" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Maxime Moriniere, Olivier Malenfant-Thuot
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

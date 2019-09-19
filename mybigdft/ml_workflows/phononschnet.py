@@ -21,55 +21,40 @@ class Phononschnet:
     eigenvalues of the dynamical matrix, that is closely related to the
     Hessian. To build these matrices, one must find the derivatives of
     the forces when each coordinate of each atom is translated by a
-    small amount around the equilibrium positions. This derivative must
-    be performed numerically. For a first order evaluation of the
-    derivative, :math:`3 n_{at} + 1` DFT calculations must be performed,
-    where :math:`n_{at}` is the number of atoms of the system, the 3
-    factors comes from the translations along each space coordinate,
-    while the extra calculation corresponds to the ground state.
-    However, this might not be precise enough because you want the
-    ground state forces to be equal to 0, or at least negligible with
-    respect to the forces of the out of equilibrium positions. This can
-    be difficult to obtain. It is therefore advised to evaluate that
-    derivative with a second order scheme, where each coodinate is
-    translated positively and negatively, so that the number of BigDFT
-    calculations amounts to :math:`2*3*n_{at} = 6 n_{at}` (no
-    :math:`+ 1` here, because there is no need to compute the ground
-    state anymore).
+    small amount around the equilibrium positions.
     """
 
     def __init__(self, init_state, relax=True, translation_amplitudes=None, order=3):
         r"""
-        From a ground state calculation, which must correspond to the
-        equilibrium calculation geometry, the :math:`3 n_{at}+1` or
-        :math:`6 n_{at}` jobs necessary for the calculation of the
-        phonon energies are prepared (depending on the order of the
-        calculation).
+        The initial position fo the atoms are taken from the `init_state`
+        Posinp instance. If they are not part of a relaxed geometry, the
+        relax parameter should stay at `True`.
+        WARNING: Relaxed geometries are dependent on the model used in the
+        `run()` method. In doubt, `relax` parameter should be ignored.
 
         The distance of the displacement in each direction is controlled
         by `translation_amplitudes` (one amplitude per space coordinate
-        must be given).
+        must be given). The order of the numerical differenciation is
+        determined by the `order` parameter.
 
-        The phonon energies calculations are computed while post-
-        processing the results of all the calculations (after running
-        the run method). They correspond to the energies of the Raman
-        spectrum. If interested in getting the Raman intensity and
-        depolarization ratio of each phonon (or normal mode), see
-        :class:`~mybigdft.workflows.ramanspectrum.RamanSpectrum`. If
-        interested in getting the infrared intensity of each phonon, see
-        :class:`~mybigdft.workflows.infreredspectrum.InfraredSpectrum`.
+        Phonon energies and normal modes are calculated using the `run()`method.
+        This method creates the additional structures needed, passes them to a 
+        `Jobschnet` instance, then post-processes the obtained forces
+        to obtain them.
 
         Parameters
         ----------
-        inti_state : mybigdft.Posinp
+        init_state : mybigdft.Posinp
             Initial positions of the system under consideration.
-        translation_amplitudes: Sequence of length 3
+        relax : bool
+            Wether the initial positions need to be relaxed or not.
+            Default is `True`.
+        translation_amplitudes: list of length 3
             Amplitudes of the translations to be applied to each atom
             along each of the three space coordinates (in angstroms).
         order : int
             Order of the numerical differentiation used to compute the
-            dynamical matrix. If second order (resp. first), then six
-            (resp. three) calculations per atom are to be performed.
+            dynamical matrix. Can be either 1, 2 or 3.
         """
         self.init_state = init_state
         self.relax = relax
@@ -217,7 +202,7 @@ class Phononschnet:
     def normal_modes(self, normal_modes):
         self._normal_modes = normal_modes
 
-    def run(self, model_dir, device="cpu", batch_size=128, recenter=False, **kwargs):
+    def run(self, model_dir, device="cpu", batch_size=128, **kwargs):
         r"""
         Parameters
         ----------
@@ -226,6 +211,8 @@ class Phononschnet:
             (absolute path if not defined).
         device : str
             Either "cpu" or "cuda" to run on cpu or gpu.
+        batch_size : int
+            Batch size used when passing the structures to the model
         **kwargs : 
             Optional arguments for the geometry optimization.
             Only useful if the relaxation is unstable.
@@ -236,7 +223,6 @@ class Phononschnet:
                 model_dir=model_dir,
                 device=device,
                 batch_size=batch_size,
-                recenter=recenter,
             )
             self.ground_state = deepcopy(geopt.final_posinp)
         else:
@@ -301,6 +287,8 @@ class Phononschnet:
 
     def _post_proc(self, job):
         r"""
+        Calculates the energies and normal modes from the results
+        obtained from the model.
         """
         self.dyn_mat = self._compute_dyn_mat(job)
         self.energies, self.normal_modes = self._solve_dyn_mat()
@@ -309,6 +297,7 @@ class Phononschnet:
 
     def _compute_dyn_mat(self, job):
         r"""
+        Computes the dynamical matrix
         """
         hessian = self._compute_hessian(job)
         masses = self._compute_masses()
@@ -316,6 +305,7 @@ class Phononschnet:
 
     def _compute_masses(self):
         r"""
+        Creates the masses matrix
         """
         to_mesh = [atom.mass for atom in self.ground_state for _ in range(3)]
         m_i, m_j = np.meshgrid(to_mesh, to_mesh)
@@ -323,6 +313,7 @@ class Phononschnet:
 
     def _compute_hessian(self, job):
         r"""
+        Computes the hessian matrix from the forces
         """
         pos = self.ground_state
         n_at = len(pos)
@@ -349,6 +340,8 @@ class Phononschnet:
 
     def _solve_dyn_mat(self):
         r"""
+        Obtains the eigenvalues and eigenvectors from
+        the dynamical matrix
         """
         eigs, vecs = np.linalg.eig(self.dyn_mat)
         eigs = np.sign(eigs) * np.sqrt(np.where(eigs < 0, -eigs, eigs))
