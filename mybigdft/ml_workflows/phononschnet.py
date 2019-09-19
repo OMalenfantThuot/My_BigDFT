@@ -130,7 +130,7 @@ class Phononschnet:
     @translation_amplitudes.setter
     def translation_amplitudes(self, translation_amplitudes):
         if translation_amplitudes == None:
-            self._translation_amplitudes = [0.015] * 3
+            self._translation_amplitudes = [0.03] * 3
         else:
             assert (
                 len(translation_amplitudes) == 3
@@ -304,6 +304,7 @@ class Phononschnet:
         """
         self.dyn_mat = self._compute_dyn_mat(job)
         self.energies, self.normal_modes = self._solve_dyn_mat()
+        self.energies[::-1].sort()
         self.energies *= HA_TO_CMM1
 
     def _compute_dyn_mat(self, job):
@@ -340,10 +341,9 @@ class Phononschnet:
         elif self.order == 3:
             for i in range(3 * n_at):
                 hessian[i, :] = (
-                    -forces[2 * i].flatten()
-                    + 8 * forces[2 * i + 1].flatten()
-                    - 8 * forces[2 * i + 2].flatten()
-                    + forces[2 * i + 3].flatten()
+                    -forces[4 * i].flatten()
+                    + forces[4 * i + 3].flatten()
+                    + 8 * (forces[4 * i + 1].flatten() - forces[4 * i + 2].flatten())
                 ) / (12 * self.translation_amplitudes[i % 3] * ANG_TO_B)
         return -(hessian + hessian.T) / 2.0
 
