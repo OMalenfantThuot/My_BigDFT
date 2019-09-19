@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Code Documentation &mdash; My_BigDFT  documentation</title>
+  <title>DFT Classes &mdash; My_BigDFT  documentation</title>
   
 
   
@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Input and Output files" href="iofiles.html" />
-    <link rel="prev" title="Welcome to My_BigDFT’s documentation!" href="index.html" /> 
+    <link rel="next" title="Job" href="job.html" />
+    <link rel="prev" title="Logfile" href="logfile.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -84,14 +84,17 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Code Documentation</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="dft.html">DFT Classes</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">DFT Classes</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l3"><a class="reference internal" href="workflows.html">Workflows</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -137,13 +140,15 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Code Documentation</li>
+          <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
+        
+      <li>DFT Classes</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="_sources/code_doc.rst.txt" rel="nofollow"> View page source</a>
+            <a href="_sources/dft.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -180,26 +185,19 @@
     text-align: unset;
 }
 </style>
-<div class="section" id="code-documentation">
-<span id="api"></span><h1>Code Documentation<a class="headerlink" href="#code-documentation" title="Permalink to this headline">¶</a></h1>
-<p>This section focuses on the documentation of the MyBigDFT module and its API.
-You will find here the documentation for the most useful classes and methods.</p>
+<div class="section" id="dft-classes">
+<h1>DFT Classes<a class="headerlink" href="#dft-classes" title="Permalink to this headline">¶</a></h1>
+<p>The classes used to make DFT calculations</p>
 <div class="toctree-wrapper compound">
 <ul>
-<li class="toctree-l1"><a class="reference internal" href="iofiles.html">Input and Output files</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="inputparams.html">InputParams</a></li>
-<li class="toctree-l2"><a class="reference internal" href="posinp.html">Posinp and Atom</a></li>
-<li class="toctree-l2"><a class="reference internal" href="logfile.html">Logfile</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="dft.html">DFT Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a></li>
+<li class="toctree-l1"><a class="reference internal" href="job.html">Job</a></li>
+<li class="toctree-l1"><a class="reference internal" href="workflows.html">Workflows</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="workflow.html">AbstractWorkflow and Workflow</a></li>
+<li class="toctree-l2"><a class="reference internal" href="convergences.html">Convergence classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="poltensors.html">Electronic and vibrational polarizability tensors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="phonons_infrared_raman.html">Phonon energies, infrared and Raman spectra</a></li>
+<li class="toctree-l2"><a class="reference internal" href="geopt.html">Geometry optimization (Geopt)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dissociation.html">Dissociation curve</a></li>
 </ul>
 </li>
 </ul>
@@ -214,10 +212,10 @@ You will find here the documentation for the most useful classes and methods.</p
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="iofiles.html" class="btn btn-neutral float-right" title="Input and Output files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="job.html" class="btn btn-neutral float-right" title="Job" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to My_BigDFT’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="logfile.html" class="btn btn-neutral float-left" title="Logfile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

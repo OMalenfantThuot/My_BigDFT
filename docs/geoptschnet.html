@@ -37,7 +37,7 @@
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="MyBigDFT tutorials" href="tutorials.html" />
+    <link rel="next" title="Phononschnet" href="phononschnet.html" />
     <link rel="prev" title="Workflows Using Machine Learned Models" href="mlworkflows.html" /> 
 </head>
 
@@ -86,21 +86,19 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
-<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="dft.html">DFT Classes</a></li>
+<li class="toctree-l2 current"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a><ul class="current">
 <li class="toctree-l3"><a class="reference internal" href="jobschnet.html">Jobschnet</a></li>
-<li class="toctree-l3"><a class="reference internal" href="logfileschnet.html">Logfileschnet</a></li>
 <li class="toctree-l3 current"><a class="reference internal" href="mlworkflows.html">Workflows Using Machine Learned Models</a><ul class="current">
 <li class="toctree-l4 current"><a class="current reference internal" href="#">Geoptschnet</a></li>
+<li class="toctree-l4"><a class="reference internal" href="phononschnet.html">Phononschnet</a></li>
 </ul>
 </li>
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -148,7 +146,7 @@
         
           <li><a href="code_doc.html">Code Documentation</a> &raquo;</li>
         
-          <li><a href="mlobjects.html">Machine Learning Related Classes</a> &raquo;</li>
+          <li><a href="mlobjects.html">Machine Learning Classes</a> &raquo;</li>
         
           <li><a href="mlworkflows.html">Workflows Using Machine Learned Models</a> &raquo;</li>
         
@@ -199,7 +197,7 @@
 <h1>Geoptschnet<a class="headerlink" href="#geoptschnet" title="Permalink to this headline">¶</a></h1>
 <dl class="class">
 <dt id="mybigdft.ml_workflows.Geoptschnet">
-<em class="property">class </em><code class="sig-prename descclassname">mybigdft.ml_workflows.</code><code class="sig-name descname">Geoptschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em>, <em class="sig-param">forcemax=0.005</em>, <em class="sig-param">step_size=0.002</em>, <em class="sig-param">max_iter=200</em>, <em class="sig-param">write_to_disk=False</em>, <em class="sig-param">out_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/geoptschnet.html#Geoptschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">mybigdft.ml_workflows.</code><code class="sig-name descname">Geoptschnet</code><span class="sig-paren">(</span><em class="sig-param">posinp</em>, <em class="sig-param">forcemax=0.01</em>, <em class="sig-param">step_size=0.003</em>, <em class="sig-param">max_iter=300</em>, <em class="sig-param">write_to_disk=False</em>, <em class="sig-param">out_name=''</em><span class="sig-paren">)</span><a class="reference internal" href="_modules/mybigdft/ml_workflows/geoptschnet.html#Geoptschnet"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#mybigdft.ml_workflows.Geoptschnet" title="Permalink to this definition">¶</a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></p>
 <p>This class allows to relax the input geometry of a given system in
 order to find the structure that minimizes the forces. The final
@@ -334,7 +332,7 @@ the the optimization has not been completed</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="tutorials.html" class="btn btn-neutral float-right" title="MyBigDFT tutorials" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="phononschnet.html" class="btn btn-neutral float-right" title="Phononschnet" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="mlworkflows.html" class="btn btn-neutral float-left" title="Workflows Using Machine Learned Models" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

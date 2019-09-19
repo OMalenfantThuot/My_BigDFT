@@ -27,7 +27,7 @@ pages:
     script:
     # Build the SiegPy documentation
     - pip install -e .[doc]
-    - cd doc
+    - cd docs
     - make html
     - mv build/html/ ../public/
     artifacts:

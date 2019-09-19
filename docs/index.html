@@ -84,8 +84,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="code_doc.html">Code Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -181,27 +180,13 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="code_doc.html">Code Documentation</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="iofiles.html">Input and Output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="job.html">Job</a></li>
-<li class="toctree-l2"><a class="reference internal" href="workflows.html">Workflows</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mlobjects.html">Machine Learning Related Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dft.html">DFT Classes</a></li>
+<li class="toctree-l2"><a class="reference internal" href="mlobjects.html">Machine Learning Classes</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Input_files.html">Manipulate BigDFT input files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Job_and_Logfile.html">Run BigDFT and manipulate its output files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Convergences.html">Convergence classes</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/PolTensor.html">Compute the electronic polarizability tensor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Phonons_and_RamanSpectrum.html">Compute the phonons and the Raman spectrum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Phonons_and_InfraredSpectrum.html">Compute the phonons and the infrared spectrum</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/VibPolTensor.html">Compute the vibrational polarizability tensor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Dissociation_curve.html">Dissociation curve</a></li>
-<li class="toctree-l2"><a class="reference internal" href="notebooks/Geopt.html">Geometry optimization</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="exercises.html">Exercises</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="exercise_01.html">Exercise 1</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exercise_02.html">Exercise 2</a></li>
-<li class="toctree-l2"><a class="reference internal" href="exercise_03.html">Exercise 3</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dft_tutorials.html">DFT Tutorials</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="tutorials.html">MyBigDFT tutorials</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exercises.html">Exercises</a></li>
 </ul>
 </li>
 </ul>
@@ -243,9 +228,12 @@ element atomic symbol.</p>
 </div>
 <div class="section" id="to-use-schnetpack-models-optional">
 <h3>To use SchnetPack models (optional)<a class="headerlink" href="#to-use-schnetpack-models-optional" title="Permalink to this headline">¶</a></h3>
-<p>To be able to use <a class="reference external" href="https://github.com/OMalenfantThuot/schnetpack">SchnetPack</a> models in calculations,
-the following line must be added to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file:</p>
+<p>To use <a class="reference external" href="https://github.com/OMalenfantThuot/schnetpack">SchnetPack</a> models in calculations,
+the following line may be added to the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file:</p>
 <p><code class="docutils literal notranslate"><span class="pre">export</span> <span class="pre">MODELDIR=&quot;/path/to/the/directory/for/trained/models/&quot;</span></code></p>
+<p>The paths of models can then be expressed as relative paths to <code class="docutils literal notranslate"><span class="pre">MODELDIR</span></code>instead of absolute paths.</p>
+<p>Note: To use the machine learning related classes of this package, the linked fork
+of SchnetPack must be installed. The <a class="reference external" href="https://github.com/atomistic-machine-learning/schnetpack">original repository</a> will not work.</p>
 </div>
 <div class="section" id="extra-steps-you-might-need-to-follow">
 <h3>Extra steps you might need to follow<a class="headerlink" href="#extra-steps-you-might-need-to-follow" title="Permalink to this headline">¶</a></h3>

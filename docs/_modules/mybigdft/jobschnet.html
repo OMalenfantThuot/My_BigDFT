@@ -83,8 +83,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../code_doc.html">Code Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -161,7 +160,7 @@
 <span class="kn">from</span> <span class="nn">schnetpack.utils.script_utils.predict</span> <span class="k">import</span> <span class="n">predict</span>
 
 
-<span class="k">class</span> <span class="nc">Jobschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Jobschnet"><a class="viewcode-back" href="../../jobschnet.html#mybigdft.jobschnet.Jobschnet">[docs]</a><span class="k">class</span> <span class="nc">Jobschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    This class defines a SchnetPack calculation similarly</span>
 <span class="sd">    to the Job class for BigDFT.</span>
@@ -272,7 +271,7 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">outfile_name</span> <span class="o">=</span> <span class="s2">&quot;outfile.out&quot;</span>
 
-    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
+<div class="viewcode-block" id="Jobschnet.run"><a class="viewcode-back" href="../../jobschnet.html#mybigdft.jobschnet.Jobschnet.run">[docs]</a>    <span class="k">def</span> <span class="nf">run</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">model_dir</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
         <span class="n">forces</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
@@ -352,6 +351,7 @@
         <span class="c1"># Determine available properties</span>
         <span class="k">if</span> <span class="s2">&quot;energy_U0&quot;</span> <span class="ow">in</span> <span class="nb">list</span><span class="p">(</span><span class="n">raw_predictions</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
             <span class="n">raw_predictions</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_predictions</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s2">&quot;energy_U0&quot;</span><span class="p">)</span>
+        <span class="n">raw_predictions</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">raw_predictions</span><span class="p">[</span><span class="s2">&quot;energy&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
         <span class="n">available_properties</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">raw_predictions</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span>
         <span class="n">available_properties</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="s2">&quot;idx&quot;</span><span class="p">)</span>
 
@@ -407,9 +407,9 @@
                     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Energy : </span><span class="si">{}</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">energy</span><span class="p">[</span><span class="n">idx</span><span class="p">]))</span>
                     <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;Forces : </span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
                     <span class="n">np</span><span class="o">.</span><span class="n">savetxt</span><span class="p">(</span><span class="n">out</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="p">[</span><span class="n">idx</span><span class="p">])</span>
-                    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="n">out</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_create_additional_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">deriv_length</span><span class="o">=</span><span class="mf">0.02</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">_create_additional_structures</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">order</span><span class="p">,</span> <span class="n">deriv_length</span><span class="o">=</span><span class="mf">0.015</span><span class="p">):</span>
         <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Creates the additional structures needed to do a numeric</span>
 <span class="sd">        derivation of the energy to calculate the forces.</span>
@@ -492,15 +492,15 @@
                     <span class="n">predictions</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">((</span><span class="n">i</span> <span class="o">+</span> <span class="mi">9</span><span class="p">)</span> <span class="o">*</span> <span class="n">nat</span><span class="p">,</span> <span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">10</span><span class="p">)</span> <span class="o">*</span> <span class="n">nat</span><span class="p">,</span> <span class="mi">1</span><span class="p">)],</span>
                 <span class="p">)</span>
                 <span class="n">forces</span><span class="p">[:,</span> <span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="o">-</span><span class="p">(</span>
-                    <span class="p">(</span><span class="o">-</span><span class="n">ener1</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">ener2</span> <span class="o">-</span> <span class="mi">8</span> <span class="o">*</span> <span class="n">ener3</span> <span class="o">+</span> <span class="n">ener4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
+                    <span class="p">(</span><span class="o">-</span><span class="n">ener1</span> <span class="o">+</span> <span class="mi">8</span> <span class="o">*</span> <span class="p">(</span><span class="n">ener2</span> <span class="o">-</span> <span class="n">ener3</span><span class="p">)</span> <span class="o">+</span> <span class="n">ener4</span><span class="p">)</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="n">nat</span><span class="p">)</span>
                     <span class="o">/</span> <span class="p">(</span><span class="mi">12</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deriv_length</span><span class="p">)</span>
                 <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Order of the forces calculation should be 1 or 2.&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">forces</span>
+        <span class="k">return</span> <span class="n">forces</span></div>
 
 
-<div class="viewcode-block" id="Logfileschnet"><a class="viewcode-back" href="../../logfileschnet.html#mybigdft.jobschnet.Logfileschnet">[docs]</a><span class="k">class</span> <span class="nc">Logfileschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Logfileschnet"><a class="viewcode-back" href="../../jobschnet.html#mybigdft.jobschnet.Logfileschnet">[docs]</a><span class="k">class</span> <span class="nc">Logfileschnet</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sa">r</span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Container class to emulate the Logfile object used in BigDFT calculations</span>
 <span class="sd">    &quot;&quot;&quot;</span>

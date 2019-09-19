@@ -1,4 +1,4 @@
-Machine Learning Related Classes
+Machine Learning Classes
 --------------------------------
 
 The classes used to make predictions using a SchnetPack-based neural network.
@@ -8,5 +8,4 @@ The classes used to make predictions using a SchnetPack-based neural network.
     :maxdepth: 2
 
     jobschnet
-    logfileschnet
     mlworkflows

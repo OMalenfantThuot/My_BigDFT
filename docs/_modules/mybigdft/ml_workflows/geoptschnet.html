@@ -83,8 +83,7 @@
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../code_doc.html">Code Documentation</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../tutorials.html">MyBigDFT tutorials</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../exercises.html">Exercises</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../dft_tutorials.html">DFT Tutorials</a></li>
 </ul>
 
             
@@ -168,9 +167,9 @@
     <span class="k">def</span> <span class="nf">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">posinp</span><span class="p">,</span>
-        <span class="n">forcemax</span><span class="o">=</span><span class="mf">5e-3</span><span class="p">,</span>
-        <span class="n">step_size</span><span class="o">=</span><span class="mf">0.002</span><span class="p">,</span>
-        <span class="n">max_iter</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span>
+        <span class="n">forcemax</span><span class="o">=</span><span class="mf">0.01</span><span class="p">,</span>
+        <span class="n">step_size</span><span class="o">=</span><span class="mf">0.003</span><span class="p">,</span>
+        <span class="n">max_iter</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
         <span class="n">write_to_disk</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
         <span class="n">out_name</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
     <span class="p">):</span>
@@ -332,6 +331,8 @@
             <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">job</span><span class="o">.</span><span class="n">logfile</span><span class="o">.</span><span class="n">forces</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span> <span class="o">&lt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">forcemax</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Geometry optimization stopped at iteration </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
                 <span class="k">break</span>
+            <span class="k">if</span> <span class="n">i</span> <span class="o">%</span> <span class="mi">100</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step_size</span> <span class="o">*</span> <span class="mf">0.9</span>
             <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">max_iter</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span>
                     <span class="s2">&quot;Geometry optimization was not succesful at iteration </span><span class="si">{}</span><span class="s2">.&quot;</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
