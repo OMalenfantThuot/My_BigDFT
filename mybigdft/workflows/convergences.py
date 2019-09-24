@@ -204,13 +204,14 @@ class AbstractConvergence(AbstractWorkflow, ABC):
         # Set the queue of jobs according to the hgrids defined
         pos = self.base_job.posinp
         name = self.base_job.name
+        pseudos = self.base_job.pseudos
         queue = []
         for param in param_variations:
             # The input parameters and the run directory of the base job
             # are updated given the value of the parameter
             new_inp = self._new_inputparams(param)
             new_run_dir = self._new_run_dir(param)
-            job = Job(posinp=pos, inputparams=new_inp, name=name, run_dir=new_run_dir)
+            job = Job(posinp=pos, inputparams=new_inp, name=name, run_dir=new_run_dir, pseudos=pseudos)
             job.param = param
             queue.append(job)
         return queue
