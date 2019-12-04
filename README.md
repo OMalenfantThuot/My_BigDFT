@@ -4,6 +4,8 @@
 <a href="https://github.com/ambv/black"><img alt="Code style: black" src="https://img.shields.io/badge/code%20style-black-000000.svg"></a>
 </p>
 
+### The machine learning functionalities have been moved and improved in the [ML\_Calc\_Driver](https://github.com/OMalenfantThuot/ML_Calc_Driver) repository. This package can still be used for DFT calculations using the [BigDFT](bigdft.org) code.
+
 MyBigDFT provides a python wrapper over the BigDFT code.
 It can be considered as a sandbox for the PyBigDFT package.
 It might be used instead of the PyBigDFT package,
