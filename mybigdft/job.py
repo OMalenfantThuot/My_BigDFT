@@ -683,7 +683,7 @@ class Job(object):
             command = self.bigdft_tool_cmd + mpi_option
         else:
             if nmpi > 1:
-                mpi_option = ["mpirun", "-np", str(nmpi)]
+                mpi_option = ["mpiexec", "-np", str(nmpi)]
             command = mpi_option + self.bigdft_cmd
         return command
 

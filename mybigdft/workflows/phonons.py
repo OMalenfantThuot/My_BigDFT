@@ -13,6 +13,7 @@ from mybigdft.globals import (
     SIGNS,
     AMU_TO_EMU,
     HA_TO_CMM1,
+#    HA_TO_EV,
     B_TO_ANG,
     ANG_TO_B,
     DEFAULT_PARAMETERS,
@@ -83,7 +84,7 @@ class Phonons(AbstractWorkflow):
         """
         # Set default translation amplitudes
         if translation_amplitudes is None:
-            translation_amplitudes = [0.45 / 64] * 3
+            translation_amplitudes = [0.015] * 3
         # Check the desired order
         order = int(order)
         if order not in [1, 2]:
@@ -287,6 +288,7 @@ class Phonons(AbstractWorkflow):
         # the ratio of both arrays to perform to get the dynamical
         # matrix.
         hessian = self._compute_hessian()
+#        print(np.around(hessian * HA_TO_EV * ANG_TO_B, decimals=2))
         masses = self._compute_masses()
         return hessian / masses
 

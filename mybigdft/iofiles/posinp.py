@@ -410,7 +410,10 @@ class Posinp(Sequence):
                 cell[1] = 0.0
             if other.boundary_conditions == "surface":
                 other_cell[1] = 0.0
-            same_cell = np.allclose(cell, other_cell)
+            if self.boundary_conditions == "free" and other.boundary_conditions == "free":
+                same_cell = True
+            else:
+                same_cell = np.allclose(cell, other_cell)
             # Check the other basic attributes
             same_BC = self.boundary_conditions == other.boundary_conditions
             same_base = (
