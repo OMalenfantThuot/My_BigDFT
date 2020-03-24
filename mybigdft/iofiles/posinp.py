@@ -424,6 +424,8 @@ class Posinp(Sequence):
             )
             # Finally check the atoms only if the base is similar, as it
             # might be time-consuming for large systems
+            # TO DO: ajouter les conditions périodiques dans la comparaison
+            # des positions. Il faut passer self.cell dans l'init des atoms.
             if same_base:
                 same_atoms = all([atom in other.atoms for atom in self.atoms])
                 return same_atoms
@@ -759,7 +761,7 @@ class Atom(object):
         """
         try:
             return (
-                np.allclose(self.position, other.position) and self.type == other.type
+                np.allclose(self.position, other.position, atol=0.00001) and self.type == other.type
             )
         except AttributeError:
             return False
